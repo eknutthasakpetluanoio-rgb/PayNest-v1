@@ -76,6 +76,7 @@ function render() {
       <main class="content">
         ${state.page === "home" ? homePage() : ""}
         ${state.page === "contracts" ? contractsPage() : ""}
+        ${state.page === "customers" ? customersPage() : ""}
         ${state.page === "settings" ? settingsPage() : ""}
       </main>
 
@@ -86,6 +87,7 @@ function render() {
       <nav class="bottom-nav">
         ${nav("home", "⌂", "หน้าหลัก")}
         ${nav("contracts", "▣", "สัญญา")}
+        ${nav("customers", "♙", "ลูกค้า")}
         ${nav("settings", "⚙", "ตั้งค่า")}
       </nav>
     </div>
@@ -94,6 +96,7 @@ function render() {
 
 function pageTitle() {
   if (state.page === "contracts") return "สัญญา";
+  if (state.page === "customers") return "ลูกค้า";
   if (state.page === "settings") return "ตั้งค่า";
   return "วันนี้";
 }
@@ -115,23 +118,14 @@ function homePage() {
   const paid = contracts.reduce((s, c) => s + calc(c).paid, 0);
   const remain = Math.max(total - paid, 0);
 
-  const todayValue = today();
-  const dueToday = active.filter(c => c.nextDue && c.nextDue <= todayValue).length;
-
-  // Put the contracts that need attention first.
-  const attention = active
-    .slice()
-    .sort((a, b) => String(a.nextDue || "").localeCompare(String(b.nextDue || "")))
-    .slice(0, 5);
-
   return `
     <section class="hero-card">
       <div class="hero-glow"></div>
-      <div class="eyebrow">ค้างรับทั้งหมด</div>
+      <div class="eyebrow">คงค้างทั้งหมด</div>
       <div class="hero-value">฿${money(remain)}</div>
       <div class="hero-meta">
-        <span>${active.length} สัญญาที่ยังไม่ครบ</span>
-        <span>ครบกำหนด ${dueToday} รายการ</span>
+        <span>${active.length} สัญญาที่กำลังผ่อน</span>
+        <span>รับแล้ว ฿${money(paid)}</span>
       </div>
     </section>
 
@@ -141,7 +135,7 @@ function homePage() {
         <strong>฿${money(remain)}</strong>
       </article>
       <article class="stat-card">
-        <span>กำลังผ่อน</span>
+        <span>สัญญากำลังผ่อน</span>
         <strong>${active.length}</strong>
       </article>
     </section>
@@ -149,40 +143,29 @@ function homePage() {
     <section class="section-head">
       <div>
         <div class="eyebrow">ACTION</div>
-        <h2>ต้องจัดการ</h2>
+        <h2>รายการที่ต้องจัดการ</h2>
       </div>
       <button class="text-btn" data-page="contracts">ดูทั้งหมด</button>
     </section>
 
     <section class="stack">
       ${
-        attention.length
-          ? attention.map(actionCard).join("")
+        active.length
+          ? active.slice().reverse().map(actionCard).join("")
           : `
             <div class="empty">
               <div class="empty-icon">✓</div>
-              <h3>วันนี้ไม่มีอะไรต้องทำ</h3>
-              <p>${contracts.length ? "ทุกสัญญายังไม่มีรายการค้างที่ต้องรับเงิน" : "กด + เพื่อเพิ่มสัญญาแรก"}</p>
+              <h3>ไม่มีรายการค้างรับ</h3>
+              <p>ทุกสัญญาชำระครบแล้ว</p>
             </div>
           `
       }
     </section>
-
-    ${
-      active.length > 5
-        ? `<button class="wide-btn" data-page="contracts">ดูสัญญาที่ยังไม่ครบทั้งหมด (${active.length})</button>`
-        : ""
-    }
   `;
 }
 
 function actionCard(c) {
   const x = calc(c);
-  const due = c.nextDue || today();
-  const overdue = due < today();
-  const dueLabel = overdue
-    ? `เกินกำหนด ${dateTH(c.nextDue)}`
-    : `ครบกำหนด ${dateTH(c.nextDue)}`;
 
   return `
     <article class="contract-card">
@@ -191,12 +174,7 @@ function actionCard(c) {
           <h3>${escapeHTML(c.title || "สัญญาไม่มีชื่อ")}</h3>
           <p>${escapeHTML(c.customerName || "ไม่ระบุลูกค้า")}</p>
         </div>
-        <span class="badge pending">${overdue ? "เกินกำหนด" : "ค้างรับ"}</span>
-      </div>
-
-      <div class="row-between muted">
-        <span>คงเหลือ</span>
-        <strong>฿${money(x.remain)}</strong>
+        <span class="badge pending">คงค้าง</span>
       </div>
 
       <div class="progress">
@@ -205,11 +183,11 @@ function actionCard(c) {
 
       <div class="row-between muted">
         <span>${x.percent.toFixed(0)}% ชำระแล้ว</span>
-        <span>${dueLabel}</span>
+        <strong>เหลือ ฿${money(x.remain)}</strong>
       </div>
 
       <div class="contract-footer">
-        <span></span>
+        <span>ครบกำหนด ${dateTH(c.nextDue)}</span>
         <button class="mini-btn" data-action="pay" data-id="${escapeHTML(c.id)}">
           รับเงิน
         </button>
@@ -287,6 +265,51 @@ function contractCard(c) {
         >
           ${x.remain ? "รับเงิน" : "ดูรายละเอียด"}
         </button>
+      </div>
+    </article>
+  `;
+}
+
+
+function customersPage() {
+  const customers = Array.isArray(state.data.customers) ? state.data.customers : [];
+
+  return `
+    <section class="section-head">
+      <div>
+        <div class="eyebrow">CUSTOMERS</div>
+        <h2>ลูกค้า</h2>
+      </div>
+      <span class="count-pill">${customers.length}</span>
+    </section>
+
+    <section class="stack">
+      ${customers.length
+        ? customers.map(customerCard).join("")
+        : emptyState("ยังไม่มีลูกค้า")}
+    </section>
+  `;
+}
+
+function customerCard(customer) {
+  const contracts = state.data.contracts.filter(
+    c => String(c.customerId || "") === String(customer.id || "") ||
+         (c.customerName || "") === (customer.name || "")
+  );
+
+  const total = contracts.reduce((s, c) => s + calc(c).total, 0);
+  const remain = contracts.reduce((s, c) => s + calc(c).remain, 0);
+
+  return `
+    <article class="customer-card" data-action="customer-detail" data-id="${escapeHTML(customer.id)}">
+      <div class="avatar">${escapeHTML((customer.name || "?").charAt(0))}</div>
+      <div class="grow">
+        <h3>${escapeHTML(customer.name || "ไม่ระบุชื่อ")}</h3>
+        <p>${escapeHTML(customer.phone || "-")}</p>
+      </div>
+      <div class="customer-summary">
+        <span>${contracts.length} สัญญา</span>
+        <strong>เหลือ ฿${money(remain)}</strong>
       </div>
     </article>
   `;
@@ -450,7 +473,7 @@ function openPaymentModal(id) {
       <div class="row-between">
         <div>
           <div class="eyebrow">RECEIVE PAYMENT</div>
-          <h2>รับเงิน</h2>
+          <h2>รับชำระเงิน</h2>
         </div>
         <button class="icon-btn" data-close>×</button>
       </div>
@@ -464,15 +487,9 @@ function openPaymentModal(id) {
         </div>
       </div>
 
-      <div class="settings-actions">
-        <button class="wide-btn" type="button" data-pay-full>
-          รับเต็มจำนวน ฿${money(x.remain)}
-        </button>
-      </div>
-
       <form id="payment-form">
         <label>
-          หรือระบุจำนวนเอง
+          จำนวนเงิน
           <input
             id="payment-amount"
             name="amount"
@@ -483,6 +500,7 @@ function openPaymentModal(id) {
             step="0.01"
             value="${x.remain}"
             required
+            autofocus
           >
         </label>
 
@@ -495,54 +513,35 @@ function openPaymentModal(id) {
 
   document.body.append(modal);
 
-  const close = () => modal.remove();
-  modal.querySelector("[data-close]").onclick = close;
+  modal.querySelector("[data-close]").onclick = () => modal.remove();
 
   modal.addEventListener("click", e => {
-    if (e.target === modal) close();
+    if (e.target === modal) modal.remove();
   });
 
-  const form = modal.querySelector("#payment-form");
-  const amountInput = modal.querySelector("#payment-amount");
+  modal.querySelector("#payment-form").addEventListener("submit", e => {
+    e.preventDefault();
 
-  const savePayment = (amount) => {
+    const amount = Number(
+      e.currentTarget.elements.amount.value
+    );
+
     if (!Number.isFinite(amount) || amount <= 0) {
       alert("กรุณาระบุจำนวนเงิน");
-      return false;
+      return;
     }
 
     if (amount > x.remain) {
       alert(`รับได้ไม่เกิน ฿${money(x.remain)}`);
-      return false;
+      return;
     }
 
-    contract.paid = Math.min(contract.total, x.paid + amount);
+    contract.paid = x.paid + amount;
+
     persist();
-    close();
+    modal.remove();
     render();
-
-    // Give a clear result without forcing the user to navigate anywhere.
-    setTimeout(() => {
-      alert(
-        calc(contract).remain <= 0
-          ? "รับเงินครบแล้ว ✓"
-          : `รับเงิน ฿${money(amount)} แล้ว\\nคงเหลือ ฿${money(calc(contract).remain)}`
-      );
-    }, 0);
-
-    return true;
-  };
-
-  modal.querySelector("[data-pay-full]").onclick = () => {
-    savePayment(x.remain);
-  };
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    savePayment(Number(amountInput.value));
   });
-
-  requestAnimationFrame(() => amountInput.focus());
 }
 
 function openContractDetail(id) {
@@ -602,6 +601,40 @@ function openContractDetail(id) {
   }
 }
 
+
+function openCustomerDetail(id) {
+  const customer = state.data.customers.find(c => String(c.id) === String(id));
+  if (!customer) return;
+
+  const contracts = state.data.contracts.filter(
+    c => String(c.customerId || "") === String(customer.id || "") ||
+         (c.customerName || "") === (customer.name || "")
+  );
+
+  const modal = document.createElement("div");
+  modal.className = "modal-wrap";
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="row-between">
+        <div><div class="eyebrow">CUSTOMER</div><h2>${escapeHTML(customer.name || "ลูกค้า")}</h2></div>
+        <button class="icon-btn" data-close>×</button>
+      </div>
+      <div class="settings-card">
+        <div class="row-between"><span>เบอร์โทร</span><strong>${escapeHTML(customer.phone || "-")}</strong></div>
+        <div class="row-between"><span>จำนวนสัญญา</span><strong>${contracts.length}</strong></div>
+      </div>
+      <div class="eyebrow">CONTRACTS</div>
+      <h2>สัญญาของลูกค้า</h2>
+      <section class="stack">
+        ${contracts.length ? contracts.map(c => { const x=calc(c); return `<article class="contract-card"><div class="row-between"><div><h3>${escapeHTML(c.title || "สัญญา")}</h3><p>${x.percent.toFixed(0)}% ชำระแล้ว</p></div><strong>เหลือ ฿${money(x.remain)}</strong></div></article>`; }).join("") : emptyState("ยังไม่มีสัญญา")}
+      </section>
+    </div>
+  `;
+  document.body.append(modal);
+  modal.querySelector("[data-close]").onclick = () => modal.remove();
+  modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
+}
+
 function backup() {
   const blob = new Blob(
     [exportData(state.data)],
@@ -659,6 +692,10 @@ document.addEventListener("click", e => {
       openContractDetail(action.dataset.id);
       break;
 
+    case "customer-detail":
+      openCustomerDetail(action.dataset.id);
+      break;
+
     case "backup":
       backup();
       break;
@@ -676,12 +713,6 @@ document.addEventListener("change", e => {
   if (e.target.id === "import-file" && e.target.files[0]) {
     importFile(e.target.files[0]);
   }
-});
-
-document.addEventListener("keydown", e => {
-  if (e.key !== "Escape") return;
-  const modal = document.querySelector(".modal-wrap");
-  if (modal) modal.remove();
 });
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
