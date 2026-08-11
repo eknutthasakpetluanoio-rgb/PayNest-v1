@@ -1,14 +1,44 @@
 const STORAGE_KEY = "paynest_v1_data";
 
+// Legacy keys used by older PayNest builds.
+// We read them only for migration so old data is not lost.
+const LEGACY_CONTRACT_KEYS = [
+  "paynest_contracts_v1",
+  "paynest_contracts",
+  "paynest_v1_contracts"
+];
+
+const LEGACY_CUSTOMER_KEYS = [
+  "paynest_customers_v1",
+  "paynest_customers",
+  "paynest_v1_customers"
+];
+
 const DEFAULT_DATA = {
   version: 1,
   contracts: [],
   customers: [],
-  settings: { currency: "฿" }
+  settings: {
+    currency: "฿"
+  }
 };
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function arrayFromStorage(keys) {
+  for (const key of keys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    } catch (error) {
+      console.warn("PayNest legacy storage read failed:", key, error);
+    }
+  }
+  return [];
 }
 
 function normalize(data) {
@@ -25,124 +55,101 @@ function normalize(data) {
   };
 }
 
-function parseJSON(raw) {
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+function migrateLegacyData() {
+  const contracts = arrayFromStorage(LEGACY_CONTRACT_KEYS);
+  const customers = arrayFromStorage(LEGACY_CUSTOMER_KEYS);
 
-function looksLikeContract(x) {
-  return x && typeof x === "object" &&
-    ("id" in x || "title" in x) &&
-    ("total" in x || "paid" in x);
-}
+  if (!contracts.length && !customers.length) return null;
 
-function looksLikeCustomer(x) {
-  return x && typeof x === "object" &&
-    ("id" in x || "name" in x) &&
-    ("name" in x);
-}
+  // Older versions sometimes stored customerName directly on contracts.
+  // Rebuild missing customer records so the customer page works again.
+  const customerMap = new Map(
+    customers
+      .filter(c => c && c.id)
+      .map(c => [String(c.id), c])
+  );
 
-function collectLocalStorageData() {
-  const found = {
-    contracts: [],
-    customers: []
-  };
+  for (const contract of contracts) {
+    if (!contract || typeof contract !== "object") continue;
 
-  const addUnique = (target, items) => {
-    if (!Array.isArray(items)) return;
-    for (const item of items) {
-      if (!item || typeof item !== "object") continue;
-      const id = item.id;
-      const duplicate = id
-        ? target.some(x => x.id === id)
-        : target.some(x => JSON.stringify(x) === JSON.stringify(item));
-      if (!duplicate) target.push(item);
-    }
-  };
-
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key || key === STORAGE_KEY) continue;
-
-    const raw = localStorage.getItem(key);
-    if (!raw) continue;
-
-    const value = parseJSON(raw);
-    if (!value) continue;
-
-    // Known legacy formats.
-    if (key === "paynest_contracts_v1") {
-      addUnique(found.contracts, Array.isArray(value) ? value : value.contracts);
-    }
-    if (key === "paynest_customers_v1") {
-      addUnique(found.customers, Array.isArray(value) ? value : value.customers);
+    if (contract.customerId && !customerMap.has(String(contract.customerId))) {
+      customerMap.set(String(contract.customerId), {
+        id: String(contract.customerId),
+        name: String(contract.customerName || "ไม่ระบุลูกค้า"),
+        phone: String(contract.phone || "")
+      });
     }
 
-    // Any old PayNest state object.
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      addUnique(found.contracts, value.contracts);
-      addUnique(found.customers, value.customers);
-    }
+    if (!contract.customerId && contract.customerName) {
+      const name = String(contract.customerName).trim();
+      let customer = [...customerMap.values()].find(
+        c => String(c.name || "").trim() === name
+      );
 
-    // Any standalone array containing recognizable records.
-    if (Array.isArray(value)) {
-      addUnique(found.contracts, value.filter(looksLikeContract));
-      addUnique(found.customers, value.filter(looksLikeCustomer));
+      if (!customer) {
+        customer = {
+          id: `cus_migrated_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          name,
+          phone: String(contract.phone || "")
+        };
+        customerMap.set(customer.id, customer);
+      }
+
+      contract.customerId = customer.id;
     }
   }
 
-  return found;
-}
-
-function loadCurrent() {
-  try {
-    return normalize(parseJSON(localStorage.getItem(STORAGE_KEY)));
-  } catch {
-    return clone(DEFAULT_DATA);
-  }
-}
-
-function recoverIfNeeded() {
-  const current = loadCurrent();
-
-  // If current data already has records, never replace it.
-  if (current.contracts.length || current.customers.length) {
-    return current;
-  }
-
-  const recovered = collectLocalStorageData();
-
-  if (!recovered.contracts.length && !recovered.customers.length) {
-    return current;
-  }
-
-  const merged = normalize({
+  return normalize({
     version: 1,
-    contracts: recovered.contracts,
-    customers: recovered.customers,
-    settings: current.settings
+    contracts,
+    customers: [...customerMap.values()],
+    settings: DEFAULT_DATA.settings
   });
-
-  // Write recovered data to the active key.
-  // Never delete or modify the source keys.
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-
-  console.info("PayNest recovery:", {
-    contracts: merged.contracts.length,
-    customers: merged.customers.length
-  });
-
-  return merged;
 }
 
 export function loadData() {
   try {
-    return recoverIfNeeded();
+    // 1. Load the current database first.
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (raw) {
+      const current = normalize(JSON.parse(raw));
+
+      // If the current database is empty but an older database still exists,
+      // prefer the older data instead of silently showing ฿0.
+      if (!current.contracts.length && !current.customers.length) {
+        const migrated = migrateLegacyData();
+        if (migrated) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
+      }
+
+      return current;
+    }
+
+    // 2. No current database: migrate old data automatically.
+    const migrated = migrateLegacyData();
+    if (migrated) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+
+    return clone(DEFAULT_DATA);
   } catch (error) {
     console.error("PayNest storage load error:", error);
+
+    // Even if the current JSON is damaged, try the legacy stores.
+    try {
+      const migrated = migrateLegacyData();
+      if (migrated) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+    } catch (migrationError) {
+      console.error("PayNest migration error:", migrationError);
+    }
+
     return clone(DEFAULT_DATA);
   }
 }
@@ -154,9 +161,10 @@ export function saveData(data) {
 }
 
 export function resetData() {
-  // Only clear the active database.
-  // Legacy/source keys are intentionally preserved for recovery.
   localStorage.removeItem(STORAGE_KEY);
+  for (const key of [...LEGACY_CONTRACT_KEYS, ...LEGACY_CUSTOMER_KEYS]) {
+    localStorage.removeItem(key);
+  }
   return clone(DEFAULT_DATA);
 }
 
@@ -165,9 +173,13 @@ export function exportData(data = loadData()) {
 }
 
 export function importData(text) {
-  const parsed = parseJSON(text);
-  if (!parsed) throw new Error("Invalid JSON");
+  const parsed = JSON.parse(text);
   const safe = normalize(parsed);
+
+  if (!safe.contracts.length && !safe.customers.length) {
+    throw new Error("ข้อมูลที่นำเข้าไม่มีสัญญาหรือลูกค้า");
+  }
+
   saveData(safe);
   return safe;
 }
