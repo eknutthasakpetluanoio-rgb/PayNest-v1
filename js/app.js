@@ -499,31 +499,50 @@ function openCustomerDetail(id) {
 }
 
 function receivePayment(id) {
-  const contract = state.data.contracts.find(c => c.id === id);
-  if (!contract) return;
+  const contract = state.data.contracts.find(
+    c => String(c.id) === String(id)
+  );
 
-  const remain = calc(contract).remain;
-  if (!remain) return;
+  if (!contract) {
+    alert("ไม่พบสัญญานี้");
+    return;
+  }
 
-  const amount = prompt(
-    `รับชำระเท่าไร? (คงเหลือ ฿${money(remain)})`,
+  const total = Number(contract.total) || 0;
+  const paid = Number(contract.paid) || 0;
+  const remain = Math.max(total - paid, 0);
+
+  if (remain <= 0) {
+    alert("สัญญานี้ชำระครบแล้ว");
+    return;
+  }
+
+  const input = prompt(
+    `รับชำระเท่าไร?\nคงเหลือ ฿${money(remain)}`,
     String(remain)
   );
 
-  if (amount === null) return;
+  if (input === null) return;
 
-  const value = Number(amount);
-
-  if (!Number.isFinite(value) || value <= 0) {
-    return alert("จำนวนเงินไม่ถูกต้อง");
-  }
-
-  contract.paid = Math.min(
-    Number(contract.total) || 0,
-    (Number(contract.paid) || 0) + value
+  const amount = Number(
+    String(input).replace(/,/g, "").trim()
   );
 
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("จำนวนเงินไม่ถูกต้อง");
+    return;
+  }
+
+  if (amount > remain) {
+    alert(`รับชำระได้ไม่เกิน ฿${money(remain)}`);
+    return;
+  }
+
+  contract.paid = paid + amount;
+
   persist();
+
+  // วาดหน้าจอใหม่ทันที
   render();
 }
 
