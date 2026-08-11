@@ -386,7 +386,7 @@ function openContractModal(prefill = {}, editId = null) {
           <input name="total" type="number" min="${editing ? Math.max(0.01, receivedValue) : "0.01"}" step="0.01" required placeholder="20000" value="${totalValue || ""}">
         </label>
         <label>รับแล้ว
-          <input name="received" type="number" value="${receivedValue}" readonly>
+  <input name="received" type="number" min="0" step="0.01" value="${receivedValue}">
         </label>
       </div>
 
