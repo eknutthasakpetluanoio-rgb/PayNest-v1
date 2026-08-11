@@ -105,3 +105,5 @@ button:active{transform:scale(.98)}
   .contract-bottom{align-items:flex-start}.button-row{flex-wrap:wrap;justify-content:flex-end}
 }
 @media(min-width:700px){.fab{right:calc((100vw - 720px)/2 + 22px)}}
+
+.receipt-paper{background:#fff;color:#111;border-radius:20px;padding:22px;max-width:520px;margin:8px auto 0}.receipt-brand{text-align:center;font-weight:900;letter-spacing:3px;font-size:18px}.receipt-title{text-align:center;font-size:22px;font-weight:900;margin:7px 0 18px}.receipt-meta,.receipt-row,.receipt-total{display:flex;justify-content:space-between;gap:16px;margin:9px 0;font-size:12px}.receipt-meta span,.receipt-row span{color:#777}.receipt-row b,.receipt-meta b{color:#111;text-align:right}.receipt-divider{border-top:1px dashed #ccc;margin:17px 0}.receipt-total{align-items:center;margin-top:12px}.receipt-total strong{font-size:23px}.receipt-thanks{text-align:center;color:#777;font-size:11px;margin-top:22px}.receipt-modal{background:#151516}.receipt-modal .receipt-paper{box-shadow:0 10px 30px #0002}.payment-row>div{display:flex;flex-direction:column;gap:3px}.payment-row{align-items:center;gap:10px}
