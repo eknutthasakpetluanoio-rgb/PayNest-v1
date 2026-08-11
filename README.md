@@ -28,3 +28,4 @@ PayNest v1 เป็นเว็บแอปจัดการสัญญาผ
 อัปโหลดไฟล์ทั้งหมดโดยคงโครงสร้างโฟลเดอร์ แล้วเปิด Settings > Pages และเลือก Deploy from a branch
 
 > แนะนำให้ใช้ Backup JSON ก่อนล้าง browser data หรือเปลี่ยนอุปกรณ์
+
