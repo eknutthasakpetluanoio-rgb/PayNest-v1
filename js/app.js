@@ -720,3 +720,4 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 }
 
 render();
+
