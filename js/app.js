@@ -115,14 +115,23 @@ function homePage() {
   const paid = contracts.reduce((s, c) => s + calc(c).paid, 0);
   const remain = Math.max(total - paid, 0);
 
+  const todayValue = today();
+  const dueToday = active.filter(c => c.nextDue && c.nextDue <= todayValue).length;
+
+  // Put the contracts that need attention first.
+  const attention = active
+    .slice()
+    .sort((a, b) => String(a.nextDue || "").localeCompare(String(b.nextDue || "")))
+    .slice(0, 5);
+
   return `
     <section class="hero-card">
       <div class="hero-glow"></div>
-      <div class="eyebrow">คงค้างทั้งหมด</div>
+      <div class="eyebrow">ค้างรับทั้งหมด</div>
       <div class="hero-value">฿${money(remain)}</div>
       <div class="hero-meta">
-        <span>${active.length} สัญญาที่กำลังผ่อน</span>
-        <span>รับแล้ว ฿${money(paid)}</span>
+        <span>${active.length} สัญญาที่ยังไม่ครบ</span>
+        <span>ครบกำหนด ${dueToday} รายการ</span>
       </div>
     </section>
 
@@ -132,7 +141,7 @@ function homePage() {
         <strong>฿${money(remain)}</strong>
       </article>
       <article class="stat-card">
-        <span>สัญญากำลังผ่อน</span>
+        <span>กำลังผ่อน</span>
         <strong>${active.length}</strong>
       </article>
     </section>
@@ -140,29 +149,40 @@ function homePage() {
     <section class="section-head">
       <div>
         <div class="eyebrow">ACTION</div>
-        <h2>รายการที่ต้องจัดการ</h2>
+        <h2>ต้องจัดการ</h2>
       </div>
       <button class="text-btn" data-page="contracts">ดูทั้งหมด</button>
     </section>
 
     <section class="stack">
       ${
-        active.length
-          ? active.slice().reverse().map(actionCard).join("")
+        attention.length
+          ? attention.map(actionCard).join("")
           : `
             <div class="empty">
               <div class="empty-icon">✓</div>
-              <h3>ไม่มีรายการค้างรับ</h3>
-              <p>ทุกสัญญาชำระครบแล้ว</p>
+              <h3>วันนี้ไม่มีอะไรต้องทำ</h3>
+              <p>${contracts.length ? "ทุกสัญญายังไม่มีรายการค้างที่ต้องรับเงิน" : "กด + เพื่อเพิ่มสัญญาแรก"}</p>
             </div>
           `
       }
     </section>
+
+    ${
+      active.length > 5
+        ? `<button class="wide-btn" data-page="contracts">ดูสัญญาที่ยังไม่ครบทั้งหมด (${active.length})</button>`
+        : ""
+    }
   `;
 }
 
 function actionCard(c) {
   const x = calc(c);
+  const due = c.nextDue || today();
+  const overdue = due < today();
+  const dueLabel = overdue
+    ? `เกินกำหนด ${dateTH(c.nextDue)}`
+    : `ครบกำหนด ${dateTH(c.nextDue)}`;
 
   return `
     <article class="contract-card">
@@ -171,7 +191,12 @@ function actionCard(c) {
           <h3>${escapeHTML(c.title || "สัญญาไม่มีชื่อ")}</h3>
           <p>${escapeHTML(c.customerName || "ไม่ระบุลูกค้า")}</p>
         </div>
-        <span class="badge pending">คงค้าง</span>
+        <span class="badge pending">${overdue ? "เกินกำหนด" : "ค้างรับ"}</span>
+      </div>
+
+      <div class="row-between muted">
+        <span>คงเหลือ</span>
+        <strong>฿${money(x.remain)}</strong>
       </div>
 
       <div class="progress">
@@ -180,11 +205,11 @@ function actionCard(c) {
 
       <div class="row-between muted">
         <span>${x.percent.toFixed(0)}% ชำระแล้ว</span>
-        <strong>เหลือ ฿${money(x.remain)}</strong>
+        <span>${dueLabel}</span>
       </div>
 
       <div class="contract-footer">
-        <span>ครบกำหนด ${dateTH(c.nextDue)}</span>
+        <span></span>
         <button class="mini-btn" data-action="pay" data-id="${escapeHTML(c.id)}">
           รับเงิน
         </button>
@@ -425,7 +450,7 @@ function openPaymentModal(id) {
       <div class="row-between">
         <div>
           <div class="eyebrow">RECEIVE PAYMENT</div>
-          <h2>รับชำระเงิน</h2>
+          <h2>รับเงิน</h2>
         </div>
         <button class="icon-btn" data-close>×</button>
       </div>
@@ -439,9 +464,15 @@ function openPaymentModal(id) {
         </div>
       </div>
 
+      <div class="settings-actions">
+        <button class="wide-btn" type="button" data-pay-full>
+          รับเต็มจำนวน ฿${money(x.remain)}
+        </button>
+      </div>
+
       <form id="payment-form">
         <label>
-          จำนวนเงิน
+          หรือระบุจำนวนเอง
           <input
             id="payment-amount"
             name="amount"
@@ -452,7 +483,6 @@ function openPaymentModal(id) {
             step="0.01"
             value="${x.remain}"
             required
-            autofocus
           >
         </label>
 
@@ -465,35 +495,54 @@ function openPaymentModal(id) {
 
   document.body.append(modal);
 
-  modal.querySelector("[data-close]").onclick = () => modal.remove();
+  const close = () => modal.remove();
+  modal.querySelector("[data-close]").onclick = close;
 
   modal.addEventListener("click", e => {
-    if (e.target === modal) modal.remove();
+    if (e.target === modal) close();
   });
 
-  modal.querySelector("#payment-form").addEventListener("submit", e => {
-    e.preventDefault();
+  const form = modal.querySelector("#payment-form");
+  const amountInput = modal.querySelector("#payment-amount");
 
-    const amount = Number(
-      e.currentTarget.elements.amount.value
-    );
-
+  const savePayment = (amount) => {
     if (!Number.isFinite(amount) || amount <= 0) {
       alert("กรุณาระบุจำนวนเงิน");
-      return;
+      return false;
     }
 
     if (amount > x.remain) {
       alert(`รับได้ไม่เกิน ฿${money(x.remain)}`);
-      return;
+      return false;
     }
 
-    contract.paid = x.paid + amount;
-
+    contract.paid = Math.min(contract.total, x.paid + amount);
     persist();
-    modal.remove();
+    close();
     render();
+
+    // Give a clear result without forcing the user to navigate anywhere.
+    setTimeout(() => {
+      alert(
+        calc(contract).remain <= 0
+          ? "รับเงินครบแล้ว ✓"
+          : `รับเงิน ฿${money(amount)} แล้ว\\nคงเหลือ ฿${money(calc(contract).remain)}`
+      );
+    }, 0);
+
+    return true;
+  };
+
+  modal.querySelector("[data-pay-full]").onclick = () => {
+    savePayment(x.remain);
+  };
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    savePayment(Number(amountInput.value));
   });
+
+  requestAnimationFrame(() => amountInput.focus());
 }
 
 function openContractDetail(id) {
@@ -627,6 +676,12 @@ document.addEventListener("change", e => {
   if (e.target.id === "import-file" && e.target.files[0]) {
     importFile(e.target.files[0]);
   }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  const modal = document.querySelector(".modal-wrap");
+  if (modal) modal.remove();
 });
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
