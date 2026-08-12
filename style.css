@@ -584,3 +584,4 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
     right: calc(50vw - 280px + 20px);
   }
 }
+
