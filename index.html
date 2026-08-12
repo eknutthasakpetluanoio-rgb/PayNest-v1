@@ -1,11 +1,67 @@
-<!-- ส่วนปุ่มสำรองและกู้คืนข้อมูล -->
-<div class="card settings-card" style="margin-top: 16px;">
+<!-- =========================================================
+   PAYNEST - SETTINGS & DATA BACKUP MODULE (COMPLETE CODE)
+========================================================= -->
+
+<div class="card settings-card">
   <h2>สำรองข้อมูลร้านค้า</h2>
   <p>ดาวน์โหลดข้อมูลสัญญาและลูกค้าเก็บไว้ในเครื่อง หรือกู้คืนข้อมูลเดิมเมื่อเปลี่ยนอุปกรณ์</p>
   
-  <div class="button-row" style="display: flex; gap: 10px; margin-top: 14px;">
-    <button onclick="exportData()" class="wide-btn" style="margin-top: 0; background: #fff; color: #000;">📥 สำรองข้อมูล (Export)</button>
-    <label for="importFile" class="wide-btn" style="margin-top: 0; text-align: center; display: block; cursor: pointer; background: rgba(255,255,255,0.08);">📤 กู้คืนข้อมูล (Import)</label>
+  <div class="button-row" style="margin-top: 14px; display: flex; gap: 10px;">
+    <button onclick="exportData()" class="wide-btn" style="flex: 1;">📥 สำรองข้อมูล (Export)</button>
+    <button onclick="document.getElementById('importFile').click()" class="wide-btn" style="flex: 1;">📤 กู้คืนข้อมูล (Import)</button>
     <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
   </div>
 </div>
+
+<script>
+  // ฟังก์ชันสำหรับดาวน์โหลดข้อมูลทั้งหมดใน LocalStorage ออกมาเป็นไฟล์ JSON
+  function exportData() {
+    try {
+      const dataObj = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        dataObj[key] = localStorage.getItem(key);
+      }
+      
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const dateNow = new Date().toISOString().slice(0, 10);
+      
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `paynest_backup_${dateNow}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (error) {
+      alert("เกิดข้อผิดพลาดในการสำรองข้อมูล: " + error.message);
+    }
+  }
+
+  // ฟังก์ชันสำหรับอัปโหลดไฟล์ JSON เพื่อกู้คืนข้อมูลเข้า LocalStorage
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!confirm("คำเตือน: การกู้คืนข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด คุณต้องการดำเนินการต่อใช่หรือไม่?")) {
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        
+        for (const key in importedData) {
+          localStorage.setItem(key, importedData[key]);
+        }
+        
+        alert("กู้คืนข้อมูลสำเร็จ! ระบบกำลังรีเฟรชหน้าจอ...");
+        location.reload();
+      } catch (error) {
+        alert("ไฟล์สำรองไม่ถูกต้องหรือเสียหาย ไม่สามารถกู้คืนได้");
+      }
+    };
+    reader.readAsText(file);
+  }
+</script>
