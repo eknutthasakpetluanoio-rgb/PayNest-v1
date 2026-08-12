@@ -1,6 +1,6 @@
 /* =========================================================
-   PAYNEST PREMIUM — PURE OBSIDIAN SMOKED GLASS
-   Deep smoked dark tones with high-gloss metallic reflections.
+   PAYNEST PREMIUM — PLATINUM OBSIDIAN SMOKED GLASS
+   Pure dark monochrome with high-contrast platinum silver highlights.
 ========================================================= */
 
 *{box-sizing:border-box}
@@ -28,14 +28,14 @@
 }
 
 :root{
-  --bg:#050507;
-  --surface:rgba(255, 255, 255, 0.04);
-  --surface-2:rgba(255, 255, 255, 0.08);
-  --line:rgba(255, 255, 255, 0.14);
-  --glass-highlight:rgba(255, 255, 255, 0.22);
-  --text:#f5f5f7;
-  --muted:#8e8e96;
-  --soft:#d1d1d6;
+  --bg:#030305;
+  --surface:rgba(255, 255, 255, 0.045);
+  --surface-2:rgba(255, 255, 255, 0.09);
+  --line:rgba(255, 255, 255, 0.16);
+  --glass-highlight:rgba(255, 255, 255, 0.3);
+  --text:#f8f8fa;
+  --muted:#8e8e99;
+  --soft:#e0e0e6;
   --accent:#ffffff;
   --success:#30d158;
   --danger:#ff453a;
@@ -50,10 +50,10 @@ html{
 body{
   margin:0;
   background-color:var(--bg);
-  /* โทนมืดสนิท แสงออร่าสีเทาเงินและสตีลโมโนโครม */
+  /* แสงออร่าพื้นหลังสีเทาแพลตตินัมและเงาสะท้อนโลหะโมโนโครม */
   background-image:
-    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.06), transparent 55%),
-    radial-gradient(circle at 85% 85%, rgba(120, 120, 130, 0.05), transparent 55%);
+    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.08), transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(150, 150, 160, 0.06), transparent 50%);
   background-attachment:fixed;
   color:var(--text);
   font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;
@@ -72,11 +72,11 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:rgba(5, 5, 7, 0.85);
-  backdrop-filter:blur(30px) saturate(180%);
-  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  background:rgba(3, 3, 5, 0.82);
+  backdrop-filter:blur(35px) saturate(180%);
+  -webkit-backdrop-filter:blur(35px) saturate(180%);
   border-bottom:1px solid var(--line);
-  box-shadow:0 15px 35px rgba(0,0,0,0.7), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 15px 35px rgba(0,0,0,0.8), inset 0 1px 0 var(--glass-highlight);
 }
 
 .brand{
@@ -93,7 +93,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   font-size:24px;
   font-weight:800;
   letter-spacing:-0.5px;
-  text-shadow:0 2px 10px rgba(255,255,255,0.2);
+  text-shadow:0 0 20px rgba(255,255,255,0.3);
 }
 
 .icon-btn{
@@ -108,11 +108,11 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   font-size:18px;
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
-  box-shadow:0 8px 20px rgba(0,0,0,0.4), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 var(--glass-highlight);
   transition:transform .15s ease, filter .15s ease;
 }
 
-.icon-btn:active{transform:scale(0.94);filter:brightness(1.2)}
+.icon-btn:active{transform:scale(0.94);filter:brightness(1.3)}
 
 /* Page Layout */
 .page{
@@ -155,25 +155,25 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   box-shadow:0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 var(--glass-highlight);
 }
 
-/* Cards (Obsidian Smoked Glass) */
+/* Cards (Platinum Smoked Glass with High-Contrast Metallic Edges) */
 .card{
   background:var(--surface);
-  backdrop-filter:blur(25px) saturate(160%);
-  -webkit-backdrop-filter:blur(25px) saturate(160%);
+  backdrop-filter:blur(30px) saturate(160%);
+  -webkit-backdrop-filter:blur(30px) saturate(160%);
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:20px;
   margin-bottom:16px;
-  box-shadow:0 20px 45px rgba(0,0,0,0.7), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 20px 50px rgba(0,0,0,0.7), inset 0 1px 0 var(--glass-highlight);
 }
 
 .hero{
-  background:linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 100%);
+  background:linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 100%);
   border:1px solid var(--line);
   padding:24px;
-  backdrop-filter:blur(30px) saturate(180%);
-  -webkit-backdrop-filter:blur(30px) saturate(180%);
-  box-shadow:0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(255,255,255,0.05), inset 0 1px 0 var(--glass-highlight);
+  backdrop-filter:blur(35px) saturate(180%);
+  -webkit-backdrop-filter:blur(35px) saturate(180%);
+  box-shadow:0 25px 60px rgba(0,0,0,0.8), 0 0 35px rgba(255,255,255,0.08), inset 0 1px 0 var(--glass-highlight);
 }
 
 .hero-number{
@@ -181,7 +181,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   font-weight:800;
   letter-spacing:-1px;
   margin:12px 0 16px;
-  text-shadow:0 2px 15px rgba(255,255,255,0.25);
+  text-shadow:0 0 20px rgba(255,255,255,0.35);
 }
 
 .hero-meta{
@@ -200,12 +200,12 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 .stat{
   background:var(--surface);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
   border:1px solid var(--line);
   border-radius:22px;
   padding:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,0.5), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 12px 35px rgba(0,0,0,0.6), inset 0 1px 0 var(--glass-highlight);
 }
 
 .stat span{
@@ -219,7 +219,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   font-size:24px;
   font-weight:800;
   display:block;
-  text-shadow:0 2px 8px rgba(255,255,255,0.2);
+  text-shadow:0 0 12px rgba(255,255,255,0.25);
 }
 
 .stat small{
@@ -251,24 +251,25 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   color:#fff;
   font-weight:700;
   font-size:13px;
-  opacity:0.9;
+  text-shadow:0 0 10px rgba(255,255,255,0.4);
 }
 
 /* Tasks & Contracts */
 .task,.contract-card,.customer{
   background:var(--surface);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
   border:1px solid var(--line);
   border-radius:22px;
   padding:16px;
   margin-bottom:12px;
-  box-shadow:0 12px 30px rgba(0,0,0,0.5), inset 0 1px 0 var(--glass-highlight);
-  transition:border-color .2s ease;
+  box-shadow:0 12px 35px rgba(0,0,0,0.6), inset 0 1px 0 var(--glass-highlight);
+  transition:border-color .2s ease, box-shadow .2s ease;
 }
 
 .task:hover,.contract-card:hover,.customer:hover{
-  border-color:rgba(255,255,255,0.35);
+  border-color:rgba(255,255,255,0.4);
+  box-shadow:0 15px 45px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.12), inset 0 1px 0 var(--glass-highlight);
 }
 
 .task{
@@ -306,7 +307,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 .progress{
   height:6px;
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.1);
   border-radius:999px;
   margin:16px 0 8px;
   overflow:hidden;
@@ -318,7 +319,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   height:100%;
   background:linear-gradient(90deg, #ffffff, #a0a0ab);
   border-radius:999px;
-  box-shadow:0 0 12px rgba(255,255,255,0.6);
+  box-shadow:0 0 15px rgba(255,255,255,0.7);
 }
 
 .progress-meta{
@@ -358,20 +359,20 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   padding:8px 12px;
   font-size:12px;
   font-weight:700;
-  backdrop-filter:blur(15px);
+  backdrop-filter:blur(20px);
   box-shadow:inset 0 1px 0 var(--glass-highlight);
 }
 
 .primary-mini{
-  background:#fff;
+  background:linear-gradient(135deg, #ffffff 0%, #d8d8e0 100%);
   color:#000;
   border:none;
-  box-shadow:0 0 15px rgba(255,255,255,0.5), inset 0 1px 0 #fff;
+  box-shadow:0 0 20px rgba(255,255,255,0.6), inset 0 1px 0 #fff;
 }
 
 .primary-btn{
   width:100%;
-  background:linear-gradient(180deg, #ffffff 0%, #d0d0d5 100%);
+  background:linear-gradient(180deg, #ffffff 0%, #c8c8d0 100%);
   color:#000;
   border:none;
   border-radius:18px;
@@ -379,7 +380,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   font-size:16px;
   font-weight:800;
   margin-top:12px;
-  box-shadow:0 12px 35px rgba(255,255,255,0.25), inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow:0 12px 35px rgba(255,255,255,0.3), 0 0 25px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.95);
   transition:transform .15s ease, filter .15s ease;
 }
 .primary-btn:active{transform:scale(0.97);filter:brightness(0.9)}
@@ -387,7 +388,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wide-btn{
   width:100%;
   background:var(--surface-2);
-  backdrop-filter:blur(15px);
+  backdrop-filter:blur(20px);
   color:var(--text);
   border:1px solid var(--line);
   border-radius:18px;
@@ -400,9 +401,9 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 .wide-btn.danger{
   color:var(--danger);
-  border-color:rgba(255,69,58,0.4);
-  background:rgba(255,69,58,0.12);
-  box-shadow:0 0 12px rgba(255,69,58,0.2);
+  border-color:rgba(255,69,58,0.5);
+  background:rgba(255,69,58,0.15);
+  box-shadow:0 0 15px rgba(255,69,58,0.3);
 }
 
 /* Tabs & Search */
@@ -417,18 +418,18 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .tabs::-webkit-scrollbar{display:none}
 
 .tab.active{
-  background:#fff;
+  background:linear-gradient(135deg, #ffffff 0%, #d8d8e0 100%);
   color:#000;
   border-color:#fff;
-  box-shadow:0 0 15px rgba(255,255,255,0.4);
+  box-shadow:0 0 20px rgba(255,255,255,0.5), inset 0 1px 0 #fff;
 }
 
 .search-wrap{
   display:flex;
   align-items:center;
   background:var(--surface);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
   border:1px solid var(--line);
   border-radius:18px;
   padding:0 14px;
@@ -510,11 +511,11 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   width:58px;
   height:58px;
   border-radius:50%;
-  background:linear-gradient(135deg, #ffffff 0%, #c5c5cb 100%);
+  background:linear-gradient(135deg, #ffffff 0%, #c0c0c8 100%);
   color:#000;
   font-size:30px;
   border:none;
-  box-shadow:0 15px 40px rgba(0,0,0,0.7), 0 0 25px rgba(255,255,255,0.3), inset 0 1px 0 #fff;
+  box-shadow:0 15px 40px rgba(0,0,0,0.8), 0 0 35px rgba(255,255,255,0.5), inset 0 1px 0 #fff;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -529,15 +530,15 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   left:16px;
   right:16px;
   height:64px;
-  background:rgba(7, 7, 10, 0.88);
-  backdrop-filter:blur(35px) saturate(200%);
-  -webkit-backdrop-filter:blur(35px) saturate(200%);
+  background:rgba(5, 5, 8, 0.88);
+  backdrop-filter:blur(40px) saturate(200%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%);
   border:1px solid var(--line);
   border-radius:32px;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   z-index:50;
-  box-shadow:0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 20px 60px rgba(0,0,0,0.9), inset 0 1px 0 var(--glass-highlight);
 }
 
 .nav-item{
@@ -553,14 +554,14 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 }
 .nav-item span{font-size:20px}
 .nav-item small{font-size:10px;font-weight:700}
-.nav-item.active{color:#fff;text-shadow:0 0 12px rgba(255,255,255,0.7)}
+.nav-item.active{color:#fff;text-shadow:0 0 15px rgba(255,255,255,0.9)}
 
 /* Modals */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.75);
-  backdrop-filter:blur(10px);
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(12px);
   z-index:100;
   display:flex;
   align-items:flex-end;
@@ -572,14 +573,14 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   max-width:600px;
   max-height:90vh;
   overflow-y:auto;
-  background:rgba(12, 12, 16, 0.94);
-  backdrop-filter:blur(45px) saturate(200%);
-  -webkit-backdrop-filter:blur(45px) saturate(200%);
+  background:rgba(10, 10, 14, 0.95);
+  backdrop-filter:blur(50px) saturate(200%);
+  -webkit-backdrop-filter:blur(50px) saturate(200%);
   border:1px solid var(--line);
   border-bottom:none;
   border-radius:32px 32px 0 0;
   padding:28px 20px;
-  box-shadow:0 -25px 60px rgba(0,0,0,0.9), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 -25px 70px rgba(0,0,0,0.95), inset 0 1px 0 var(--glass-highlight);
 }
 
 .modal-head{margin-bottom:20px}
@@ -596,7 +597,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .modal input,.modal select,.modal textarea{
   width:100%;
   background:var(--surface);
-  backdrop-filter:blur(15px);
+  backdrop-filter:blur(20px);
   border:1px solid var(--line);
   border-radius:16px;
   padding:15px;
@@ -606,8 +607,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 }
 .modal input:focus,.modal select:focus,.modal textarea:focus{
   border-color:#fff;
-  background:rgba(255,255,255,0.08);
-  box-shadow:0 0 15px rgba(255,255,255,0.2), inset 0 1px 0 var(--glass-highlight);
+  background:rgba(255,255,255,0.1);
+  box-shadow:0 0 20px rgba(255,255,255,0.3), inset 0 1px 0 var(--glass-highlight);
 }
 
 .form-note,.payment-summary,.detail-status,.detail-grid div,.subtle-box,.note-box{
@@ -675,7 +676,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   background:var(--surface-2);
   border:1px solid var(--line);
 }
-.summary-dot.has-overdue{background:rgba(255,69,58,0.2);color:var(--danger);border-color:rgba(255,69,58,0.4);box-shadow:0 0 12px rgba(255,69,58,0.25)}
+.summary-dot.has-overdue{background:rgba(255,69,58,0.25);color:var(--danger);border-color:rgba(255,69,58,0.5);box-shadow:0 0 15px rgba(255,69,58,0.35)}
 
 @media(min-width:640px){
   .bottom-nav{left:50%;transform:translateX(-50%);width:560px}
