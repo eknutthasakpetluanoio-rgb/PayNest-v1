@@ -313,8 +313,12 @@ function settings() {
         <div><b>${data.contracts.length}</b><span>สัญญา</span></div>
         <div><b>${data.customers.length}</b><span>ลูกค้า</span></div>
       </div>
-      <button class="wide-btn" id="export">ส่งออกข้อมูล JSON</button>
-      <button class="wide-btn" id="import">นำเข้าข้อมูล JSON</button>
+      <div class="backup-note">
+        <b>สำรองข้อมูลก่อนแก้ไขหรือเปลี่ยนเครื่อง</b>
+        <span>ไฟล์ JSON นี้เก็บสัญญา ลูกค้า และประวัติการรับชำระของ PayNest</span>
+      </div>
+      <button class="wide-btn" id="export">⬇ สำรองข้อมูลลงเครื่อง</button>
+      <button class="wide-btn" id="import">↥ กู้คืนข้อมูลจากไฟล์</button>
       <button class="wide-btn danger" id="reset">ล้างข้อมูลทั้งหมด</button>
     </div>
 
@@ -814,8 +818,18 @@ function openReceipt(contractId, paymentId) {
   });
 }
 
-function exportJson() {
-  const blob = new Blob([exportData(data)], {type: "application/json;charset=utf-8"});
+function exportJson(reason = "manual") {
+  const payload = {
+    app: "PayNest",
+    backupVersion: 1,
+    createdAt: new Date().toISOString(),
+    reason,
+    data: JSON.parse(exportData(data))
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json;charset=utf-8"
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -914,12 +928,14 @@ document.addEventListener("click", event => {
   }
 
   if (event.target.id === "reset") {
-    if (confirm("ล้างข้อมูล PayNest ทั้งหมดใช่หรือไม่? ข้อมูลที่ล้างจะกู้คืนไม่ได้")) {
+    if (confirm("ล้างข้อมูล PayNest ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
+      exportJson("before-reset");
       data = resetData();
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
       render();
+      alert("สำรองข้อมูลเดิมแล้ว และล้างข้อมูลเรียบร้อย");
     }
   }
 });
@@ -949,8 +965,21 @@ $("#importFile").addEventListener("change", async event => {
   if (!file) return;
 
   try {
-    data = importData(await file.text());
-    alert("นำเข้าข้อมูลสำเร็จ");
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+
+    // New backup envelope stores the actual PayNest data under .data.
+    // Older PayNest backups stored the data directly, so keep both formats compatible.
+    const payload = parsed?.app === "PayNest" && parsed?.data ? parsed.data : parsed;
+
+    // Safety: save the current data before replacing it.
+    exportJson("before-restore");
+
+    data = importData(JSON.stringify(payload));
+    contractFilter = "active";
+    contractQuery = "";
+    customerQuery = "";
+    alert("กู้คืนข้อมูลสำเร็จ\nระบบสร้างไฟล์สำรองของข้อมูลเดิมไว้ให้แล้ว");
     render();
   } catch (error) {
     console.error(error);

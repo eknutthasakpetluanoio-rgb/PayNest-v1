@@ -15,15 +15,48 @@ function clone(value) {
 
 function normalize(data) {
   if (!data || typeof data !== "object") return clone(DEFAULT_DATA);
+
+  const contracts = Array.isArray(data.contracts)
+    ? data.contracts.filter(item => item && typeof item === "object")
+    : [];
+
+  const customers = Array.isArray(data.customers)
+    ? data.customers.filter(item => item && typeof item === "object")
+    : [];
+
   return {
     version: 1,
-    contracts: Array.isArray(data.contracts) ? data.contracts : [],
-    customers: Array.isArray(data.customers) ? data.customers : [],
+    contracts,
+    customers,
     settings: {
       ...DEFAULT_DATA.settings,
       ...(data.settings || {})
     }
   };
+}
+
+export function validateImportData(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return {ok: false, message: "ไฟล์ต้องเป็นข้อมูล PayNest JSON"};
+  }
+
+  if (!Array.isArray(data.contracts) || !Array.isArray(data.customers)) {
+    return {ok: false, message: "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ PayNest"};
+  }
+
+  for (const contract of data.contracts) {
+    if (!contract || typeof contract !== "object") {
+      return {ok: false, message: "พบข้อมูลสัญญาที่ไม่ถูกต้อง"};
+    }
+  }
+
+  for (const customer of data.customers) {
+    if (!customer || typeof customer !== "object") {
+      return {ok: false, message: "พบข้อมูลลูกค้าที่ไม่ถูกต้อง"};
+    }
+  }
+
+  return {ok: true};
 }
 
 export function loadData() {
@@ -54,6 +87,11 @@ export function exportData(data = loadData()) {
 
 export function importData(text) {
   const parsed = JSON.parse(text);
+  const validation = validateImportData(parsed);
+  if (!validation.ok) {
+    throw new Error(validation.message);
+  }
+
   const safe = normalize(parsed);
   saveData(safe);
   return safe;

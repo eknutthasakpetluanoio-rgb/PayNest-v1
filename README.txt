@@ -14,3 +14,10 @@ PayNest v1.2 — ใบเสร็จรับเงิน
 5. เข้า สัญญา > รายละเอียด > ประวัติการรับชำระ > ใบเสร็จ
 
 หมายเหตุ: ไม่ต้องเปลี่ยน storage.js และไม่ต้องลบข้อมูล LocalStorage เดิม
+
+
+PayNest Backup & Restore
+- "สำรองข้อมูลลงเครื่อง" downloads a JSON backup containing contracts, customers and payment history.
+- "กู้คืนข้อมูลจากไฟล์" accepts the new PayNest backup format and older plain JSON backups.
+- Before restore/reset, PayNest automatically downloads a backup of the current data.
+- Do not delete the downloaded backup files; keep at least one copy in a safe location.
