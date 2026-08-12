@@ -1,4 +1,27 @@
 *{box-sizing:border-box}
+
+/* Accessibility: keep the skip link hidden until keyboard focus */
+.skip-link{
+  position:absolute;
+  left:12px;
+  top:8px;
+  z-index:100;
+  transform:translateY(-160%);
+  padding:10px 14px;
+  border-radius:10px;
+  background:#f4f4f4;
+  color:#111;
+  font-size:13px;
+  font-weight:700;
+  text-decoration:none;
+  transition:transform .15s ease;
+}
+.skip-link:focus,
+.skip-link:focus-visible{
+  transform:translateY(0);
+  outline:2px solid #fff;
+  outline-offset:2px;
+}
 :root{
   --bg:#09090a;
   --surface:#121214;
