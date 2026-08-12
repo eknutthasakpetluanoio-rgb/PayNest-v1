@@ -2704,3 +2704,278 @@ body::before{
     border-radius:23px;
   }
 }
+
+/* =========================================================
+   PayNest Premium v1.5 — SIGNATURE UI
+   Final visual layer only.
+   Logic / storage / existing HTML structure untouched.
+========================================================= */
+
+:root{
+  --pn-accent:#d9dcff;
+  --pn-accent-2:#aeb6ff;
+  --pn-glass:rgba(255,255,255,.045);
+  --pn-glass-hi:rgba(255,255,255,.075);
+  --pn-border:rgba(255,255,255,.085);
+  --pn-border-hi:rgba(222,225,255,.18);
+}
+
+html{background:#07080a}
+
+body{
+  background:
+    radial-gradient(520px 320px at 92% -4%,rgba(166,174,255,.075),transparent 68%),
+    radial-gradient(460px 300px at -8% 30%,rgba(255,255,255,.028),transparent 72%),
+    #07080a;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.012),transparent 22%),
+    radial-gradient(circle at 50% 100%,rgba(130,138,220,.025),transparent 42%);
+}
+
+.topbar{
+  min-height:76px;
+  padding-top:calc(12px + env(safe-area-inset-top));
+  padding-bottom:12px;
+  background:rgba(7,8,10,.76);
+  border-bottom-color:rgba(255,255,255,.055);
+  box-shadow:0 10px 32px rgba(0,0,0,.22);
+}
+
+.brand{color:#686c76;font-size:8px;letter-spacing:4.8px}
+
+.topbar h1{
+  font-size:27px;
+  letter-spacing:-1.2px;
+  margin-top:6px;
+}
+
+.icon-btn{
+  width:46px;
+  height:46px;
+  border-radius:17px;
+  background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+  border-color:rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 25px rgba(0,0,0,.24);
+}
+
+.page{padding-top:22px}
+.welcome-row{margin-bottom:18px}
+
+.eyebrow{
+  font-size:8px;
+  letter-spacing:3.8px;
+  color:#686c76;
+}
+
+.subtle{color:#80848e}
+
+.hero{
+  min-height:248px;
+  padding:27px 23px 23px;
+  margin-bottom:13px;
+  border-radius:28px;
+  border-color:var(--pn-border-hi);
+  background:
+    radial-gradient(250px 190px at 100% 0%,rgba(185,191,255,.16),transparent 70%),
+    radial-gradient(220px 180px at 0% 100%,rgba(255,255,255,.035),transparent 72%),
+    linear-gradient(145deg,#20242a 0%,#15181d 43%,#0d0f12 100%);
+  box-shadow:0 28px 65px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.075),inset 0 -1px 0 rgba(0,0,0,.35);
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:170px;
+  height:170px;
+  left:-105px;
+  bottom:-115px;
+  border-radius:50%;
+  background:rgba(186,192,255,.055);
+  filter:blur(30px);
+  pointer-events:none;
+}
+
+.hero-number{
+  font-size:45px;
+  line-height:1;
+  margin:24px 0 26px;
+  letter-spacing:-2.6px;
+  text-shadow:0 2px 24px rgba(255,255,255,.055);
+}
+
+.hero-meta{color:#8b8f98;font-size:11px}
+
+.stat-grid{gap:11px}
+
+.stat{
+  min-height:106px;
+  padding:18px 16px;
+  border-radius:22px;
+  border-color:rgba(255,255,255,.065);
+  background:linear-gradient(145deg,rgba(25,27,31,.92),rgba(12,13,15,.96));
+  box-shadow:0 15px 34px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+.stat span{color:#777b85;font-size:11px;margin-bottom:9px}
+.stat strong{font-size:25px;letter-spacing:-1px}
+.stat small{color:#5f636c;font-size:10px}
+
+.status-summary{
+  margin-top:11px;
+  padding:15px 16px;
+  border-radius:21px;
+  border-color:rgba(255,255,255,.065);
+  background:linear-gradient(145deg,rgba(23,25,29,.90),rgba(12,13,15,.96));
+}
+
+.status-summary b{font-size:12px;color:#d7d9df}
+.status-summary span{font-size:10px}
+
+.summary-dot{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.045);
+}
+
+.section{margin-top:31px}
+.section-head{margin-bottom:13px}
+
+.section-head h2,
+.page-heading h2{
+  font-size:24px;
+  letter-spacing:-.8px;
+  margin-top:6px;
+}
+
+.text-btn{color:#bfc3ff;font-size:11px}
+
+.empty{
+  min-height:158px;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 50% 20%,rgba(190,196,255,.035),transparent 40%),
+    linear-gradient(145deg,rgba(20,22,26,.90),rgba(10,11,13,.96));
+}
+
+.empty-icon{color:#777b85}
+
+.contract-card{
+  padding:18px;
+  margin:10px 0;
+  border-radius:22px;
+  border-color:rgba(255,255,255,.075);
+  background:linear-gradient(145deg,rgba(25,27,31,.95),rgba(11,12,14,.98));
+  box-shadow:0 17px 35px rgba(0,0,0,.27),inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+.contract-card:hover{border-color:rgba(218,221,255,.14)}
+.contract-top h3{font-size:16px;letter-spacing:-.35px}
+.contract-top span:not(.pill){font-size:10px;color:#777b84}
+
+.pill{
+  padding:6px 9px;
+  font-size:9px;
+  border-radius:999px;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.075);
+}
+
+.pill.paid{
+  background:linear-gradient(180deg,#ffffff,#e6e7ed);
+  box-shadow:0 4px 15px rgba(255,255,255,.06);
+}
+
+.progress{height:6px;margin:17px 0 8px;background:rgba(255,255,255,.065)}
+
+.progress i{
+  background:linear-gradient(90deg,#f4f5ff,#b8beff);
+  box-shadow:0 0 10px rgba(183,190,255,.25),inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+.progress-meta{font-size:9px;color:#858993}
+.contract-info{font-size:9px;color:#666a73}
+
+.contract-bottom{
+  margin-top:13px;
+  padding-top:12px;
+  border-top-color:rgba(255,255,255,.055);
+  color:#b8bbc4;
+  font-size:9px;
+}
+
+.mini-btn{border-radius:12px;padding:8px 10px;font-size:9px}
+
+.primary-mini{
+  background:linear-gradient(180deg,#fafaff,#e3e4eb);
+  border-color:rgba(255,255,255,.92);
+  color:#0e1014;
+  box-shadow:0 6px 16px rgba(255,255,255,.055),inset 0 1px 0 #fff;
+}
+
+.ghost-mini{
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.07);
+}
+
+.fab{
+  width:58px;
+  height:58px;
+  right:16px;
+  bottom:84px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 22%,#fff 0%,#f1f2f7 42%,#d6d9e5 100%);
+  color:#0b0c10;
+  border:1px solid rgba(255,255,255,.96);
+  box-shadow:0 17px 38px rgba(0,0,0,.52),0 0 0 5px rgba(204,210,255,.04),0 0 28px rgba(185,193,255,.14),inset 0 1px 0 rgba(255,255,255,.95);
+  font-size:29px;
+}
+
+.fab::before{inset:-4px;border-color:rgba(205,211,255,.10)}
+.fab::after{inset:3px;border-color:rgba(0,0,0,.08)}
+
+.bottom-nav{
+  height:70px;
+  bottom:7px;
+  width:calc(100% - 14px);
+  max-width:680px;
+  border-radius:23px;
+  padding:4px;
+  background:linear-gradient(180deg,rgba(27,29,34,.95),rgba(9,10,13,.98));
+  border-color:rgba(255,255,255,.10);
+  box-shadow:0 20px 50px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.065);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.nav-item{border-radius:18px;color:#5e626c;gap:3px}
+.nav-item span{font-size:20px}
+.nav-item small{font-size:9px;font-weight:700}
+
+.nav-item.active{
+  color:#f3f4f7;
+  background:radial-gradient(circle at 50% 0,rgba(207,212,255,.09),transparent 65%),linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.028));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 5px 16px rgba(0,0,0,.20);
+}
+
+.card,.mini-btn,.icon-btn,.nav-item,.fab{
+  -webkit-tap-highlight-color:transparent;
+}
+
+@media(max-width:480px){
+  .page{padding-left:12px;padding-right:12px;padding-bottom:118px}
+  .topbar{padding-left:16px;padding-right:16px}
+  .hero{min-height:246px;padding:25px 18px 22px}
+  .hero-number{font-size:43px}
+  .section{margin-top:29px}
+  .section-head h2,.page-heading h2{font-size:22px}
+  .contract-card{padding:17px;border-radius:21px}
+  .contract-top h3{font-size:16px}
+  .fab{width:58px;height:58px;right:15px;bottom:84px}
+}
