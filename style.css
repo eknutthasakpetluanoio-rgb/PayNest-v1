@@ -1,18 +1,19 @@
 /* =========================================================
-   PAYNEST PREMIUM - iOS GLASSMORPHISM EDITION
+   PAYNEST PREMIUM - ULTRA GLASSMORPHISM (CLEAR GLASS)
    Visual-only layer. HTML / JS / Storage remain untouched.
 ========================================================= */
 
 :root {
   --app-bg: #000000;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-highlight: rgba(255, 255, 255, 0.15);
+  /* ค่าสีกระจกที่โปร่งแสงมากขึ้น */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
   --text-main: #ffffff;
-  --text-muted: #ebebf599; /* iOS style muted text */
-  --accent: #0a84ff; /* iOS Blue */
-  --danger: #ff453a; /* iOS Red */
-  --success: #30d158; /* iOS Green */
+  --text-muted: rgba(235, 235, 245, 0.6);
+  --accent: #0a84ff; 
+  --danger: #ff453a; 
+  --success: #30d158; 
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 12px;
@@ -27,10 +28,11 @@ html {
 body {
   margin: 0;
   background-color: var(--app-bg);
-  /* พื้นหลังแบบมีแสงออร่า เพื่อให้เอฟเฟกต์กระจกทำงานได้สวยงาม */
+  /* เพิ่มแสงออร่าให้สว่างขึ้น เพื่อให้กระจกสะท้อนสีได้สวยงาม */
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(10, 132, 255, 0.15), transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(94, 92, 230, 0.15), transparent 50%);
+    radial-gradient(circle at 10% 30%, rgba(10, 132, 255, 0.25), transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(94, 92, 230, 0.25), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(255, 55, 95, 0.15), transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Noto Sans Thai", sans-serif;
@@ -51,14 +53,14 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* เอฟเฟกต์กระจกของ iOS Navbar */
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 0.5px solid var(--glass-border);
+  /* กระจกใสบน Navbar */
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  box-shadow: inset 0 -0.5px 0 var(--glass-border);
 }
 
-.brand { display: none; } /* ซ่อนคำว่า PAYNEST เล็กๆ เพื่อความคลีนแบบ iOS */
+.brand { display: none; }
 .eyebrow { 
   font-size: 11px; 
   font-weight: 600; 
@@ -84,13 +86,14 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   display: grid;
   place-items: center;
   font-size: 18px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 
 /* ---------- Page Layout ---------- */
 .page {
-  max-width: 600px; /* บีบให้พอดีสายตาแบบแอปมือถือ */
+  max-width: 600px;
   margin: auto;
   padding: 20px 20px 140px;
 }
@@ -111,16 +114,21 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 
-/* ---------- Glassmorphism Cards (พระเอกของงาน) ---------- */
+/* ---------- Ultra Glassmorphism Cards ---------- */
 .card, .task, .contract-card, .status-summary, .customer, .settings-card, .empty {
   background: var(--glass-bg);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  /* ดันค่าความเบลอเป็น 45px เพื่อความนุ่มลึก */
+  backdrop-filter: blur(45px) saturate(220%);
+  -webkit-backdrop-filter: blur(45px) saturate(220%);
   border: 0.5px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  /* แสงตกกระทบขอบบนกระจก (Inner shadow) */
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 var(--glass-highlight);
   margin-bottom: 16px;
 }
 
@@ -129,8 +137,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   padding: 32px 24px;
   position: relative;
   overflow: hidden;
-  /* ไล่สีพื้นหลังแบบบัตร Apple Card (มืด) */
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 100%);
 }
 
 .hero-number {
@@ -148,7 +155,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   font-weight: 500;
 }
 
-/* Stat Grid (ยอดค้างรับ / ลูกค้า) */
+/* Stat Grid */
 .stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -178,7 +185,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .text-btn {
   background: none;
   border: 0;
-  color: var(--accent); /* สีฟ้า iOS */
+  color: var(--accent);
   font-weight: 600;
   font-size: 14px;
 }
@@ -212,7 +219,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
-  background: var(--glass-bg);
+  background: rgba(255,255,255,0.08);
   border: 0.5px solid var(--glass-border);
 }
 .pill.paid { background: var(--success); color: #fff; border: none; }
@@ -220,10 +227,10 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .status-text.overdue { color: var(--danger); }
 .status-text.paid { color: var(--success); }
 
-/* Progress Bar - สไตล์เรียบหรู */
+/* Progress Bar */
 .progress {
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   margin: 20px 0 10px;
   overflow: hidden;
@@ -233,7 +240,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   height: 100%;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  box-shadow: 0 0 10px rgba(255,255,255,0.8);
 }
 .progress-meta {
   display: flex;
@@ -265,13 +272,14 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 /* Buttons */
 .button-row { display: flex; gap: 8px; }
 .mini-btn, .tab {
-  background: var(--glass-bg);
+  background: rgba(255, 255, 255, 0.08);
   border: 0.5px solid var(--glass-border);
   color: var(--text-main);
   border-radius: var(--radius-md);
   padding: 8px 14px;
   font-size: 13px;
   font-weight: 600;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 .primary-mini {
   background: #fff;
@@ -289,15 +297,20 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   font-weight: 600;
   margin-top: 10px;
 }
-.wide-btn { background: var(--glass-bg); color: #fff; border: 0.5px solid var(--glass-border); }
+.wide-btn { 
+  background: rgba(255,255,255,0.08); 
+  color: #fff; 
+  border: 0.5px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
 .wide-btn.danger { color: var(--danger); }
 
 /* ---------- Floating Elements (Dock & FAB) ---------- */
-/* Floating Action Button (ปุ่ม +) */
+/* Floating Action Button */
 .fab {
   position: fixed;
   right: 20px;
-  bottom: 100px; /* ยกขึ้นให้พ้น Dock */
+  bottom: 100px;
   z-index: 40;
   width: 56px;
   height: 56px;
@@ -307,29 +320,32 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   font-size: 32px;
   font-weight: 300;
   border: none;
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .fab small { display: none; }
 
-/* Bottom Nav (ทำให้เหมือน iOS Dock ลอยๆ) */
+/* Bottom Nav (Dock) */
 .bottom-nav {
   position: fixed;
   bottom: 20px;
   left: 20px;
   right: 20px;
   height: 64px;
-  background: rgba(30, 30, 30, 0.65);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  /* กระจกใสจัดๆ สำหรับ Dock ด้านล่าง */
+  background: rgba(20, 20, 25, 0.35);
+  backdrop-filter: blur(50px) saturate(250%);
+  -webkit-backdrop-filter: blur(50px) saturate(250%);
   border: 0.5px solid var(--glass-border);
-  border-radius: 32px; /* โค้งมนแบบ Dock */
+  border-radius: 32px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   z-index: 50;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    0 15px 45px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 var(--glass-highlight);
 }
 
 .nav-item {
@@ -350,11 +366,12 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .search-wrap {
   display: flex;
   align-items: center;
-  background: var(--glass-bg);
+  background: rgba(255,255,255,0.06);
   border: 0.5px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 0 16px;
   margin-bottom: 16px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 .search-wrap span { font-size: 20px; color: var(--text-muted); margin-right: 8px;}
 .search-wrap input {
@@ -367,7 +384,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 }
 .search-wrap input::placeholder { color: var(--text-muted); }
 .clear-search {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   border: none;
   color: #fff;
   border-radius: 50%;
@@ -382,7 +399,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   margin-bottom: 10px;
 }
 .tabs::-webkit-scrollbar { display: none; }
-.tab.active { background: #fff; color: #000; }
+.tab.active { background: #fff; color: #000; box-shadow: none; }
 
 /* ---------- Customer & Settings ---------- */
 .customer {
@@ -394,9 +411,10 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .avatar {
   width: 48px; height: 48px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   display: grid; place-items: center;
   font-weight: 600; font-size: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .customer-main b { font-size: 16px; font-weight: 600; }
 .customer-main span { color: var(--text-muted); font-size: 13px; margin-top: 4px; display: block;}
@@ -407,10 +425,11 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .settings-card p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
 .data-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
 .data-summary div { 
-  background: var(--glass-bg); 
+  background: rgba(255,255,255,0.06); 
   border: 0.5px solid var(--glass-border); 
   border-radius: var(--radius-md); 
   padding: 16px; 
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 .data-summary b { font-size: 24px; font-weight: 700; display: block;}
 .data-summary span { color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;}
@@ -420,10 +439,10 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
   z-index: 100;
   display: flex;
-  align-items: flex-end; /* ให้ชิดล่างแบบ iOS Sheet */
+  align-items: flex-end;
   justify-content: center;
 }
 
@@ -432,18 +451,19 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  background: rgba(25, 25, 30, 0.85);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  background: rgba(20, 20, 25, 0.65);
+  backdrop-filter: blur(50px) saturate(250%);
+  -webkit-backdrop-filter: blur(50px) saturate(250%);
   border: 0.5px solid var(--glass-border);
   border-bottom: none;
   border-radius: 32px 32px 0 0;
   padding: 32px 24px;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  box-shadow: 
+    0 -10px 40px rgba(0,0,0,0.5),
+    inset 0 1px 0 var(--glass-highlight);
   position: relative;
 }
 
-/* ขีดลากปิดด้านบน Modal */
 .modal::before {
   content: "";
   position: absolute;
@@ -452,7 +472,7 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   transform: translateX(-50%);
   width: 40px;
   height: 5px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 10px;
 }
 
@@ -464,8 +484,8 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
   margin-top: 8px;
   padding: 16px;
   border-radius: var(--radius-md);
-  background: rgba(255,255,255,0.08);
-  border: 0.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.15);
   color: #fff;
 }
 .modal input:focus, .modal select:focus, .modal textarea:focus {
@@ -474,10 +494,11 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 }
 
 .form-note, .payment-summary, .detail-status, .detail-grid div, .subtle-box, .note-box {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.06);
   border: 0.5px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 16px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 .form-note b { font-size: 14px; display: block; }
 .form-note span { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: block;}
@@ -491,10 +512,11 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 .detail-grid b { font-size: 14px; font-weight: 600; margin-top: 4px; display: block;}
 
 .payment-list {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.06);
   border: 0.5px solid var(--glass-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 .payment-row {
   display: flex;
@@ -509,12 +531,12 @@ button:active { transform: scale(0.97); transition: transform 0.1s; }
 
 /* ---------- Utilities & Resets ---------- */
 .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
-.skip-link { display: none; } /* ซ่อน skip-link สำหรับ UI นี้ */
+.skip-link { display: none; }
 .status-summary { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px;}
 .status-summary b { font-size: 14px; font-weight: 600;}
 .status-summary span { font-size: 12px; color: var(--text-muted); margin-left: 8px;}
-.summary-dot { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.1); }
-.summary-dot.has-overdue { background: rgba(255,69,58,0.2); color: var(--danger); }
+.summary-dot { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.15); }
+.summary-dot.has-overdue { background: rgba(255,69,58,0.3); color: #fff; }
 
 /* Responsive สำหรับจอใหญ่ */
 @media (min-width: 640px) {
