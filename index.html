@@ -1,68 +1,120 @@
-<!-- =========================================================
-   PAYNEST - SETTINGS & DATA BACKUP MODULE (COMPLETE CODE)
-========================================================= -->
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090a">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="PayNest v2 ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
+<meta name="application-name" content="PayNest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<div class="card settings-card">
-  <h2>สำรองข้อมูลร้านค้า</h2>
-  <p>ดาวน์โหลดข้อมูลสัญญาและลูกค้าเก็บไว้ในเครื่อง หรือกู้คืนข้อมูลเดิมเมื่อเปลี่ยนอุปกรณ์</p>
-  
-  <div class="button-row" style="margin-top: 14px; display: flex; gap: 10px;">
-    <button onclick="exportData()" class="wide-btn" style="flex: 1;">📥 สำรองข้อมูล (Export)</button>
-    <button onclick="document.getElementById('importFile').click()" class="wide-btn" style="flex: 1;">📤 กู้คืนข้อมูล (Import)</button>
-    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
-  </div>
+<title>PayNest Premium</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20260812-v2-1">
+</head>
+
+<body>
+
+<a class="skip-link" href="#view">ข้ามไปยังเนื้อหาหลัก</a>
+
+<div id="app">
+
+  <!-- ==============================
+       TOP BAR
+       V2 keeps the original hooks used by app.js.
+  =============================== -->
+  <header class="topbar" role="banner">
+    <div>
+      <div class="brand">PAYNEST</div>
+      <h1 id="pageTitle">ภาพรวม</h1>
+    </div>
+
+    <button
+      class="icon-btn"
+      id="topAction"
+      type="button"
+      aria-label="ขึ้นด้านบน"
+      title="ขึ้นด้านบน"
+    >↑</button>
+  </header>
+
+  <!-- ==============================
+       MAIN VIEW
+  =============================== -->
+  <main id="view" role="main" tabindex="-1"></main>
+
+  <!-- ==============================
+       FLOATING ACTION BUTTON
+  =============================== -->
+  <button
+    class="fab"
+    id="fab"
+    type="button"
+    aria-label="เพิ่มรายการ"
+    aria-haspopup="dialog"
+  >
+    <span aria-hidden="true">+</span>
+    <small id="fabLabel">สัญญา</small>
+  </button>
+
+  <!-- ==============================
+       BOTTOM NAVIGATION
+  =============================== -->
+  <nav class="bottom-nav" aria-label="เมนูหลัก">
+    <button type="button" data-page="dashboard" class="nav-item active" aria-label="ภาพรวม">
+      <span aria-hidden="true">⌂</span>
+      <small>ภาพรวม</small>
+    </button>
+
+    <button type="button" data-page="contracts" class="nav-item" aria-label="สัญญา">
+      <span aria-hidden="true">▣</span>
+      <small>สัญญา</small>
+    </button>
+
+    <button type="button" data-page="customers" class="nav-item" aria-label="ลูกค้า">
+      <span aria-hidden="true">♙</span>
+      <small>ลูกค้า</small>
+    </button>
+
+    <button type="button" data-page="settings" class="nav-item" aria-label="ตั้งค่า">
+      <span aria-hidden="true">⚙</span>
+      <small>ตั้งค่า</small>
+    </button>
+  </nav>
+
 </div>
 
-<script>
-  // ฟังก์ชันสำหรับดาวน์โหลดข้อมูลทั้งหมดใน LocalStorage ออกมาเป็นไฟล์ JSON
-  function exportData() {
-    try {
-      const dataObj = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        dataObj[key] = localStorage.getItem(key);
-      }
-      
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
-      const downloadAnchor = document.createElement('a');
-      const dateNow = new Date().toISOString().slice(0, 10);
-      
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `paynest_backup_${dateNow}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    } catch (error) {
-      alert("เกิดข้อผิดพลาดในการสำรองข้อมูล: " + error.message);
-    }
-  }
+<!-- ==============================
+     MODAL ROOT
+=============================== -->
+<div id="modalRoot" aria-live="polite"></div>
 
-  // ฟังก์ชันสำหรับอัปโหลดไฟล์ JSON เพื่อกู้คืนข้อมูลเข้า LocalStorage
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+<!-- ==============================
+     IMPORT
+=============================== -->
+<input
+  id="importFile"
+  type="file"
+  accept=".json,application/json"
+  hidden
+>
 
-    if (!confirm("คำเตือน: การกู้คืนข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด คุณต้องการดำเนินการต่อใช่หรือไม่?")) {
-      event.target.value = "";
-      return;
-    }
+<noscript>
+  <div style="padding:24px;font-family:sans-serif;background:#09090a;color:#fff;min-height:100vh">
+    PayNest ต้องเปิดใช้งาน JavaScript เพื่อให้ระบบทำงานได้ครบถ้วน
+  </div>
+</noscript>
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const importedData = JSON.parse(e.target.result);
-        
-        for (const key in importedData) {
-          localStorage.setItem(key, importedData[key]);
-        }
-        
-        alert("กู้คืนข้อมูลสำเร็จ! ระบบกำลังรีเฟรชหน้าจอ...");
-        location.reload();
-      } catch (error) {
-        alert("ไฟล์สำรองไม่ถูกต้องหรือเสียหาย ไม่สามารถกู้คืนได้");
-      }
-    };
-    reader.readAsText(file);
-  }
-</script>
+<!-- ==============================
+     APP
+=============================== -->
+<script type="module" src="app.js"></script>
 
+</body>
+</html>
