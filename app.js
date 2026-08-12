@@ -54,8 +54,29 @@ function getStatus(contract) {
   return remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active";
 }
 
+function paymentStatus(contract) {
+  if (getStatus(contract) === "paid") return "paid";
+  const received = Number(contract.received || 0);
+  const dueDate = contract.dueDate ? new Date(`${contract.dueDate}T23:59:59`) : null;
+  const today = new Date(`${localToday()}T00:00:00`);
+  if (dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < today) {
+    return received > 0 ? "overdue-partial" : "overdue";
+  }
+  return received > 0 ? "partial" : "due";
+}
+
 function statusLabel(contract) {
-  return getStatus(contract) === "paid" ? "ชำระครบ" : "กำลังผ่อน";
+  return ({
+    paid: "ชำระครบ",
+    overdue: "ค้างชำระ",
+    "overdue-partial": "ค้างชำระบางส่วน",
+    partial: "ชำระบางส่วน",
+    due: "ถึงกำหนด"
+  }[paymentStatus(contract)] || "กำลังผ่อน");
+}
+
+function statusClass(contract) {
+  return paymentStatus(contract);
 }
 
 function stats() {
@@ -65,6 +86,8 @@ function stats() {
     received: data.contracts.reduce((sum, c) => sum + Number(c.received || 0), 0),
     due: active.reduce((sum, c) => sum + remaining(c), 0),
     active: active.length,
+    overdue: active.filter(c => ["overdue", "overdue-partial"].includes(paymentStatus(c))).length,
+    dueToday: active.filter(c => c.dueDate === localToday()).length,
     customers: data.customers.length
   };
 }
@@ -128,6 +151,10 @@ function dashboard() {
         <strong>${s.customers}</strong>
         <small>${data.contracts.length} สัญญา</small>
       </div>
+    </div> 
+    <div class="status-summary card">
+      <div><b>สถานะการชำระ</b><span>ค้างกำหนด ${s.overdue} · ครบกำหนดวันนี้ ${s.dueToday}</span></div>
+      <span class="summary-dot ${s.overdue ? "has-overdue" : ""}">${s.overdue ? "ต้องติดตาม" : "ปกติ"}</span>
     </div>
 
     <section class="section">
@@ -168,6 +195,7 @@ function actionList() {
       </div>
       <div class="task-right">
         <strong>${money(remaining(c))}</strong>
+        <span class="status-text ${statusClass(c)}">${statusLabel(c)}</span>
         <button class="mini-btn primary-mini" data-pay="${c.id}">รับชำระ</button>
       </div>
     </div>
@@ -185,7 +213,7 @@ function contractCard(c) {
         <h3>${esc(c.product)}</h3>
         <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
       </div>
-      <span class="pill ${paid ? "paid" : "active"}">${statusLabel(c)}</span>
+      <span class="pill ${statusClass(c)}">${statusLabel(c)}</span>
     </div>
 
     <div class="progress"><i style="width:${pct}%"></i></div>
@@ -201,7 +229,10 @@ function contractCard(c) {
     </div>
 
     <div class="contract-bottom">
-      <span>${paid ? "✓ ชำระครบแล้ว" : "งวดถัดไป " + fmtDate(c.dueDate)}</span>
+      <span>${paid ? "✓ ชำระครบแล้ว" :
+        (["overdue","overdue-partial"].includes(paymentStatus(c))
+          ? "⚠ เกินกำหนด " + fmtDate(c.dueDate)
+          : "งวดถัดไป " + fmtDate(c.dueDate))}</span>
       <div class="button-row">
         <button class="mini-btn ghost-mini" data-detail="${c.id}">รายละเอียด</button>
         ${paid
@@ -220,6 +251,8 @@ function contracts() {
   const all = [...data.contracts]
     .filter(c => {
       if (contractFilter === "active") return getStatus(c) === "active";
+      if (contractFilter === "overdue") return ["overdue", "overdue-partial"].includes(paymentStatus(c));
+      if (contractFilter === "partial") return paymentStatus(c) === "partial";
       if (contractFilter === "paid") return getStatus(c) === "paid";
       return true;
     })
@@ -248,6 +281,8 @@ function contracts() {
 
     <div class="tabs">
       <button class="tab ${contractFilter === "active" ? "active" : ""}" data-contract-filter="active">กำลังผ่อน <b>${activeCount}</b></button>
+      <button class="tab ${contractFilter === "overdue" ? "active" : ""}" data-contract-filter="overdue">ค้างชำระ <b>${data.contracts.filter(c => ["overdue","overdue-partial"].includes(paymentStatus(c))).length}</b></button>
+      <button class="tab ${contractFilter === "partial" ? "active" : ""}" data-contract-filter="partial">บางส่วน <b>${data.contracts.filter(c => paymentStatus(c) === "partial").length}</b></button>
       <button class="tab ${contractFilter === "all" ? "active" : ""}" data-contract-filter="all">ทั้งหมด <b>${data.contracts.length}</b></button>
       <button class="tab ${contractFilter === "paid" ? "active" : ""}" data-contract-filter="paid">ชำระครบ <b>${paidCount}</b></button>
     </div>

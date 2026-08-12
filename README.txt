@@ -21,3 +21,9 @@ PayNest Backup & Restore
 - "กู้คืนข้อมูลจากไฟล์" accepts the new PayNest backup format and older plain JSON backups.
 - Before restore/reset, PayNest automatically downloads a backup of the current data.
 - Do not delete the downloaded backup files; keep at least one copy in a safe location.
+
+
+Payment status enhancement
+- เพิ่มสถานะ ถึงกำหนด, ชำระบางส่วน, ค้างชำระ, ค้างชำระบางส่วน และชำระครบ
+- เพิ่มตัวกรอง ค้างชำระ และ บางส่วนในหน้าสัญญา
+- Dashboard แสดงจำนวนรายการค้างกำหนดและครบกำหนดวันนี้
