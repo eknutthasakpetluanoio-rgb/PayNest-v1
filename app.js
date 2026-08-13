@@ -783,8 +783,28 @@ function openContractDetail(id) {
       ${getStatus(contract) === "active"
         ? `<button class="primary-btn" data-pay="${contract.id}">รับชำระเงิน</button>`
         : ""}
+      <button type="button" class="wide-btn danger" data-delete-contract="${contract.id}">ลบสัญญานี้</button>
     </div>
   </div>`;
+}
+
+function deleteContract(id) {
+  const contract = data.contracts.find(c => c.id === id);
+  if (!contract) return;
+
+  const confirmed = confirm(
+    `ลบสัญญา "${contract.product}" ใช่หรือไม่?\n\n` +
+    `ยอดรวม ${money(contract.total)}\n` +
+    `รับแล้ว ${money(contract.received)}\n\n` +
+    `การลบจะลบสัญญาและประวัติการรับชำระของสัญญานี้ออกจากเครื่องถาวร`
+  );
+
+  if (!confirmed) return;
+
+  data.contracts = data.contracts.filter(c => c.id !== id);
+
+  $("#modalRoot").innerHTML = "";
+  persist();
 }
 
 function openReceipt(contractId, paymentId) {
@@ -914,6 +934,12 @@ document.addEventListener("click", event => {
   const detail = event.target.closest("[data-detail]");
   if (detail) {
     openContractDetail(detail.dataset.detail);
+    return;
+  }
+
+  const deleteContractButton = event.target.closest("[data-delete-contract]");
+  if (deleteContractButton) {
+    deleteContract(deleteContractButton.dataset.deleteContract);
     return;
   }
 
