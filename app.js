@@ -126,10 +126,6 @@ function openAuthModal() {
   $("#authRegister").addEventListener("click", () => runAuth("register"));
 }
 
-function isStandalone() {
-  return window.matchMedia?.("(display-mode: standalone)")?.matches ||
-    window.navigator.standalone === true;
-}
 
 function isStandalone() {
   return window.matchMedia?.("(display-mode: standalone)")?.matches ||
@@ -146,20 +142,15 @@ async function installApp() {
   if (!deferredInstallPrompt || isStandalone()) return;
 
   const promptEvent = deferredInstallPrompt;
-  deferredInstallPrompt = null;
-  renderInstallButton();
-
   try {
     await promptEvent.prompt();
-    const choice = await promptEvent.userChoice;
-    if (choice?.outcome === "accepted") {
-      console.log("[PayNest] PWA installation accepted");
-    }
+    await promptEvent.userChoice;
   } catch (error) {
-    console.warn("[PayNest] PWA installation prompt failed:", error);
+    console.warn("[PayNest] Install prompt failed:", error);
+  } finally {
+    deferredInstallPrompt = null;
+    renderInstallButton();
   }
-
-  renderInstallButton();
 }
 
 function renderAuthButton() {
@@ -1152,6 +1143,19 @@ document.addEventListener("click", event => {
   }
 });
 
+$("#installApp")?.addEventListener("click", installApp);
+
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  renderInstallButton();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  renderInstallButton();
+});
+
 document.addEventListener("input", event => {
   if (event.target.id === "contractSearch") {
     contractQuery = event.target.value;
@@ -1201,23 +1205,6 @@ $("#importFile").addEventListener("change", async event => {
   }
 });
 
-$("#installApp")?.addEventListener("click", installApp);
-
-window.addEventListener("beforeinstallprompt", event => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
-  renderInstallButton();
-});
-
-window.addEventListener("appinstalled", () => {
-  deferredInstallPrompt = null;
-  renderInstallButton();
-  console.log("[PayNest] PWA installed");
-});
-
-window.addEventListener("DOMContentLoaded", renderInstallButton);
-renderInstallButton();
-
 $("#topAction").addEventListener("click", () =>
   scrollTo({top: 0, behavior: "smooth"})
 );
@@ -1245,3 +1232,4 @@ onAuthStateChanged(auth, async user => {
 });
 
 render();
+renderInstallButton();
