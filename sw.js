@@ -1,4 +1,4 @@
-const CACHE_NAME = "paynest-v20260814-sync-3";
+const CACHE_NAME = "paynest-v20260814-pwa-1";
 
 const APP_SHELL = [
   "./",
@@ -8,7 +8,9 @@ const APP_SHELL = [
   "./storage.js",
   "./firebase.js",
   "./firestore-sync.js",
-  "./manifest.json"
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {

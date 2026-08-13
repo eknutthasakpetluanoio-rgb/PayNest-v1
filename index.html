@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#09090a">
+<meta name="theme-color" content="#040406">
 <meta name="color-scheme" content="dark">
 <meta name="description" content="PayNest v2 ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
 <meta name="application-name" content="PayNest">
@@ -18,7 +18,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=20260813-firebase-2">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#050507">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+<meta name="theme-color" content="#040406">
 
 </head>
 
@@ -134,7 +136,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=20260813-firebase-2')
+      navigator.serviceWorker.register('./sw.js?v=20260814-pwa-1')
         .then((reg) => { console.log('Service Worker registered successfully!', reg); })
         .catch((err) => { console.log('Service Worker registration failed:', err); });
     });

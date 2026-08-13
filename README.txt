@@ -35,3 +35,6 @@ PayNest Latest — Firebase Cloud
 - หลัง Login ระบบจะ merge ข้อมูล LocalStorage กับ Firestore และส่งข้อมูลขึ้น Cloud
 - ปรับ Service Worker และ cache-busting เพื่อป้องกัน GitHub Pages ใช้ app.js รุ่นเก่า
 - ไม่ต้องลบข้อมูล LocalStorage เดิม
+
+
+PWA v1 patch: manifest icons (192x192, 512x512), app icon links, and service-worker cache entries added.
