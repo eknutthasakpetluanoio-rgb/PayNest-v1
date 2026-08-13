@@ -1094,6 +1094,8 @@ document.addEventListener("click", event => {
     if (confirm("ล้างข้อมูล PayNest ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
       data = resetData();
+      // Keep Firestore consistent with the explicit local reset.
+      saveData(data);
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
