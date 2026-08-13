@@ -4,7 +4,7 @@
   "description": "ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน",
   "lang": "th",
   "dir": "ltr",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
