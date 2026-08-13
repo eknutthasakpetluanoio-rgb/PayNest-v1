@@ -1,0 +1,37 @@
+PayNest PWA FINAL — index.html integration
+
+ใช้กับ index.html ล่าสุดของ PayNest เท่านั้น
+ไม่ต้องแก้ app.js / style.css / storage / firebase / firestore logic
+
+1) ใน <head> ให้คง:
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#050507">
+
+และเพิ่ม:
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+2) ก่อน </body> ให้เพิ่ม:
+<script src="./pwa-install.js" defer></script>
+
+3) index.html รุ่นปัจจุบันมี inline Service Worker registration อยู่แล้ว
+ไม่จำเป็นต้องลบก็ได้ เพราะ browser จะ deduplicate registration ของ ./sw.js
+แต่ถ้าต้องการให้โค้ดสะอาดที่สุด ให้ลบเฉพาะ block นี้:
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => { console.log('Service Worker registered successfully!', reg); })
+        .catch((err) => { console.log('Service Worker registration failed:', err); });
+    });
+  }
+</script>
+
+แล้วใช้ pwa-install.js แทน
+
+หมายเหตุ:
+- อย่าเปลี่ยน id/class ของ PayNest
+- อย่าเปลี่ยน app.js
+- อย่าเปลี่ยน Firebase
+- อย่าเปลี่ยน UI เดิม
+- ชุดนี้แก้เฉพาะ PWA
