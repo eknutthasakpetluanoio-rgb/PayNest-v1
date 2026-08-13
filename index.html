@@ -132,6 +132,14 @@
   );
 </script>
 
+<script type="module">
+  import { auth, onAuthStateChanged } from "./firebase.js";
+  window.PayNestFirebaseAuth = auth;
+  window.PayNestFirebaseAuthReady = new Promise((resolve) => {
+    onAuthStateChanged(auth, (user) => resolve(user));
+  });
+</script>
+
 <script type="module" src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
