@@ -133,11 +133,11 @@
   console.log("[PayNest] Firebase initialized:", firebaseApp.options.projectId);
 </script>
 
-<script type="module" src="app.js?v=20260814-pwa-install-1"></script>
+<script type="module" src="app.js?v=20260814-pwa-install-2"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=20260814-pwa-3')
+      navigator.serviceWorker.register('./sw.js?v=20260814-pwa-4')
         .then((reg) => { console.log('Service Worker registered successfully!', reg); })
         .catch((err) => { console.log('Service Worker registration failed:', err); });
     });

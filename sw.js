@@ -1,11 +1,11 @@
-const CACHE_NAME = "paynest-pwa-v4";
-const RUNTIME_CACHE = "paynest-runtime-v4";
+const CACHE_NAME = "paynest-pwa-v5";
+const RUNTIME_CACHE = "paynest-runtime-v5";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css?v=20260813-firebase-2",
-  "./app.js?v=20260814-pwa-install-1",
+  "./app.js?v=20260814-pwa-install-2",
   "./storage.js",
   "./firebase.js",
   "./firestore-sync.js",

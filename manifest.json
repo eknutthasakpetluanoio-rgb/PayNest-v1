@@ -4,13 +4,13 @@
   "description": "ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน",
   "lang": "th",
   "dir": "ltr",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#040406",
   "theme_color": "#040406",
-  "id": "./",
+  "id": "./index.html",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -24,5 +24,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
