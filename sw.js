@@ -1,5 +1,5 @@
-const CACHE_NAME = "paynest-pwa-v5";
-const RUNTIME_CACHE = "paynest-runtime-v5";
+const CACHE_NAME = "paynest-pwa-v6";
+const RUNTIME_CACHE = "paynest-runtime-v6";
 
 const APP_SHELL = [
   "./",

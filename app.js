@@ -131,38 +131,19 @@ function isStandalone() {
     window.navigator.standalone === true;
 }
 
+function isStandalone() {
+  return window.matchMedia?.("(display-mode: standalone)")?.matches ||
+    window.navigator.standalone === true;
+}
+
 function renderInstallButton() {
   const button = $("#installApp");
   if (!button) return;
-  button.hidden = isStandalone();
+  button.hidden = isStandalone() || !deferredInstallPrompt;
 }
 
 async function installApp() {
-  if (isStandalone()) return;
-
-  if (!deferredInstallPrompt) {
-    const modalRoot = $("#modalRoot");
-    if (modalRoot) {
-      modalRoot.innerHTML = `
-        <div class="overlay">
-          <div class="modal small" role="dialog" aria-modal="true" aria-label="ติดตั้ง PayNest">
-            <div class="modal-head">
-              <div>
-                <div class="eyebrow">PAYNEST PWA</div>
-                <h2>ติดตั้ง PayNest</h2>
-              </div>
-              <button class="icon-btn" data-close type="button" aria-label="ปิด">×</button>
-            </div>
-            <div class="form-note">
-              <b>เพิ่ม PayNest ลงหน้าจอหลัก</b>
-              <span>เบราว์เซอร์นี้ยังไม่ส่งหน้าต่างติดตั้งอัตโนมัติ ให้กดเมนู ⋮ ของ Chrome แล้วเลือก “เพิ่มลงในหน้าจอหลัก” หรือ “ติดตั้งแอป”</span>
-            </div>
-            <button class="primary-btn" data-close type="button">เข้าใจแล้ว</button>
-          </div>
-        </div>`;
-    }
-    return;
-  }
+  if (!deferredInstallPrompt || isStandalone()) return;
 
   const promptEvent = deferredInstallPrompt;
   deferredInstallPrompt = null;
