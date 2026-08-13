@@ -136,7 +136,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=20260814-pwa-1')
+      navigator.serviceWorker.register('./sw.js?v=20260814-pwa-3')
         .then((reg) => { console.log('Service Worker registered successfully!', reg); })
         .catch((err) => { console.log('Service Worker registration failed:', err); });
     });
