@@ -13,6 +13,7 @@ let page = "dashboard";
 let contractFilter = "active";
 let contractQuery = "";
 let customerQuery = "";
+let deferredInstallPrompt = null;
 
 const $ = selector => document.querySelector(selector);
 const uid = () => globalThis.crypto?.randomUUID?.() ||
@@ -123,6 +124,37 @@ function openAuthModal() {
 
   $("#authLogin").addEventListener("click", () => runAuth("login"));
   $("#authRegister").addEventListener("click", () => runAuth("register"));
+}
+
+function isStandalone() {
+  return window.matchMedia?.("(display-mode: standalone)")?.matches ||
+    window.navigator.standalone === true;
+}
+
+function renderInstallButton() {
+  const button = $("#installApp");
+  if (!button) return;
+  button.hidden = isStandalone() || !deferredInstallPrompt;
+}
+
+async function installApp() {
+  if (!deferredInstallPrompt) return;
+
+  const promptEvent = deferredInstallPrompt;
+  deferredInstallPrompt = null;
+  renderInstallButton();
+
+  try {
+    await promptEvent.prompt();
+    const choice = await promptEvent.userChoice;
+    if (choice?.outcome === "accepted") {
+      console.log("[PayNest] PWA installation accepted");
+    }
+  } catch (error) {
+    console.warn("[PayNest] PWA installation prompt failed:", error);
+  }
+
+  renderInstallButton();
 }
 
 function renderAuthButton() {
@@ -1163,6 +1195,23 @@ $("#importFile").addEventListener("change", async event => {
     event.target.value = "";
   }
 });
+
+$("#installApp")?.addEventListener("click", installApp);
+
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  renderInstallButton();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  renderInstallButton();
+  console.log("[PayNest] PWA installed");
+});
+
+window.addEventListener("DOMContentLoaded", renderInstallButton);
+renderInstallButton();
 
 $("#topAction").addEventListener("click", () =>
   scrollTo({top: 0, behavior: "smooth"})
