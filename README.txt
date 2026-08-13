@@ -1,21 +1,18 @@
-PayNest PWA FINAL v1
+PayNest PWA FINAL FIX
 
-PWA-only patch for the latest PayNest project.
+ใส่ไฟล์ตามโครงสร้าง:
+manifest.json
+sw.js
+icons/icon-192.png
+icons/icon-512.png
 
-Included:
-- manifest.json
-- sw.js
-- pwa-install.js
-- icons/icon-192.png
-- icons/icon-512.png
-- INDEX-PWA-INTEGRATION.txt
+index.html รุ่นปัจจุบันของ PayNest มีการเรียก manifest.json และ sw.js อยู่แล้ว
+จึงไม่ต้องเพิ่มปุ่มหรือเปลี่ยน UI
 
-Design goals:
-1. Chrome installability criteria
-2. Service Worker controls the start URL
-3. Offline navigation fallback
-4. Resilient installation: one missing optional shell file cannot abort SW installation
-5. Online-first navigation keeps index fresh
-6. LocalStorage app remains usable offline; Firebase/cloud sync can fail gracefully when offline
-7. beforeinstallprompt is captured and a temporary "ติดตั้ง PayNest" button appears only when Chrome says installation is available
-8. No PayNest UI/business logic is changed except the temporary PWA install button
+หลังอัปโหลด:
+1. เปิดเว็บ PayNest แบบออนไลน์ 1 ครั้ง
+2. รีเฟรช 1 ครั้ง
+3. ปิด Chrome แล้วเปิดใหม่
+4. เข้าเมนู Chrome > ติดตั้งแอป / เพิ่มในหน้าจอหลัก
+5. เปิดแอปจากไอคอน
+6. ทดสอบเปิดโหมดเครื่องบินแล้วเปิด PayNest
