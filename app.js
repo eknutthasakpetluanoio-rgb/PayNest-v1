@@ -57,29 +57,43 @@ function authErrorMessage(error) {
   if (code.includes("weak-password")) return "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
   if (code.includes("invalid-email")) return "รูปแบบอีเมลไม่ถูกต้อง";
   if (code.includes("network-request-failed")) return "ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้";
+  if (code.includes("operation-not-allowed")) return "Firebase ยังไม่ได้เปิด Email/Password Authentication";
+  if (code.includes("too-many-requests")) return "ลองเข้าสู่ระบบใหม่อีกครั้งภายหลัง";
   return "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่";
 }
 
 function openAuthModal() {
   $("#modalRoot").innerHTML = `
-    <div class="modal-backdrop" data-close></div>
-    <div class="modal-sheet" role="dialog" aria-modal="true" aria-label="บัญชี PayNest">
-      <div class="modal-head">
-        <div>
-          <div class="eyebrow">PAYNEST CLOUD</div>
-          <h2>บัญชีของคุณ</h2>
+    <div class="overlay">
+      <div class="modal small auth-modal" role="dialog" aria-modal="true" aria-label="บัญชี PayNest">
+        <div class="modal-head">
+          <div>
+            <div class="eyebrow">PAYNEST CLOUD</div>
+            <h2>บัญชีของคุณ</h2>
+          </div>
+          <button class="icon-btn" data-close type="button" aria-label="ปิด">×</button>
         </div>
-        <button class="icon-btn" data-close type="button">×</button>
+
+        <div class="form-note">
+          <b>ซิงก์ข้อมูลกับ Firebase Cloud</b>
+          <span>เข้าสู่ระบบเพื่อเก็บข้อมูล PayNest ไว้บนบัญชีของคุณ และใช้งานข้อมูลเดิมจากเครื่องอื่นได้</span>
+        </div>
+
+        <label>อีเมล
+          <input id="authEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+        </label>
+
+        <label>รหัสผ่าน
+          <input id="authPassword" type="password" autocomplete="current-password" placeholder="อย่างน้อย 6 ตัวอักษร">
+        </label>
+
+        <div class="modal-actions">
+          <button class="primary-btn" id="authLogin" type="button">เข้าสู่ระบบ</button>
+          <button class="wide-btn" id="authRegister" type="button">สร้างบัญชีใหม่</button>
+        </div>
+
+        <p id="authStatus" class="muted auth-status" role="status" aria-live="polite"></p>
       </div>
-      <div class="form-grid">
-        <label>อีเมล<input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
-        <label>รหัสผ่าน<input id="authPassword" type="password" autocomplete="current-password" placeholder="อย่างน้อย 6 ตัวอักษร"></label>
-      </div>
-      <div class="sheet-actions">
-        <button class="primary-btn" id="authLogin" type="button">เข้าสู่ระบบ</button>
-        <button class="wide-btn" id="authRegister" type="button">สร้างบัญชีใหม่</button>
-      </div>
-      <p id="authStatus" class="muted" style="margin:12px 0 0"></p>
     </div>`;
 
   const status = $("#authStatus");

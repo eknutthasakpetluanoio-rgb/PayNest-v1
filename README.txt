@@ -27,3 +27,11 @@ Payment status enhancement
 - เพิ่มสถานะ ถึงกำหนด, ชำระบางส่วน, ค้างชำระ, ค้างชำระบางส่วน และชำระครบ
 - เพิ่มตัวกรอง ค้างชำระ และ บางส่วนในหน้าสัญญา
 - Dashboard แสดงจำนวนรายการค้างกำหนดและครบกำหนดวันนี้
+
+
+PayNest Latest — Firebase Cloud
+- ปุ่ม ☁️ บน Topbar เปิดหน้าบัญชี PayNest Cloud
+- รองรับเข้าสู่ระบบ / สร้างบัญชีด้วย Firebase Authentication (Email/Password)
+- หลัง Login ระบบจะ merge ข้อมูล LocalStorage กับ Firestore และส่งข้อมูลขึ้น Cloud
+- ปรับ Service Worker และ cache-busting เพื่อป้องกัน GitHub Pages ใช้ app.js รุ่นเก่า
+- ไม่ต้องลบข้อมูล LocalStorage เดิม
