@@ -1,4 +1,12 @@
 import {loadData, saveData, resetData, exportData, importData} from "./storage.js";
+import {
+  auth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "./firebase.js";
+import {syncInitialData} from "./firestore-sync.js";
 
 let data = loadData();
 let page = "dashboard";
@@ -40,6 +48,86 @@ function fmtDate(value) {
 function persist() {
   data = saveData(data);
   render();
+}
+
+function authErrorMessage(error) {
+  const code = error?.code || "";
+  if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) return "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+  if (code.includes("email-already-in-use")) return "อีเมลนี้ถูกใช้แล้ว";
+  if (code.includes("weak-password")) return "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+  if (code.includes("invalid-email")) return "รูปแบบอีเมลไม่ถูกต้อง";
+  if (code.includes("network-request-failed")) return "ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้";
+  return "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่";
+}
+
+function openAuthModal() {
+  $("#modalRoot").innerHTML = `
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-label="บัญชี PayNest">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow">PAYNEST CLOUD</div>
+          <h2>บัญชีของคุณ</h2>
+        </div>
+        <button class="icon-btn" data-close type="button">×</button>
+      </div>
+      <div class="form-grid">
+        <label>อีเมล<input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+        <label>รหัสผ่าน<input id="authPassword" type="password" autocomplete="current-password" placeholder="อย่างน้อย 6 ตัวอักษร"></label>
+      </div>
+      <div class="sheet-actions">
+        <button class="primary-btn" id="authLogin" type="button">เข้าสู่ระบบ</button>
+        <button class="wide-btn" id="authRegister" type="button">สร้างบัญชีใหม่</button>
+      </div>
+      <p id="authStatus" class="muted" style="margin:12px 0 0"></p>
+    </div>`;
+
+  const status = $("#authStatus");
+  const email = $("#authEmail");
+  const password = $("#authPassword");
+
+  async function runAuth(action) {
+    const emailValue = email.value.trim();
+    const passwordValue = password.value;
+    if (!emailValue || !passwordValue) {
+      status.textContent = "กรุณากรอกอีเมลและรหัสผ่าน";
+      return;
+    }
+    status.textContent = "กำลังเชื่อมต่อ...";
+    try {
+      if (action === "login") {
+        await signInWithEmailAndPassword(auth, emailValue, passwordValue);
+      } else {
+        await createUserWithEmailAndPassword(auth, emailValue, passwordValue);
+      }
+      $("#modalRoot").innerHTML = "";
+    } catch (error) {
+      console.error(error);
+      status.textContent = authErrorMessage(error);
+    }
+  }
+
+  $("#authLogin").addEventListener("click", () => runAuth("login"));
+  $("#authRegister").addEventListener("click", () => runAuth("register"));
+}
+
+function renderAuthButton() {
+  const button = $("#cloudAccount");
+  if (!button) return;
+  const user = auth.currentUser;
+  button.textContent = user ? "☁" : "☁";
+  button.title = user ? `Cloud: ${user.email} — กดเพื่อออกจากระบบ` : "เข้าสู่ระบบ PayNest Cloud";
+  button.setAttribute("aria-label", button.title);
+}
+
+async function bootstrapCloud() {
+  try {
+    const merged = await syncInitialData(data);
+    data = saveData(merged);
+    render();
+  } catch (error) {
+    console.warn("PayNest initial cloud sync skipped:", error);
+  }
 }
 
 function customerById(id) {
@@ -1053,5 +1141,21 @@ $("#importFile").addEventListener("change", async event => {
 $("#topAction").addEventListener("click", () =>
   scrollTo({top: 0, behavior: "smooth"})
 );
+
+$("#cloudAccount")?.addEventListener("click", async () => {
+  if (auth.currentUser) {
+    if (confirm(`ออกจากระบบ ${auth.currentUser.email} ใช่หรือไม่?`)) {
+      await signOut(auth);
+      renderAuthButton();
+    }
+  } else {
+    openAuthModal();
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  renderAuthButton();
+  if (user) await bootstrapCloud();
+});
 
 render();

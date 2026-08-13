@@ -73,6 +73,12 @@ export function loadData() {
 export function saveData(data) {
   const safe = normalize(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+
+  // Cloud sync is best-effort and never blocks the local app.
+  import("./firestore-sync.js")
+    .then(({setCloudData}) => setCloudData(safe))
+    .catch(error => console.warn("PayNest cloud sync skipped:", error));
+
   return safe;
 }
 

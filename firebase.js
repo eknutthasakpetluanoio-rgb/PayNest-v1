@@ -1,9 +1,6 @@
-// PayNest — Firebase
-// Authentication + Firestore
-// Safe Sync foundation: never overwrites LocalStorage automatically.
+// PayNest — Firebase Authentication + Firestore
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-
 import {
   getAuth,
   onAuthStateChanged,
@@ -11,7 +8,6 @@ import {
   createUserWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
 import {
   getFirestore,
   doc,

@@ -38,13 +38,16 @@
       <h1 id="pageTitle">ภาพรวม</h1>
     </div>
 
-    <button
-      class="icon-btn"
-      id="topAction"
-      type="button"
-      aria-label="ขึ้นด้านบน"
-      title="ขึ้นด้านบน"
-    >↑</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="icon-btn" id="cloudAccount" type="button" aria-label="เข้าสู่ระบบ PayNest Cloud" title="เข้าสู่ระบบ PayNest Cloud">☁</button>
+      <button
+        class="icon-btn"
+        id="topAction"
+        type="button"
+        aria-label="ขึ้นด้านบน"
+        title="ขึ้นด้านบน"
+      >↑</button>
+    </div>
   </header>
 
   <!-- ==============================
@@ -123,22 +126,10 @@
 =============================== -->
 <script type="module">
   import { firebaseApp } from "./firebase.js";
-
   window.PayNestFirebase = firebaseApp;
-
-  console.log(
-    "[PayNest] Firebase initialized:",
-    firebaseApp.options.projectId
-  );
+  console.log("[PayNest] Firebase initialized:", firebaseApp.options.projectId);
 </script>
 
-<script type="module">
-  import { auth, onAuthStateChanged } from "./firebase.js";
-  window.PayNestFirebaseAuth = auth;
-  window.PayNestFirebaseAuthReady = new Promise((resolve) => {
-    onAuthStateChanged(auth, (user) => resolve(user));
-  });
-</script>
 <script type="module" src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
