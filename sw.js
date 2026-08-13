@@ -1,10 +1,10 @@
-const CACHE_NAME = "paynest-v20260814-pwa-1";
+const CACHE_NAME = "paynest-v20260814-pwa-2";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=20260814-sync-3",
-  "./app.js?v=20260814-sync-3",
+  "./style.css?v=20260813-firebase-2",
+  "./app.js?v=20260813-firebase-2",
   "./storage.js",
   "./firebase.js",
   "./firestore-sync.js",
@@ -40,7 +40,7 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(event.request.url);
 
-  // Let Firebase/CDN requests go directly to the network.
+  // Firebase / external CDN requests go directly to the network.
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
@@ -49,8 +49,14 @@ self.addEventListener("fetch", event => {
         .then(response => {
           if (response && response.ok) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, copy))
+              .catch(error => {
+                console.warn("PayNest cache update skipped:", error);
+              });
           }
+
           return response;
         })
         .catch(() => cached);
