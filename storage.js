@@ -98,31 +98,3 @@ export function importData(text) {
 }
 
 export { STORAGE_KEY };
-
-
-/* ===================================
-   Firebase Cloud Sync API
-   =================================== */
-
-let cloudSyncModule = null;
-
-async function getCloudSync() {
-    if (!cloudSyncModule) {
-        cloudSyncModule = await import("./firestore-sync.js");
-    }
-    return cloudSyncModule;
-}
-
-export async function loadCloudData() {
-    const cloud = await getCloudSync();
-    return cloud.loadCloudData();
-}
-
-export async function saveCloudData(data) {
-    const cloud = await getCloudSync();
-    return cloud.saveCloudData(data);
-}
-
-export function isCloudSignedIn() {
-    return !!window.PayNestFirebaseAuth?.currentUser;
-}
