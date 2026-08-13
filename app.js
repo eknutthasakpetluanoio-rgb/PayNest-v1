@@ -1,4 +1,4 @@
-import {loadData, saveData, resetData, exportData, importData} from "./storage.js";
+import {loadData, saveData, saveLocalData, resetData, exportData, importData} from "./storage.js";
 import {
   auth,
   onAuthStateChanged,
@@ -6,7 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signOut
 } from "./firebase.js";
-import {syncInitialData} from "./firestore-sync.js";
+import {syncInitialData, startRealtimeSync, stopRealtimeSync} from "./firestore-sync.js";
 
 let data = loadData();
 let page = "dashboard";
@@ -136,10 +136,20 @@ function renderAuthButton() {
 
 async function bootstrapCloud() {
   try {
-    const merged = await syncInitialData(data);
-    data = saveData(merged);
+    // Existing Cloud data is authoritative. Only a brand-new Cloud account
+    // is bootstrapped from this device's LocalStorage.
+    const cloudData = await syncInitialData(data);
+    data = saveLocalData(cloudData);
     render();
+
+    startRealtimeSync(cloudData => {
+      // Never call saveData() here: that would write the incoming Cloud
+      // snapshot back to Cloud and can create a sync loop.
+      data = saveLocalData(cloudData);
+      render();
+    });
   } catch (error) {
+    stopRealtimeSync();
     console.warn("PayNest initial cloud sync skipped:", error);
   }
 }
@@ -1171,7 +1181,13 @@ $("#cloudAccount")?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async user => {
   renderAuthButton();
-  if (user) await bootstrapCloud();
+
+  if (!user) {
+    stopRealtimeSync();
+    return;
+  }
+
+  await bootstrapCloud();
 });
 
 render();

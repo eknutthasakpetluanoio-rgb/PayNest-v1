@@ -1,7 +1,18 @@
 // PayNest — Firestore Sync
-// Safe merge strategy: never replaces non-empty local data with an empty cloud document.
+// Cloud is the source of truth once a user document already exists.
+// LocalStorage is only used to bootstrap a brand-new Cloud document.
 
-import { auth, db, doc, getDoc, setDoc } from "./firebase.js";
+import {
+  auth,
+  db,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp
+} from "./firebase.js";
+
+let unsubscribeRealtime = null;
 
 function currentUser() {
   return auth.currentUser;
@@ -11,69 +22,94 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function mergeById(localItems, cloudItems) {
-  const result = [];
-  const seen = new Set();
-
-  for (const item of Array.isArray(localItems) ? localItems : []) {
-    if (!item || typeof item !== "object") continue;
-    const id = item.id ?? JSON.stringify(item);
-    if (seen.has(id)) continue;
-    seen.add(id);
-    result.push(item);
-  }
-
-  for (const item of Array.isArray(cloudItems) ? cloudItems : []) {
-    if (!item || typeof item !== "object") continue;
-    const id = item.id ?? JSON.stringify(item);
-    if (seen.has(id)) continue;
-    seen.add(id);
-    result.push(item);
-  }
-
-  return result;
+function hasData(data) {
+  return !!data && typeof data === "object";
 }
 
-function mergeData(localData, cloudData) {
-  if (!cloudData) return clone(localData);
-  if (!localData) return clone(cloudData);
-
-  return {
-    version: 1,
-    contracts: mergeById(localData.contracts, cloudData.contracts),
-    customers: mergeById(localData.customers, cloudData.customers),
-    settings: {
-      ...(cloudData.settings || {}),
-      ...(localData.settings || {})
-    }
-  };
+function userDocumentRef() {
+  const user = currentUser();
+  return user ? doc(db, "users", user.uid) : null;
 }
 
 export async function getCloudData() {
-  const user = currentUser();
-  if (!user) return null;
+  const ref = userDocumentRef();
+  if (!ref) return null;
 
-  const snapshot = await getDoc(doc(db, "users", user.uid));
+  const snapshot = await getDoc(ref);
   if (!snapshot.exists()) return null;
 
-  return snapshot.data()?.data ?? null;
+  const cloudData = snapshot.data()?.data;
+  return hasData(cloudData) ? clone(cloudData) : null;
 }
 
 export async function setCloudData(data) {
-  const user = currentUser();
-  if (!user) return false;
+  const ref = userDocumentRef();
+  if (!ref) return false;
 
-  await setDoc(doc(db, "users", user.uid), {
+  await setDoc(ref, {
     data: clone(data),
-    updatedAt: new Date().toISOString()
+    updatedAt: serverTimestamp()
   }, { merge: true });
 
   return true;
 }
 
+// Initial login rule:
+// 1) Existing Cloud data wins completely over stale LocalStorage.
+// 2) If Cloud has no user document yet, upload the current LocalStorage once.
 export async function syncInitialData(localData) {
-  const cloudData = await getCloudData();
-  const merged = mergeData(localData, cloudData);
-  await setCloudData(merged);
-  return merged;
+  const ref = userDocumentRef();
+  if (!ref) return localData;
+
+  const snapshot = await getDoc(ref);
+
+  if (snapshot.exists()) {
+    const cloudData = snapshot.data()?.data;
+    if (hasData(cloudData)) {
+      return clone(cloudData);
+    }
+  }
+
+  const safeLocal = clone(localData);
+  await setDoc(ref, {
+    data: safeLocal,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
+  return safeLocal;
+}
+
+export function startRealtimeSync(onData) {
+  stopRealtimeSync();
+
+  const ref = userDocumentRef();
+  if (!ref) return () => {};
+
+  unsubscribeRealtime = onSnapshot(
+    ref,
+    snapshot => {
+      if (!snapshot.exists()) return;
+
+      const cloudData = snapshot.data()?.data;
+      if (!hasData(cloudData)) return;
+
+      try {
+        onData(clone(cloudData));
+      } catch (error) {
+        console.error("PayNest realtime data handler error:", error);
+      }
+    },
+    error => {
+      console.warn("PayNest realtime sync error:", error);
+    }
+  );
+
+  return unsubscribeRealtime;
+}
+
+export function stopRealtimeSync() {
+  if (typeof unsubscribeRealtime === "function") {
+    unsubscribeRealtime();
+  }
+  unsubscribeRealtime = null;
 }

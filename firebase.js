@@ -12,7 +12,9 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  onSnapshot,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -35,5 +37,7 @@ export {
   signOut,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  onSnapshot,
+  serverTimestamp
 };

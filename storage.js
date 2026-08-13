@@ -70,11 +70,18 @@ export function loadData() {
   }
 }
 
-export function saveData(data) {
+// Local-only persistence. Used when Firestore sends a newer snapshot so
+// the incoming Cloud data cannot be sent straight back to Cloud again.
+export function saveLocalData(data) {
   const safe = normalize(data);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+  return safe;
+}
 
-  // Cloud sync is best-effort and never blocks the local app.
+export function saveData(data) {
+  const safe = saveLocalData(data);
+
+  // User-initiated local changes are synced to Cloud.
   import("./firestore-sync.js")
     .then(({setCloudData}) => setCloudData(safe))
     .catch(error => console.warn("PayNest cloud sync skipped:", error));

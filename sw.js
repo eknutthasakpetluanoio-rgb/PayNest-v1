@@ -1,10 +1,10 @@
-const CACHE_NAME = "paynest-v20260813-firebase-2";
+const CACHE_NAME = "paynest-v20260814-sync-3";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=20260813-firebase-2",
-  "./app.js?v=20260813-firebase-2",
+  "./style.css?v=20260814-sync-3",
+  "./app.js?v=20260814-sync-3",
   "./storage.js",
   "./firebase.js",
   "./firestore-sync.js",
