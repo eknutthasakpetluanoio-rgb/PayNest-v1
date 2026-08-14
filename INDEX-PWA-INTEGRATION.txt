@@ -1,0 +1,10 @@
+PayNest — Clean PWA Integration
+
+1. index.html -> manifest.json
+2. index.html -> app.js + pwa-install.js
+3. pwa-install.js -> sw.js (จุดลงทะเบียนเดียว)
+4. manifest.json -> icon/icon-192.png + icon/icon-512.png
+5. sw.js -> app shell + Firebase browser modules
+6. start_url = ./index.html
+7. scope = ./
+8. app.js ไม่ลงทะเบียน Service Worker และไม่ดัก beforeinstallprompt ซ้ำ
