@@ -1,11 +1,11 @@
 /* PayNest PWA Service Worker — production offline shell */
-const CACHE_NAME = "paynest-pwa-v1-final-20260814";
+const CACHE_NAME = "paynest-pwa-v1-final-20260814-2";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
-  "./app.js",
+  "./style.css?v=20260813-firebase-2",
+  "./app.js?v=20260814-pwa-8",
   "./storage.js",
   "./firebase.js",
   "./firestore-sync.js",
