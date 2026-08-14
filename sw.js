@@ -1,5 +1,5 @@
 /* PayNest PWA Service Worker — production offline shell */
-const CACHE_NAME = "paynest-pwa-v1-final-20260814-2";
+const CACHE_NAME = "paynest-pwa-v1-final-20260814-3";
 
 const APP_SHELL = [
   "./",
@@ -10,8 +10,9 @@ const APP_SHELL = [
   "./firebase.js",
   "./firestore-sync.js",
   "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./pwa-install.js?v=20260814-pwa-10",
+  "./icon/icon-192.png",
+  "./icon/icon-512.png"
 ];
 
 self.addEventListener("install", event => {

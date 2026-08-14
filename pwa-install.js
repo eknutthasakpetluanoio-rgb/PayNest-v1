@@ -1,62 +1,45 @@
-/* PayNest PWA controller — PWA-only layer. */
+/* PayNest PWA controller — single install flow + single service worker registration. */
 
 (() => {
   "use strict";
 
   const SW_URL = "./sw.js";
-  const PWA_VERSION = "20260814-v1";
+  const SW_SCOPE = "./";
+  const PWA_VERSION = "20260814-v2";
 
   let deferredInstallPrompt = null;
+
+  const getInstallButton = () => document.getElementById("installApp");
 
   function isStandalone() {
     return window.matchMedia?.("(display-mode: standalone)")?.matches ||
       window.navigator.standalone === true;
   }
 
-  function removeInstallButton() {
-    document.getElementById("paynest-pwa-install")?.remove();
+  function showInstallButton() {
+    const button = getInstallButton();
+    if (!button || isStandalone()) return;
+    button.hidden = false;
   }
 
-  function createInstallButton() {
-    if (isStandalone() || document.getElementById("paynest-pwa-install")) return;
+  function hideInstallButton() {
+    const button = getInstallButton();
+    if (button) button.hidden = true;
+  }
 
-    const button = document.createElement("button");
-    button.id = "paynest-pwa-install";
-    button.type = "button";
-    button.textContent = "ติดตั้ง PayNest";
-    button.setAttribute("aria-label", "ติดตั้ง PayNest");
+  async function promptInstall() {
+    if (!deferredInstallPrompt) return;
 
-    Object.assign(button.style, {
-      position: "fixed",
-      left: "50%",
-      bottom: "96px",
-      transform: "translateX(-50%)",
-      zIndex: "9999",
-      border: "1px solid rgba(255,255,255,.22)",
-      borderRadius: "18px",
-      padding: "14px 22px",
-      background: "rgba(245,245,248,.96)",
-      color: "#050507",
-      font: "700 15px system-ui, -apple-system, 'Noto Sans Thai', sans-serif",
-      boxShadow: "0 14px 40px rgba(0,0,0,.55)",
-      backdropFilter: "blur(20px)",
-      WebkitBackdropFilter: "blur(20px)"
-    });
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    hideInstallButton();
 
-    button.addEventListener("click", async () => {
-      if (!deferredInstallPrompt) return;
-
-      const promptEvent = deferredInstallPrompt;
-      deferredInstallPrompt = null;
-      removeInstallButton();
-
-      try {
-        await promptEvent.prompt();
-        await promptEvent.userChoice;
-      } catch (_) {}
-    });
-
-    document.body.appendChild(button);
+    try {
+      await promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (error) {
+      console.warn("[PayNest PWA] install prompt failed:", error);
+    }
   }
 
   async function registerServiceWorker() {
@@ -65,17 +48,17 @@
     try {
       const registration = await navigator.serviceWorker.register(
         SW_URL,
-        { scope: "./", updateViaCache: "none" }
+        { scope: SW_SCOPE, updateViaCache: "none" }
       );
 
-      // Ask the browser to check for a new PWA controller.
       try {
         await registration.update();
       } catch (_) {}
 
+      console.info("[PayNest PWA] Service Worker registered", PWA_VERSION);
       return registration;
     } catch (error) {
-      console.warn("[PayNest PWA] Service Worker registration failed:", error);
+      console.error("[PayNest PWA] Service Worker registration failed:", error);
       return null;
     }
   }
@@ -83,17 +66,24 @@
   window.addEventListener("beforeinstallprompt", event => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    createInstallButton();
+    showInstallButton();
     console.info("[PayNest PWA] install prompt available");
   });
 
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
-    removeInstallButton();
+    hideInstallButton();
     console.info("[PayNest PWA] installed");
   });
 
   window.addEventListener("load", () => {
+    const button = getInstallButton();
+
+    if (button) {
+      button.addEventListener("click", promptInstall);
+      if (isStandalone()) hideInstallButton();
+    }
+
     registerServiceWorker();
 
     if (isStandalone()) {
