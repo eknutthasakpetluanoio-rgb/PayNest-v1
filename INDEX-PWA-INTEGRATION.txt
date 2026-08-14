@@ -1,0 +1,13 @@
+PayNest — PWA Integration (updated 2026-08-14)
+
+PWA source of truth:
+1. index.html -> manifest.json
+2. index.html -> app.js + pwa-install.js
+3. pwa-install.js -> sw.js (single Service Worker registration)
+4. manifest.json -> ./icon/icon-192.png + ./icon/icon-512.png
+5. sw.js caches the PWA controller as part of the app shell
+6. start_url = ./ and scope = ./
+7. app.js contains no PWA install logic and no Service Worker registration
+8. Install flow:
+   - Chrome fires beforeinstallprompt -> PayNest uses the native install prompt
+   - If the event is unavailable -> PayNest shows the manual Chrome install guidance
