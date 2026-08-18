@@ -2015,7 +2015,11 @@ document.addEventListener("click", event => {
       exportJson("before-reset");
       data = resetData();
       // Keep Firestore consistent with the explicit local reset.
-      saveData(data);
+      if (currentUser()) {
+        setCloudData(data).catch(error =>
+          console.warn("PayNest cloud reset sync skipped:", error)
+        );
+      }
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
