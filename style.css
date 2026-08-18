@@ -846,24 +846,24 @@ html[data-theme="light"] .skip-link{
    Only presentation/storage of optional imageData is added.
 ========================================================= */
 .brand-lockup{display:flex;align-items:center;gap:10px;min-width:0}
-.app-logo{width:34px;height:34px;border-radius:10px;display:block;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 var(--glass-highlight)}
+.app-logo{width:24px;height:24px;border-radius:7px;display:block;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 var(--glass-highlight)}
 
 .contract-title-wrap{display:flex;align-items:center;gap:11px;min-width:0}
 .contract-title-copy{min-width:0}
 .product-thumb{flex:0 0 auto;overflow:hidden;display:grid;place-items:center;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.025));border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--glass-highlight),0 8px 18px rgba(0,0,0,.25)}
-.product-thumb-small{width:46px;height:46px;border-radius:14px}
-.product-thumb-large{width:58px;height:58px;border-radius:17px}
+.product-thumb-small{width:44px;height:44px;border-radius:12px}
+.product-thumb-large{width:54px;height:54px;border-radius:15px}
 .product-thumb img{width:100%;height:100%;display:block;object-fit:cover}
 .product-thumb span{font-size:12px;font-weight:800;color:var(--soft);letter-spacing:.5px}
 .product-thumb-large span{font-size:14px}
 
-.product-image-field{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:inset 0 1px 0 var(--glass-highlight);margin-top:2px}
+.product-image-field{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:inset 0 1px 0 var(--glass-highlight);margin-top:2px}
 .product-image-preview{flex:0 0 auto}
-.product-image-copy{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:7px 8px}
-.product-image-copy b{width:100%;font-size:13px}
-.product-image-copy span{width:100%;color:var(--muted);font-size:11px;line-height:1.45}
-.file-btn{display:inline-flex!important;align-items:center;justify-content:center;width:auto!important;margin:0!important;padding:7px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
-.product-image-copy .mini-btn{font-size:10px;padding:7px 10px}
+.product-image-copy{min-width:0;display:block}
+.product-image-copy b{display:block;font-size:12px}
+.product-image-copy span{display:block;color:var(--muted);font-size:10px;line-height:1.35;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-btn{display:inline-flex!important;align-items:center;justify-content:center;width:auto!important;margin:0!important;padding:7px 9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap}
+.product-image-copy .mini-btn{font-size:10px;padding:7px 9px}
 
 .contract-detail-title{display:flex;align-items:center;gap:12px;min-width:0}
 .contract-detail-title > div:last-child{min-width:0}
@@ -873,11 +873,11 @@ html[data-theme="light"] .product-thumb{background:linear-gradient(145deg,rgba(2
 html[data-theme="light"] .product-image-field{background:rgba(255,255,255,.68)}
 
 @media (max-width:420px){
-  .app-logo{width:31px;height:31px;border-radius:9px}
+  .app-logo{width:24px;height:24px;border-radius:7px}
   .topbar{padding-left:14px;padding-right:14px}
   .topbar h1{font-size:22px}
-  .product-thumb-small{width:42px;height:42px;border-radius:12px}
-  .product-image-field{padding:10px;gap:10px}
-  .product-thumb-large{width:54px;height:54px;border-radius:15px}
+  .product-thumb-small{width:42px;height:42px;border-radius:11px}
+  .product-image-field{grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding:8px}.product-image-field .ghost-mini{display:none}
+  .product-thumb-large{width:50px;height:50px;border-radius:14px}
   .contract-detail-title{gap:9px}
 }

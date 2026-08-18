@@ -418,12 +418,20 @@ function productInitials(product) {
   return text.slice(0, 2).toUpperCase();
 }
 
+function defaultProductImage(product) {
+  const text = String(product || "").toLowerCase();
+  if (text.includes("vivo") && text.includes("v70")) return "./products/vivo-v70.svg";
+  if (text.includes("soundcore") && text.includes("r60i")) return "./products/soundcore-r60i-nc.svg";
+  if (text.includes("redmi") && text.includes("watch") && text.includes("5")) return "./products/redmi-watch-5-lite.svg";
+  return "";
+}
+
 function productThumb(product, imageData = "", size = "small") {
   const safeImage = String(imageData || "");
+  const fallback = defaultProductImage(product);
+  const src = safeImage.startsWith("data:image/") ? safeImage : fallback;
   return `<div class="product-thumb product-thumb-${size}" aria-hidden="true">${
-    safeImage.startsWith("data:image/")
-      ? `<img src="${esc(safeImage)}" alt="">`
-      : `<span>${esc(productInitials(product))}</span>`
+    src ? `<img src="${esc(src)}" alt="">` : `<span>${esc(productInitials(product))}</span>`
   }</div>`;
 }
 
@@ -1042,15 +1050,15 @@ function openContractModal(prefill = {}, editId = null) {
 
       <div class="product-image-field">
         <div class="product-image-preview" id="productImagePreview">
-          ${productThumb(source.product || "สินค้า", source.imageData, "large")}
+          ${productThumb(source.product || "สินค้า", source.imageData, "small")}
         </div>
         <div class="product-image-copy">
           <b>รูปสินค้า</b>
-          <span>ใส่รูปได้แบบพอดีการ์ด ไม่กระทบข้อมูลสัญญา</span>
-          <label class="file-btn" for="productImageInput">เลือกจากเครื่อง</label>
-          <input id="productImageInput" name="productImage" type="file" accept="image/*" hidden>
-          <button type="button" class="mini-btn ghost-mini" id="removeProductImage">เอารูปออก</button>
+          <span>ระบบใส่รูปสินค้าให้ตามรุ่นอัตโนมัติ · เปลี่ยนรูปเองได้</span>
         </div>
+        <label class="file-btn" for="productImageInput">เปลี่ยนรูป</label>
+        <input id="productImageInput" name="productImage" type="file" accept="image/*" hidden>
+        <button type="button" class="mini-btn ghost-mini" id="removeProductImage" aria-label="ใช้รูปอัตโนมัติ">รีเซ็ต</button>
       </div>
 
       ${data.customers.length ? `
@@ -1111,7 +1119,7 @@ function openContractModal(prefill = {}, editId = null) {
   let productImageData = String(source.imageData || "");
 
   function updateProductImagePreview() {
-    productImagePreview.innerHTML = productThumb(form.product?.value || "สินค้า", productImageData, "large");
+    productImagePreview.innerHTML = productThumb(form.product?.value || "สินค้า", productImageData, "small");
   }
 
   productImageInput?.addEventListener("change", async () => {
