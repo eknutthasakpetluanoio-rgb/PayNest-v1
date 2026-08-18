@@ -834,3 +834,9 @@ html[data-theme="light"] .skip-link{
   background:#17181c;
   color:#fff;
 }
+
+
+.payment-row-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+.payment-row > div:first-child{min-width:0;}
+.payment-row small{color:var(--soft);font-size:10px;display:block;margin-top:3px;}
+.payment-row .payment-penalty{color:#f2b86b;}

@@ -1195,6 +1195,83 @@ function openCustomerForm(prefill = {}) {
   });
 }
 
+function recalculateContractPayments(contract) {
+  const payments = Array.isArray(contract.payments) ? contract.payments : [];
+  const principal = payments.reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+  contract.received = Math.min(
+    Math.max(0, Number(contract.total || 0)),
+    Math.round(principal * 100) / 100
+  );
+  contract.penaltyTotal = Math.round(
+    payments.reduce((sum, p) => sum + Math.max(0, Number(p.penalty || 0)), 0) * 100
+  ) / 100;
+  contract.status = getStatus(contract);
+  return contract;
+}
+
+function openPaymentEdit(contractId, paymentId) {
+  const contract = data.contracts.find(c => c.id === contractId);
+  if (!contract) return;
+  const payment = (contract.payments || []).find(p => p.id === paymentId);
+  if (!payment) return;
+
+  $("#modalRoot").innerHTML = `<div class="overlay">
+    <form class="modal small" id="paymentEditForm">
+      <div class="modal-head">
+        <div><div class="eyebrow">EDIT PAYMENT</div><h2>แก้ไขประวัติการรับเงิน</h2></div>
+        <button type="button" class="icon-btn" data-close>×</button>
+      </div>
+
+      <div class="payment-summary">
+        <b>${esc(contract.product)}</b>
+        <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
+        <strong>ยอดสัญญา ${money(contract.total)}</strong>
+      </div>
+
+      <label>เงินต้นที่รับ
+        <input name="amount" type="number" min="0" step="0.01" value="${Number(payment.amount || 0)}" required>
+      </label>
+
+      <label>ค่าปรับ
+        <input name="penalty" type="number" min="0" step="0.01" value="${Number(payment.penalty || 0)}">
+      </label>
+
+      <label>วันที่รับเงิน
+        <input name="date" type="date" value="${esc(payment.date || localToday())}" required>
+      </label>
+
+      <label>หมายเหตุ
+        <input name="note" type="text" maxlength="200" value="${esc(payment.note || "")}">
+      </label>
+
+      <button class="primary-btn" type="submit">บันทึกการแก้ไข</button>
+    </form>
+  </div>`;
+
+  $("#paymentEditForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const f = new FormData(event.currentTarget);
+    const otherPrincipal = (contract.payments || [])
+      .filter(p => p.id !== payment.id)
+      .reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+    const amount = Math.max(0, Number(f.get("amount") || 0));
+    if (otherPrincipal + amount > Number(contract.total || 0) + 0.005) {
+      alert(`เงินต้นรวมจะเกินยอดสัญญา ${money(contract.total)}`);
+      return;
+    }
+
+    payment.amount = Math.round(amount * 100) / 100;
+    payment.penalty = Math.round(Math.max(0, Number(f.get("penalty") || 0)) * 100) / 100;
+    payment.date = String(f.get("date") || localToday());
+    payment.note = String(f.get("note") || "").trim();
+
+    recalculateContractPayments(contract);
+    $("#modalRoot").innerHTML = "";
+    persist();
+    openContractDetail(contract.id);
+  });
+}
+
 function openPayment(id) {
   const contract = data.contracts.find(c => c.id === id);
   if (!contract || getStatus(contract) === "paid") return;
@@ -1416,8 +1493,20 @@ function openContractDetail(id) {
   </section>`;
 
   const historyBlock = `<div class="modal-section-title">ประวัติการรับชำระ</div>
+    ${Number(contract.penaltyTotal || 0) > 0 ? `<div class="subtle-box">ค่าปรับสะสม ${money(contract.penaltyTotal)}</div>` : ""}
     ${payments.length
-      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row"><div><span>${fmtDate(p.date)}</span><b>+ ${money(p.amount)}</b></div><button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button></div>`).join("")}</div>`
+      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row">
+        <div>
+          <span>${fmtDate(p.date)}</span>
+          <b>+ ${money(p.amount)}</b>
+          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+        </div>
+        <div class="payment-row-actions">
+          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+        </div>
+      </div>`).join("")}</div>`
       : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
@@ -1576,6 +1665,12 @@ document.addEventListener("click", event => {
   if (filter) {
     contractFilter = filter.dataset.contractFilter;
     render();
+    return;
+  }
+
+  const editPayment = event.target.closest("[data-edit-payment]");
+  if (editPayment) {
+    openPaymentEdit(editPayment.dataset.editPayment, editPayment.dataset.payment);
     return;
   }
 
