@@ -1,0 +1,40 @@
+PAYFLOW PWA FINAL AUDIT — 2026-08-19
+
+ตรวจครบทุกโฟลเดอร์และไฟล์ใน ZIP รอบนี้
+
+Root files:
+- index.html
+- style.css
+- app.js
+- manifest.json
+- sw.js
+- pwa-install.js
+- firebase.js
+- storage.js
+- firestore-sync.js
+- icons
+
+Folders:
+- icon/
+- js/
+- css/
+
+Fixed:
+1. manifest start_url/scope/id aligned to "./"
+2. manifest contains 192x192 and 512x512 PNG icons
+3. index.html loads pwa-install.js exactly once
+4. index.html loads app.js exactly once
+5. service worker caches pwa-install.js
+6. Service Worker cache version advanced
+7. repaired broken relative imports in unused helper modules under js/
+8. preserved application data and business logic
+
+Important:
+ZIP cannot force Chrome to show installation if the deployed origin is not eligible.
+The live site must be HTTPS (or localhost for testing), and Service Worker registration must succeed.
+Do NOT open index.html with file:// and expect PWA installation.
+
+Data/structure:
+- No LocalStorage keys or business data fields were intentionally changed.
+- No Firebase project configuration was changed.
+- No color theme was introduced.

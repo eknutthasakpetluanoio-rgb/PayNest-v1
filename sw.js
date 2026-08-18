@@ -1,11 +1,12 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v6-install-fix-20260819";
+const CACHE_NAME = "paynest-pwa-v7-final-20260819";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
+  "./pwa-install.js",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",

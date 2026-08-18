@@ -3,6 +3,7 @@
   "use strict";
 
   const SW_URL = "./sw.js";
+  const MANIFEST_URL = "./manifest.json";
   const SW_SCOPE = "./";
   let deferredInstallPrompt = null;
 
@@ -11,6 +12,24 @@
   const isStandalone = () =>
     window.matchMedia?.("(display-mode: standalone)")?.matches === true ||
     window.navigator.standalone === true;
+
+  async function verifyManifest() {
+    try {
+      const response = await fetch(MANIFEST_URL, { cache: "no-store" });
+      if (!response.ok) throw new Error(`manifest HTTP ${response.status}`);
+      const manifest = await response.json();
+      if (!manifest.icons?.some(icon => icon.sizes === "192x192")) {
+        console.warn("[PAYFLOW PWA] 192x192 icon missing from manifest");
+      }
+      if (!manifest.icons?.some(icon => icon.sizes === "512x512")) {
+        console.warn("[PAYFLOW PWA] 512x512 icon missing from manifest");
+      }
+      return manifest;
+    } catch (error) {
+      console.warn("[PAYFLOW PWA] Manifest check failed:", error);
+      return null;
+    }
+  }
 
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return null;
@@ -99,6 +118,7 @@
   }
 
   // Register immediately. Do not wait for window.load.
+  verifyManifest();
   registerServiceWorker();
 
   window.addEventListener("beforeinstallprompt", event => {

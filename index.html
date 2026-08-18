@@ -18,6 +18,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="theme-color" content="#040406">
 
 </head>
@@ -121,8 +123,10 @@
 <!-- ==============================
      APP
 =============================== -->
-<script type="module" src="./app.js"></script>
 
+
+<script src="./pwa-install.js" defer></script>
+<script type="module" src="./app.js"></script>
 
 </body>
 </html>
