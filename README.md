@@ -26,3 +26,10 @@ PayNest/
 ## การใช้งาน
 
 เปิด `index.html` ผ่านเว็บเซิร์ฟเวอร์หรือ GitHub Pages เพื่อให้ ES Modules, Firebase และ Service Worker ทำงานได้ตามปกติ
+
+
+## Payment logic locked
+- Payment history can be edited (principal, penalty, date, note).
+- Next due date is calculated directly from the latest payment date plus the contract payment period.
+- Penalties are stored separately from principal and never reduce contract principal balance.
+- Due status uses a consistent luxury-glass palette: normal, due soon (3 days), due today, overdue, paid.

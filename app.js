@@ -357,6 +357,7 @@ function stopRealtimeSync() {
 })();
 
 let data = loadData();
+normalizePaymentData(data);
 let page = "dashboard";
 let contractFilter = "active";
 let contractQuery = "";
@@ -374,6 +375,19 @@ const money = value =>
   `${data.settings.currency}${Number(value || 0).toLocaleString("th-TH", {
     maximumFractionDigits: 2
   })}`;
+
+function normalizePaymentData(target) {
+  (target.contracts || []).forEach(contract => {
+    contract.payments = Array.isArray(contract.payments) ? contract.payments : [];
+    contract.payments.forEach(payment => {
+      payment.amount = Math.max(0, Number(payment.amount || 0));
+      payment.penalty = Math.max(0, Number(payment.penalty || 0));
+      payment.date = payment.date || contract.dueDate || contract.startDate || localToday();
+      payment.note = String(payment.note || "");
+    });
+    recalculateContractPayments(contract);
+  });
+}
 
 function localToday() {
   const d = new Date();
@@ -572,7 +586,7 @@ function getInstallmentSchedule(contract) {
   const type = contract.paymentType || "monthly";
   let cumulativeDue = 0;
 
-  return Array.from({length: count}, (_, index) => {
+  const baseSchedule = Array.from({length: count}, (_, index) => {
     const amount = installmentAmount(contract, index);
     const previousDue = cumulativeDue;
     cumulativeDue += amount;
@@ -596,6 +610,39 @@ function getInstallmentSchedule(contract) {
       status
     };
   });
+
+  // Once a payment exists, the next due date is anchored directly to the
+  // latest payment date. This keeps weekly/monthly schedules predictable
+  // even when a payment was made earlier or later than the original date.
+  const next = baseSchedule.find(item => item.status !== "paid");
+  if (next) {
+    const nextDue = calculateNextDueDate(contract);
+    if (nextDue) {
+      const nextIndex = baseSchedule.findIndex(item => item.number === next.number);
+      for (let i = nextIndex; i < baseSchedule.length; i++) {
+        baseSchedule[i].dueDate = addPeriod(
+          nextDue,
+          i - nextIndex,
+          type
+        );
+      }
+    }
+  }
+
+  return baseSchedule;
+}
+
+function calculateNextDueDate(contract) {
+  const payments = Array.isArray(contract.payments)
+    ? contract.payments.filter(p => p && p.date)
+    : [];
+
+  if (!payments.length) {
+    return contract.dueDate || contract.startDate || localToday();
+  }
+
+  const latest = [...payments].sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
+  return addPeriod(latest.date, 1, contract.paymentType || "monthly");
 }
 
 function getNextInstallment(contract) {
@@ -612,27 +659,53 @@ function installmentStatusLabel(item) {
 
 function paymentStatus(contract) {
   if (getStatus(contract) === "paid") return "paid";
-  const received = Number(contract.received || 0);
-  const dueDate = contract.dueDate ? new Date(`${contract.dueDate}T23:59:59`) : null;
+
+  const next = getNextInstallment(contract);
+  const dueValue = next?.dueDate || contract.dueDate;
+  if (!dueValue) return "due";
+
   const today = new Date(`${localToday()}T00:00:00`);
-  if (dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < today) {
-    return received > 0 ? "overdue-partial" : "overdue";
-  }
-  return received > 0 ? "partial" : "due";
+  const due = new Date(`${dueValue}T00:00:00`);
+  if (Number.isNaN(due.getTime())) return "due";
+
+  const days = Math.round((due - today) / 86400000);
+  const hasReceived = Number(contract.received || 0) > 0;
+
+  if (days < 0) return hasReceived ? "overdue-partial" : "overdue";
+  if (days === 0) return "due-today";
+  if (days <= 3) return "due-soon";
+  return hasReceived ? "partial" : "due";
 }
 
 function statusLabel(contract) {
   return ({
     paid: "ชำระครบ",
-    overdue: "ค้างชำระ",
+    overdue: "เกินกำหนด",
     "overdue-partial": "ค้างชำระบางส่วน",
+    "due-today": "ถึงกำหนดวันนี้",
+    "due-soon": "ใกล้ถึงกำหนด",
     partial: "ชำระบางส่วน",
-    due: "ถึงกำหนด"
+    due: "กำลังผ่อน"
   }[paymentStatus(contract)] || "กำลังผ่อน");
 }
 
 function statusClass(contract) {
   return paymentStatus(contract);
+}
+
+function statusTextWithDate(contract) {
+  const next = getNextInstallment(contract);
+  if (!next) return "ชำระครบแล้ว";
+  const status = paymentStatus(contract);
+  const days = Math.round(
+    (new Date(`${next.dueDate}T00:00:00`) - new Date(`${localToday()}T00:00:00`)) / 86400000
+  );
+  if (status === "overdue" || status === "overdue-partial") {
+    return `⚠ เกินกำหนด ${Math.abs(days)} วัน · ${fmtDate(next.dueDate)}`;
+  }
+  if (status === "due-today") return `ถึงกำหนดวันนี้ · ${fmtDate(next.dueDate)}`;
+  if (status === "due-soon") return `ใกล้ถึงกำหนด · อีก ${days} วัน · ${fmtDate(next.dueDate)}`;
+  return `งวดถัดไป · ${fmtDate(next.dueDate)}`;
 }
 
 function stats() {
@@ -643,7 +716,8 @@ function stats() {
     due: active.reduce((sum, c) => sum + remaining(c), 0),
     active: active.length,
     overdue: active.filter(c => ["overdue", "overdue-partial"].includes(paymentStatus(c))).length,
-    dueToday: active.filter(c => c.dueDate === localToday()).length,
+    dueToday: active.filter(c => paymentStatus(c) === "due-today").length,
+    dueSoon: active.filter(c => paymentStatus(c) === "due-soon").length,
     customers: data.customers.length
   };
 }
@@ -709,7 +783,7 @@ function dashboard() {
       </div>
     </div> 
     <div class="status-summary card">
-      <div><b>สถานะการชำระ</b><span>ค้างกำหนด ${s.overdue} · ครบกำหนดวันนี้ ${s.dueToday}</span></div>
+      <div><b>สถานะการชำระ</b><span>ค้างกำหนด ${s.overdue} · วันนี้ ${s.dueToday} · ใกล้ถึง ${s.dueSoon}</span></div>
       <span class="summary-dot ${s.overdue ? "has-overdue" : ""}">${s.overdue ? "ต้องติดตาม" : "ปกติ"}</span>
     </div>
 
@@ -747,7 +821,7 @@ function actionList() {
       <div class="task-main">
         <b>${esc(c.product)}</b>
         <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
-        <small>${getNextInstallment(c) ? `งวดถัดไป ${fmtDate(getNextInstallment(c).dueDate)}` : "ชำระครบแล้ว"}</small>
+        <small>${statusTextWithDate(c)}</small>
       </div>
       <div class="task-right">
         <strong>${money(remaining(c))}</strong>
@@ -786,9 +860,7 @@ function contractCard(c) {
 
     <div class="contract-bottom">
       <span>${paid ? "✓ ชำระครบแล้ว" :
-        (["overdue","overdue-partial"].includes(paymentStatus(c))
-          ? "⚠ เกินกำหนด " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate)
-          : "งวดถัดไป " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate))}</span>
+        statusTextWithDate(c)}</span>
       <div class="button-row">
         <button class="mini-btn ghost-mini" data-detail="${c.id}">รายละเอียด</button>
         ${paid
@@ -808,6 +880,7 @@ function contracts() {
     .filter(c => {
       if (contractFilter === "active") return getStatus(c) === "active";
       if (contractFilter === "overdue") return ["overdue", "overdue-partial"].includes(paymentStatus(c));
+      if (contractFilter === "due-soon") return ["due-soon", "due-today"].includes(paymentStatus(c));
       if (contractFilter === "partial") return paymentStatus(c) === "partial";
       if (contractFilter === "paid") return getStatus(c) === "paid";
       return true;
@@ -838,6 +911,7 @@ function contracts() {
     <div class="tabs">
       <button class="tab ${contractFilter === "active" ? "active" : ""}" data-contract-filter="active">กำลังผ่อน <b>${activeCount}</b></button>
       <button class="tab ${contractFilter === "overdue" ? "active" : ""}" data-contract-filter="overdue">ค้างชำระ <b>${data.contracts.filter(c => ["overdue","overdue-partial"].includes(paymentStatus(c))).length}</b></button>
+      <button class="tab ${contractFilter === "due-soon" ? "active" : ""}" data-contract-filter="due-soon">ใกล้ถึงกำหนด <b>${data.contracts.filter(c => ["due-soon","due-today"].includes(paymentStatus(c))).length}</b></button>
       <button class="tab ${contractFilter === "partial" ? "active" : ""}" data-contract-filter="partial">บางส่วน <b>${data.contracts.filter(c => paymentStatus(c) === "partial").length}</b></button>
       <button class="tab ${contractFilter === "all" ? "active" : ""}" data-contract-filter="all">ทั้งหมด <b>${data.contracts.length}</b></button>
       <button class="tab ${contractFilter === "paid" ? "active" : ""}" data-contract-filter="paid">ชำระครบ <b>${paidCount}</b></button>
@@ -1160,6 +1234,83 @@ function openCustomerForm(prefill = {}) {
   });
 }
 
+function recalculateContractPayments(contract) {
+  const payments = Array.isArray(contract.payments) ? contract.payments : [];
+  const principal = payments.reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+  contract.received = Math.min(
+    Math.max(0, Number(contract.total || 0)),
+    Math.round(principal * 100) / 100
+  );
+  contract.penaltyTotal = Math.round(
+    payments.reduce((sum, p) => sum + Math.max(0, Number(p.penalty || 0)), 0) * 100
+  ) / 100;
+  contract.status = getStatus(contract);
+  return contract;
+}
+
+function openPaymentEdit(contractId, paymentId) {
+  const contract = data.contracts.find(c => c.id === contractId);
+  if (!contract) return;
+  const payment = (contract.payments || []).find(p => p.id === paymentId);
+  if (!payment) return;
+
+  $("#modalRoot").innerHTML = `<div class="overlay">
+    <form class="modal small" id="paymentEditForm">
+      <div class="modal-head">
+        <div><div class="eyebrow">EDIT PAYMENT</div><h2>แก้ไขประวัติการรับเงิน</h2></div>
+        <button type="button" class="icon-btn" data-close>×</button>
+      </div>
+
+      <div class="payment-summary">
+        <b>${esc(contract.product)}</b>
+        <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
+        <strong>ยอดสัญญา ${money(contract.total)}</strong>
+      </div>
+
+      <label>เงินต้นที่รับ
+        <input name="amount" type="number" min="0" step="0.01" value="${Number(payment.amount || 0)}" required>
+      </label>
+
+      <label>ค่าปรับ
+        <input name="penalty" type="number" min="0" step="0.01" value="${Number(payment.penalty || 0)}">
+      </label>
+
+      <label>วันที่รับเงิน
+        <input name="date" type="date" value="${esc(payment.date || localToday())}" required>
+      </label>
+
+      <label>หมายเหตุ
+        <input name="note" type="text" maxlength="200" value="${esc(payment.note || "")}">
+      </label>
+
+      <button class="primary-btn" type="submit">บันทึกการแก้ไข</button>
+    </form>
+  </div>`;
+
+  $("#paymentEditForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const f = new FormData(event.currentTarget);
+    const otherPrincipal = (contract.payments || [])
+      .filter(p => p.id !== payment.id)
+      .reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+    const amount = Math.max(0, Number(f.get("amount") || 0));
+    if (otherPrincipal + amount > Number(contract.total || 0) + 0.005) {
+      alert(`เงินต้นรวมจะเกินยอดสัญญา ${money(contract.total)}`);
+      return;
+    }
+
+    payment.amount = Math.round(amount * 100) / 100;
+    payment.penalty = Math.round(Math.max(0, Number(f.get("penalty") || 0)) * 100) / 100;
+    payment.date = String(f.get("date") || localToday());
+    payment.note = String(f.get("note") || "").trim();
+
+    recalculateContractPayments(contract);
+    $("#modalRoot").innerHTML = "";
+    persist();
+    openContractDetail(contract.id);
+  });
+}
+
 function openPayment(id) {
   const contract = data.contracts.find(c => c.id === id);
   if (!contract || getStatus(contract) === "paid") return;
@@ -1177,12 +1328,20 @@ function openPayment(id) {
         <strong>คงเหลือ ${money(remaining(contract))}</strong>
       </div>
 
-      <label>จำนวนเงิน
+      <label>เงินต้นที่รับ
         <input name="amount" type="number" min="0.01" max="${remaining(contract)}" step="0.01" value="${remaining(contract)}" required>
+      </label>
+
+      <label>ค่าปรับ
+        <input name="penalty" type="number" min="0" step="0.01" value="0">
       </label>
 
       <label>วันที่รับเงิน
         <input name="date" type="date" value="${localToday()}">
+      </label>
+
+      <label>หมายเหตุ
+        <input name="note" type="text" maxlength="200" placeholder="เช่น ชำระล่าช้า">
       </label>
 
       <button class="primary-btn">บันทึกรับชำระ</button>
@@ -1192,16 +1351,20 @@ function openPayment(id) {
   $("#payForm").addEventListener("submit", event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
-    const amount = Math.min(remaining(contract), Number(f.get("amount") || 0));
+    const amount = Math.min(remaining(contract), Math.max(0, Number(f.get("amount") || 0)));
+    const penalty = Math.max(0, Number(f.get("penalty") || 0));
     if (amount <= 0) return;
 
-    contract.received += amount;
     contract.payments = Array.isArray(contract.payments) ? contract.payments : [];
     contract.payments.push({
       id: uid(),
-      amount,
-      date: String(f.get("date") || localToday())
+      amount: Math.round(amount * 100) / 100,
+      penalty: Math.round(penalty * 100) / 100,
+      date: String(f.get("date") || localToday()),
+      note: String(f.get("note") || "").trim()
     });
+
+    recalculateContractPayments(contract);
     contract.status = getStatus(contract);
 
     $("#modalRoot").innerHTML = "";
@@ -1339,8 +1502,11 @@ function openContractDetail(id) {
     const statusText = installmentStatusLabel(item);
     const dateText = fmtDate(item.dueDate);
     const amountText = money(item.amount);
-    const statusClassName = item.status === "paid" ? "installment-paid" :
-      item.status === "partial" ? "installment-partial" : "installment-pending";
+    const statusClassName = [
+      item.status === "paid" ? "installment-paid" :
+      item.status === "partial" ? "installment-partial" : "installment-pending",
+      nextInstallment && item.number === nextInstallment.number ? "installment-next" : ""
+    ].filter(Boolean).join(" ");
 
     return `<div class="installment-row ${statusClassName}">
       <div class="installment-main">
@@ -1357,7 +1523,7 @@ function openContractDetail(id) {
 
   const nextLabel = getStatus(contract) === "paid"
     ? "ชำระครบ"
-    : `งวด ${nextInstallment?.number || "-"} · ${fmtDate(nextInstallment?.dueDate || contract.dueDate)}`;
+    : `${statusTextWithDate(contract)} · งวด ${nextInstallment?.number || "-"}`;
 
   const progressPercent = contract.total > 0
     ? Math.min(100, (Number(contract.received || 0) / Number(contract.total || 0)) * 100)
@@ -1381,8 +1547,20 @@ function openContractDetail(id) {
   </section>`;
 
   const historyBlock = `<div class="modal-section-title">ประวัติการรับชำระ</div>
+    ${Number(contract.penaltyTotal || 0) > 0 ? `<div class="subtle-box">ค่าปรับสะสม ${money(contract.penaltyTotal)}</div>` : ""}
     ${payments.length
-      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row"><div><span>${fmtDate(p.date)}</span><b>+ ${money(p.amount)}</b></div><button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button></div>`).join("")}</div>`
+      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row">
+        <div>
+          <span>${fmtDate(p.date)}</span>
+          <b>+ ${money(p.amount)}</b>
+          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+        </div>
+        <div class="payment-row-actions">
+          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+        </div>
+      </div>`).join("")}</div>`
       : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
@@ -1478,8 +1656,10 @@ function openReceipt(contractId, paymentId) {
         <div class="receipt-row"><span>จำนวนงวด</span><b>${esc(contract.installments)} งวด</b></div>
 
         <div class="receipt-divider"></div>
-        <div class="receipt-total"><span>รับชำระครั้งนี้</span><strong>${money(payment.amount)}</strong></div>
-        <div class="receipt-row"><span>รับแล้วสะสม</span><b>${money(receivedAfter)}</b></div>
+        <div class="receipt-total"><span>เงินต้นที่รับ</span><strong>${money(payment.amount)}</strong></div>
+        ${Number(payment.penalty || 0) > 0 ? `<div class="receipt-row"><span>ค่าปรับ</span><b>${money(payment.penalty)}</b></div>` : ""}
+        <div class="receipt-row"><span>รับเงินรวมครั้งนี้</span><b>${money(Number(payment.amount || 0) + Number(payment.penalty || 0))}</b></div>
+        <div class="receipt-row"><span>รับต้นเงินสะสม</span><b>${money(receivedAfter)}</b></div>
         <div class="receipt-row"><span>คงเหลือหลังรับเงิน</span><b>${money(balanceAfter)}</b></div>
 
         <div class="receipt-thanks">ขอบคุณที่ใช้บริการ PAYNEST</div>
@@ -1541,6 +1721,12 @@ document.addEventListener("click", event => {
   if (filter) {
     contractFilter = filter.dataset.contractFilter;
     render();
+    return;
+  }
+
+  const editPayment = event.target.closest("[data-edit-payment]");
+  if (editPayment) {
+    openPaymentEdit(editPayment.dataset.editPayment, editPayment.dataset.payment);
     return;
   }
 

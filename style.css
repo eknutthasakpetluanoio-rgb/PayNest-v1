@@ -794,3 +794,56 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .installment-paid .installment-side span{color:var(--success);border-color:rgba(48,209,88,.25);background:rgba(48,209,88,.08)}
 .installment-partial .installment-side span{color:#ffd60a;border-color:rgba(255,214,10,.25);background:rgba(255,214,10,.08)}
 .installment-pending .installment-side span{color:var(--soft)}
+
+
+/* ---------- PayNest payment status / history refinement ---------- */
+.status-text{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 9px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:700;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.035);
+}
+.status-text.paid{color:#8ee6a8;border-color:rgba(48,209,88,.22);background:rgba(48,209,88,.08)}
+.status-text.partial{color:#c9b6ff;border-color:rgba(175,130,255,.22);background:rgba(175,130,255,.08)}
+.status-text.due{color:#d5d7dc;border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.045)}
+.status-text.due-soon{color:#f2b86b;border-color:rgba(242,184,107,.28);background:rgba(242,184,107,.09)}
+.status-text.due-today{color:#ff9b83;border-color:rgba(255,120,95,.28);background:rgba(255,120,95,.10)}
+.status-text.overdue,.status-text.overdue-partial{color:#ff8f86;border-color:rgba(255,69,58,.28);background:rgba(255,69,58,.10)}
+
+.installment-row.installment-next{
+  background:rgba(242,184,107,.055);
+  box-shadow:inset 2px 0 0 rgba(242,184,107,.65);
+}
+.installment-row.installment-next .installment-side span{
+  color:#f2b86b;
+  border-color:rgba(242,184,107,.28);
+  background:rgba(242,184,107,.09);
+}
+.payment-row-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.payment-row > div:first-child{
+  min-width:0;
+}
+.payment-row small{
+  color:var(--soft);
+  font-size:10px;
+  display:block;
+  margin-top:3px;
+}
+.payment-row .payment-penalty{
+  color:#f2b86b;
+}
+
+.pill.due-soon{color:#f2b86b;border-color:rgba(242,184,107,.28);background:rgba(242,184,107,.09)}
+.pill.due-today{color:#ff9b83;border-color:rgba(255,120,95,.28);background:rgba(255,120,95,.10)}
+.pill.overdue,.pill.overdue-partial{color:#ff8f86;border-color:rgba(255,69,58,.28);background:rgba(255,69,58,.10)}
+.pill.partial{color:#c9b6ff;border-color:rgba(175,130,255,.22);background:rgba(175,130,255,.08)}
