@@ -1,5 +1,5 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v6-theme-20260819";
+const CACHE_NAME = "paynest-pwa-v5-firebase-delete-20260819";
 
 const APP_SHELL = [
   "./",
