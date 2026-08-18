@@ -265,7 +265,7 @@ function stopRealtimeSync() {
   function showInstallButton() {
     const el = getById("installApp");
     if (!el) return;
-    const hidden = isStandalone() && !deferredInstallPrompt;
+    const hidden = isStandalone() || !deferredInstallPrompt;
     el.hidden = hidden;
     el.setAttribute("aria-hidden", String(hidden));
   }
@@ -336,7 +336,6 @@ function stopRealtimeSync() {
   registerServiceWorker();
 
   window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault();
     deferredInstallPrompt = event;
     showInstallButton();
   });
