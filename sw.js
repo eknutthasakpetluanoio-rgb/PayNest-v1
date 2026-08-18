@@ -1,5 +1,5 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v6-final-consistent-20260819";
+const CACHE_NAME = "paynest-pwa-v5-firebase-delete-20260819";
 
 const APP_SHELL = [
   "./",
@@ -7,9 +7,7 @@ const APP_SHELL = [
   "./style.css",
   "./app.js",
   "./manifest.json",
-  "./sw.js",
-  "./icon-192.png",
-  "./icon-512.png"
+  "./sw.js"
 ];
 
 self.addEventListener("install", event => {
