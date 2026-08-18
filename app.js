@@ -410,6 +410,49 @@ const money = value =>
     maximumFractionDigits: 2
   })}`;
 
+/* ---------- Product image helpers (UI-only, existing data remains intact) ---------- */
+function productInitials(product) {
+  const text = String(product || "สินค้า").trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return text.slice(0, 2).toUpperCase();
+}
+
+function productThumb(product, imageData = "", size = "small") {
+  const safeImage = String(imageData || "");
+  return `<div class="product-thumb product-thumb-${size}" aria-hidden="true">${
+    safeImage.startsWith("data:image/")
+      ? `<img src="${esc(safeImage)}" alt="">`
+      : `<span>${esc(productInitials(product))}</span>`
+  }</div>`;
+}
+
+function compressProductImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve("");
+    if (!file.type.startsWith("image/")) return reject(new Error("กรุณาเลือกไฟล์รูปภาพ"));
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("อ่านรูปภาพไม่สำเร็จ"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("รูปภาพไม่ถูกต้อง"));
+      img.onload = () => {
+        const max = 320;
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function localToday() {
   const d = new Date();
   const y = d.getFullYear();
@@ -800,9 +843,12 @@ function contractCard(c) {
 
   return `<article class="contract-card card" data-contract-card="${c.id}">
     <div class="contract-top">
-      <div>
-        <h3>${esc(c.product)}</h3>
-        <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
+      <div class="contract-title-wrap">
+        ${productThumb(c.product, c.imageData, "small")}
+        <div class="contract-title-copy">
+          <h3>${esc(c.product)}</h3>
+          <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
+        </div>
       </div>
       <span class="pill ${statusClass(c)}">${statusLabel(c)}</span>
     </div>
@@ -991,8 +1037,21 @@ function openContractModal(prefill = {}, editId = null) {
       </div>
 
       <label>สินค้า / รายการ
-        <input name="product" required placeholder="เช่น iPhone 16 Pro" value="${esc(source.product || "")}">
+        <input name="product" required placeholder="เช่น Vivo V70" value="${esc(source.product || "")}">
       </label>
+
+      <div class="product-image-field">
+        <div class="product-image-preview" id="productImagePreview">
+          ${productThumb(source.product || "สินค้า", source.imageData, "large")}
+        </div>
+        <div class="product-image-copy">
+          <b>รูปสินค้า</b>
+          <span>ใส่รูปได้แบบพอดีการ์ด ไม่กระทบข้อมูลสัญญา</span>
+          <label class="file-btn" for="productImageInput">เลือกจากเครื่อง</label>
+          <input id="productImageInput" name="productImage" type="file" accept="image/*" hidden>
+          <button type="button" class="mini-btn ghost-mini" id="removeProductImage">เอารูปออก</button>
+        </div>
+      </div>
 
       ${data.customers.length ? `
       <label>เลือกลูกค้าที่มีอยู่
@@ -1047,6 +1106,33 @@ function openContractModal(prefill = {}, editId = null) {
   const totalInput = form.querySelector('[name="total"]');
   const installmentInput = form.querySelector('[name="installments"]');
   const preview = $("#installmentPreview");
+  const productImageInput = $("#productImageInput");
+  const productImagePreview = $("#productImagePreview");
+  let productImageData = String(source.imageData || "");
+
+  function updateProductImagePreview() {
+    productImagePreview.innerHTML = productThumb(form.product?.value || "สินค้า", productImageData, "large");
+  }
+
+  productImageInput?.addEventListener("change", async () => {
+    const file = productImageInput.files?.[0];
+    if (!file) return;
+    try {
+      productImageData = await compressProductImage(file);
+      updateProductImagePreview();
+    } catch (error) {
+      alert(error.message || "เพิ่มรูปสินค้าไม่สำเร็จ");
+      productImageInput.value = "";
+    }
+  });
+
+  $("#removeProductImage")?.addEventListener("click", () => {
+    productImageData = "";
+    if (productImageInput) productImageInput.value = "";
+    updateProductImagePreview();
+  });
+
+  form.product?.addEventListener("input", updateProductImagePreview);
 
   function updatePreview() {
     const total = Number(totalInput?.value || 0);
@@ -1066,7 +1152,7 @@ function openContractModal(prefill = {}, editId = null) {
   installmentInput?.addEventListener("input", updatePreview);
   updatePreview();
 
-  form.addEventListener("submit", event => {
+  form.addEventListener("submit", async event => {
     event.preventDefault();
     const f = new FormData(form);
 
@@ -1111,6 +1197,7 @@ function openContractModal(prefill = {}, editId = null) {
 
     const updated = {
       product: String(f.get("product") || "ไม่ระบุ").trim(),
+      imageData: productImageData,
       customerId,
       customerName: name,
       phone,
@@ -1511,8 +1598,11 @@ function openContractDetail(id) {
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <div class="modal small contract-detail-modal">
-      <div class="modal-head">
-        <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
+      <div class="modal-head contract-detail-head">
+        <div class="contract-detail-title">
+          ${productThumb(contract.product, contract.imageData, "large")}
+          <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
+        </div>
         <div class="modal-head-actions">
           <button type="button" class="mini-btn ghost-mini" data-edit="${contract.id}">แก้ไข</button>
           <button class="icon-btn" data-close>×</button>
