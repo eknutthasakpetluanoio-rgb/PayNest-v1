@@ -735,3 +735,62 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   min-height:22px;
   margin:12px 0 0;
 }
+
+/* Installment schedule */
+.contract-detail-modal{padding-bottom:24px}
+.installment-section{margin-top:18px}
+.installment-summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:12px;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--surface-2);
+  box-shadow:inset 0 1px 0 var(--glass-highlight);
+}
+.installment-summary span{display:block;color:var(--muted);font-size:11px}
+.installment-summary b{display:block;font-size:13px;margin-top:3px}
+.installment-summary>strong{font-size:18px}
+.installment-progress{
+  height:7px;
+  margin:10px 2px 12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
+}
+.installment-progress i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#fff,rgba(255,255,255,.55));
+  box-shadow:0 0 14px rgba(255,255,255,.25);
+}
+.installment-list{
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--surface-2);
+  box-shadow:inset 0 1px 0 var(--glass-highlight);
+}
+.installment-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 15px;
+  border-bottom:1px solid var(--line);
+}
+.installment-row:last-child{border-bottom:none}
+.installment-main{min-width:0}
+.installment-main b{display:block;font-size:13px}
+.installment-main span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.installment-main small{display:block;color:var(--soft);font-size:10px;margin-top:4px}
+.installment-side{text-align:right;flex:0 0 auto}
+.installment-side strong{display:block;font-size:14px}
+.installment-side span{display:inline-block;margin-top:3px;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;border:1px solid var(--line);color:var(--muted);background:rgba(255,255,255,.035)}
+.installment-paid .installment-side span{color:var(--success);border-color:rgba(48,209,88,.25);background:rgba(48,209,88,.08)}
+.installment-partial .installment-side span{color:#ffd60a;border-color:rgba(255,214,10,.25);background:rgba(255,214,10,.08)}
+.installment-pending .installment-side span{color:var(--soft)}

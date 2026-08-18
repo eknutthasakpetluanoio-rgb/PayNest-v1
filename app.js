@@ -530,6 +530,86 @@ function getStatus(contract) {
   return remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active";
 }
 
+function installmentAmount(contract, index) {
+  const total = Math.max(0, Number(contract.total || 0));
+  const count = Math.max(1, Number(contract.installments || 1));
+  const base = Math.round((total / count) * 100) / 100;
+  if (index === count - 1) {
+    const previous = base * (count - 1);
+    return Math.round((total - previous) * 100) / 100;
+  }
+  return base;
+}
+
+function addPeriod(dateValue, index, type) {
+  const source = new Date(`${dateValue || localToday()}T00:00:00`);
+  if (Number.isNaN(source.getTime())) return localToday();
+
+  const d = new Date(source);
+  if (type === "daily") {
+    d.setDate(d.getDate() + index);
+  } else if (type === "weekly") {
+    d.setDate(d.getDate() + (index * 7));
+  } else {
+    // Monthly dates are clamped to the last valid day of the target month.
+    const originalDay = d.getDate();
+    const targetMonth = d.getMonth() + index;
+    d.setDate(1);
+    d.setMonth(targetMonth);
+    const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    d.setDate(Math.min(originalDay, lastDay));
+  }
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function getInstallmentSchedule(contract) {
+  const count = Math.max(1, Number(contract.installments || 1));
+  const received = Math.max(0, Number(contract.received || 0));
+  const type = contract.paymentType || "monthly";
+  let cumulativeDue = 0;
+
+  return Array.from({length: count}, (_, index) => {
+    const amount = installmentAmount(contract, index);
+    const previousDue = cumulativeDue;
+    cumulativeDue += amount;
+
+    let status = "pending";
+    let paidAmount = 0;
+    if (received >= cumulativeDue - 0.005) {
+      status = "paid";
+      paidAmount = amount;
+    } else if (received > previousDue + 0.005) {
+      status = "partial";
+      paidAmount = Math.min(amount, received - previousDue);
+    }
+
+    return {
+      number: index + 1,
+      amount,
+      paidAmount: Math.round(paidAmount * 100) / 100,
+      remainingAmount: Math.max(0, Math.round((amount - paidAmount) * 100) / 100),
+      dueDate: addPeriod(contract.dueDate || contract.startDate || localToday(), index, type),
+      status
+    };
+  });
+}
+
+function getNextInstallment(contract) {
+  return getInstallmentSchedule(contract).find(item => item.status !== "paid") || null;
+}
+
+function installmentStatusLabel(item) {
+  return ({
+    paid: "ชำระแล้ว",
+    partial: "ชำระบางส่วน",
+    pending: "รอชำระ"
+  }[item.status] || "รอชำระ");
+}
+
 function paymentStatus(contract) {
   if (getStatus(contract) === "paid") return "paid";
   const received = Number(contract.received || 0);
@@ -667,7 +747,7 @@ function actionList() {
       <div class="task-main">
         <b>${esc(c.product)}</b>
         <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
-        <small>งวดถัดไป ${fmtDate(c.dueDate)}</small>
+        <small>${getNextInstallment(c) ? `งวดถัดไป ${fmtDate(getNextInstallment(c).dueDate)}` : "ชำระครบแล้ว"}</small>
       </div>
       <div class="task-right">
         <strong>${money(remaining(c))}</strong>
@@ -707,8 +787,8 @@ function contractCard(c) {
     <div class="contract-bottom">
       <span>${paid ? "✓ ชำระครบแล้ว" :
         (["overdue","overdue-partial"].includes(paymentStatus(c))
-          ? "⚠ เกินกำหนด " + fmtDate(c.dueDate)
-          : "งวดถัดไป " + fmtDate(c.dueDate))}</span>
+          ? "⚠ เกินกำหนด " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate)
+          : "งวดถัดไป " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate))}</span>
       <div class="button-row">
         <button class="mini-btn ghost-mini" data-detail="${c.id}">รายละเอียด</button>
         ${paid
@@ -1250,9 +1330,63 @@ function openContractDetail(id) {
 
   const customer = customerById(contract.customerId);
   const payments = [...(contract.payments || [])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  const schedule = getInstallmentSchedule(contract);
+  const nextInstallment = schedule.find(item => item.status !== "paid");
+  const paidCount = schedule.filter(item => item.status === "paid").length;
+  const partialItem = schedule.find(item => item.status === "partial");
+
+  const scheduleRows = schedule.map(item => {
+    const statusText = installmentStatusLabel(item);
+    const dateText = fmtDate(item.dueDate);
+    const amountText = money(item.amount);
+    const statusClassName = item.status === "paid" ? "installment-paid" :
+      item.status === "partial" ? "installment-partial" : "installment-pending";
+
+    return `<div class="installment-row ${statusClassName}">
+      <div class="installment-main">
+        <b>งวด ${item.number}/${schedule.length}</b>
+        <span>${dateText}</span>
+        ${item.status === "partial" ? `<small>รับแล้ว ${money(item.paidAmount)} · เหลือ ${money(item.remainingAmount)}</small>` : ""}
+      </div>
+      <div class="installment-side">
+        <strong>${amountText}</strong>
+        <span>${statusText}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  const nextLabel = getStatus(contract) === "paid"
+    ? "ชำระครบ"
+    : `งวด ${nextInstallment?.number || "-"} · ${fmtDate(nextInstallment?.dueDate || contract.dueDate)}`;
+
+  const progressPercent = contract.total > 0
+    ? Math.min(100, (Number(contract.received || 0) / Number(contract.total || 0)) * 100)
+    : 0;
+
+  const scheduleSummary = getStatus(contract) === "paid"
+    ? `ชำระครบ ${schedule.length}/${schedule.length} งวด`
+    : `${paidCount}/${schedule.length} งวด · ${partialItem ? `งวด ${partialItem.number} ชำระบางส่วน` : `งวดถัดไป ${nextInstallment?.number || "-"}`}`;
+
+  const scheduleBlock = `<section class="installment-section">
+    <div class="modal-section-title">งวดที่ต้องชำระ</div>
+    <div class="installment-summary">
+      <div>
+        <span>ความคืบหน้า</span>
+        <b>${scheduleSummary}</b>
+      </div>
+      <strong>${Math.round(progressPercent)}%</strong>
+    </div>
+    <div class="installment-progress"><i style="width:${progressPercent}%"></i></div>
+    <div class="installment-list">${scheduleRows}</div>
+  </section>`;
+
+  const historyBlock = `<div class="modal-section-title">ประวัติการรับชำระ</div>
+    ${payments.length
+      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row"><div><span>${fmtDate(p.date)}</span><b>+ ${money(p.amount)}</b></div><button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button></div>`).join("")}</div>`
+      : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
-    <div class="modal small">
+    <div class="modal small contract-detail-modal">
       <div class="modal-head">
         <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
         <div class="modal-head-actions">
@@ -1273,13 +1407,11 @@ function openContractDetail(id) {
         <div><span>คงเหลือ</span><b>${money(remaining(contract))}</b></div>
         <div><span>จำนวนงวด</span><b>${contract.installments} งวด</b></div>
         <div><span>รูปแบบ</span><b>${paymentTypeLabel(contract.paymentType)}</b></div>
-        <div><span>งวดถัดไป</span><b>${getStatus(contract) === "paid" ? "ชำระครบ" : fmtDate(contract.dueDate)}</b></div>
+        <div><span>งวดถัดไป</span><b>${nextLabel}</b></div>
       </div>
 
-      <div class="modal-section-title">ประวัติการรับชำระ</div>
-      ${payments.length
-        ? `<div class="payment-list">${payments.map(p => `<div class="payment-row"><div><span>${fmtDate(p.date)}</span><b>+ ${money(p.amount)}</b></div><button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button></div>`).join("")}</div>`
-        : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}
+      ${scheduleBlock}
+      ${historyBlock}
 
       ${getStatus(contract) === "active"
         ? `<button class="primary-btn" data-pay="${contract.id}">รับชำระเงิน</button>`
