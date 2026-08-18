@@ -1,131 +1,466 @@
 <!doctype html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#040406">
-<meta name="color-scheme" content="dark">
-<meta name="description" content="ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
-<meta name="application-name" content="PayNest">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070709">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="PayNest – Smart Installment Manager">
+  <meta name="application-name" content="PayNest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<title>PayNest Premium</title>
+  <title>PayNest – Smart Installment Manager</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon/icon-192.png">
-<link rel="apple-touch-icon" sizes="192x192" href="./icon/icon-192.png">
-<meta name="theme-color" content="#040406">
-
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.json">
 </head>
 
 <body>
+  <a class="skip-link" href="#mainView">ข้ามไปยังเนื้อหาหลัก</a>
 
-<a class="skip-link" href="#view">ข้ามไปยังเนื้อหาหลัก</a>
+  <div id="app">
 
-<div id="app">
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="topbar" role="banner">
+      <div class="brand-wrap">
+        <div class="brand" aria-label="PayNest">PAYNEST</div>
+        <h1 id="pageTitle">ภาพรวม</h1>
+      </div>
 
-  <!-- ==============================
-       TOP BAR
-       V2 keeps the original hooks used by app.js.
-  =============================== -->
-  <header class="topbar" role="banner">
-    <div>
-      <div class="brand">PAYNEST</div>
-      <h1 id="pageTitle">ภาพรวม</h1>
-    </div>
+      <div class="top-actions">
+        <button
+          id="installApp"
+          class="icon-btn"
+          type="button"
+          aria-label="ติดตั้ง PayNest"
+          title="ติดตั้ง PayNest"
+          hidden
+        >
+          <span aria-hidden="true">⇩</span>
+        </button>
 
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="icon-btn" id="cloudAccount" type="button" aria-label="เข้าสู่ระบบ PayNest Cloud" title="เข้าสู่ระบบ PayNest Cloud">☁</button>
-      <button class="icon-btn" id="installApp" type="button" aria-label="ติดตั้ง PayNest" title="ติดตั้ง PayNest" hidden>⇩</button>
-      <button
-        class="icon-btn"
-        id="topAction"
-        type="button"
-        aria-label="ขึ้นด้านบน"
-        title="ขึ้นด้านบน"
-      >↑</button>
-    </div>
-  </header>
+        <button
+          id="topAction"
+          class="icon-btn"
+          type="button"
+          aria-label="กลับด้านบน"
+          title="กลับด้านบน"
+        >
+          <span aria-hidden="true">↑</span>
+        </button>
+      </div>
+    </header>
 
-  <!-- ==============================
-       MAIN VIEW
-  =============================== -->
-  <main id="view" role="main" tabindex="-1"></main>
+    <!-- =========================
+         MAIN
+    ========================== -->
+    <main id="mainView" class="main-view" role="main" tabindex="-1">
 
-  <!-- ==============================
-       FLOATING ACTION BUTTON
-  =============================== -->
-  <button
-    class="fab"
-    id="fab"
-    type="button"
-    aria-label="เพิ่มรายการ"
-    aria-haspopup="dialog"
-  >
-    <span aria-hidden="true">+</span>
-    <small id="fabLabel">สัญญา</small>
-  </button>
+      <!-- Dashboard -->
+      <section id="dashboardPage" class="page" data-page-view="dashboard">
+        <div class="hero-card">
+          <div class="hero-content">
+            <div class="eyebrow">PAYNEST</div>
+            <h2>ภาพรวมการผ่อน</h2>
+            <p>จัดการภาระผ่อนทั้งหมดของคุณในที่เดียว</p>
+          </div>
+        </div>
 
-  <!-- ==============================
-       BOTTOM NAVIGATION
-  =============================== -->
-  <nav class="bottom-nav" aria-label="เมนูหลัก">
-    <button type="button" data-page="dashboard" class="nav-item active" aria-label="ภาพรวม">
-      <span aria-hidden="true">⌂</span>
-      <small>ภาพรวม</small>
-    </button>
+        <section class="summary-section" aria-labelledby="summaryTitle">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">SUMMARY</span>
+              <h2 id="summaryTitle">สรุปภาพรวม</h2>
+            </div>
+          </div>
 
-    <button type="button" data-page="contracts" class="nav-item" aria-label="สัญญา">
-      <span aria-hidden="true">▣</span>
+          <div class="summary-grid">
+            <article class="summary-card">
+              <span class="summary-label">ยอดผ่อนต่อเดือน</span>
+              <strong id="monthlyTotal">฿0</strong>
+            </article>
+
+            <article class="summary-card">
+              <span class="summary-label">ยอดคงเหลือ</span>
+              <strong id="remainingTotal">฿0</strong>
+            </article>
+
+            <article class="summary-card">
+              <span class="summary-label">จำนวนสัญญา</span>
+              <strong id="contractCount">0</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="insight-section" aria-labelledby="insightTitle">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">SMART INSIGHT</span>
+              <h2 id="insightTitle">ภาพรวมของคุณ</h2>
+            </div>
+          </div>
+          <div id="insightContent" class="insight-card">
+            <p id="insightText">ยังไม่มีข้อมูลสำหรับวิเคราะห์</p>
+          </div>
+        </section>
+
+        <section class="contracts-section" aria-labelledby="dashboardContractsTitle">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">CONTRACTS</span>
+              <h2 id="dashboardContractsTitle">สัญญาล่าสุด</h2>
+            </div>
+
+            <button
+              id="viewAllContracts"
+              class="text-btn"
+              type="button"
+            >
+              ดูทั้งหมด
+            </button>
+          </div>
+
+          <div id="dashboardContractList" class="contract-list">
+            <div class="empty-state">
+              <div class="empty-icon" aria-hidden="true">＋</div>
+              <h3>ยังไม่มีสัญญา</h3>
+              <p>เริ่มต้นด้วยการเพิ่มสัญญาผ่อนรายการแรก</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Contracts -->
+      <section id="contractsPage" class="page" data-page-view="contracts" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-kicker">MANAGE</span>
+            <h2>สัญญาทั้งหมด</h2>
+            <p>จัดการและติดตามสถานะการผ่อนของคุณ</p>
+          </div>
+        </div>
+
+        <div class="search-wrap">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input
+              id="contractSearch"
+              type="search"
+              inputmode="search"
+              autocomplete="off"
+              placeholder="ค้นหาสัญญา..."
+              aria-label="ค้นหาสัญญา"
+            >
+          </label>
+        </div>
+
+        <div id="contractList" class="contract-list">
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">＋</div>
+            <h3>ยังไม่มีสัญญา</h3>
+            <p>กดปุ่ม + เพื่อเพิ่มสัญญา</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Customers -->
+      <section id="customersPage" class="page" data-page-view="customers" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-kicker">CUSTOMERS</span>
+            <h2>ลูกค้า</h2>
+            <p>ข้อมูลลูกค้าที่เกี่ยวข้องกับสัญญาผ่อน</p>
+          </div>
+        </div>
+
+        <div id="customerList" class="customer-list">
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">♙</div>
+            <h3>ยังไม่มีข้อมูลลูกค้า</h3>
+            <p>ข้อมูลลูกค้าจะแสดงเมื่อมีสัญญาที่เกี่ยวข้อง</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settingsPage" class="page" data-page-view="settings" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-kicker">SETTINGS</span>
+            <h2>ตั้งค่า</h2>
+            <p>จัดการข้อมูลและการทำงานของ PayNest</p>
+          </div>
+        </div>
+
+        <div class="settings-list">
+          <button id="exportData" class="settings-item" type="button">
+            <span>
+              <strong>ส่งออกข้อมูล</strong>
+              <small>บันทึกข้อมูล PayNest เป็นไฟล์ JSON</small>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+
+          <button id="importData" class="settings-item" type="button">
+            <span>
+              <strong>นำเข้าข้อมูล</strong>
+              <small>กู้คืนข้อมูลจากไฟล์ JSON</small>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+
+          <button id="clearData" class="settings-item danger" type="button">
+            <span>
+              <strong>ล้างข้อมูลทั้งหมด</strong>
+              <small>ลบข้อมูลสัญญาที่บันทึกไว้ในอุปกรณ์</small>
+            </span>
+            <span aria-hidden="true">›</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =========================
+         FAB
+    ========================== -->
+    <button
+      id="fab"
+      class="fab"
+      type="button"
+      aria-label="เพิ่มสัญญา"
+      aria-haspopup="dialog"
+    >
+      <span aria-hidden="true">+</span>
       <small>สัญญา</small>
     </button>
 
-    <button type="button" data-page="customers" class="nav-item" aria-label="ลูกค้า">
-      <span aria-hidden="true">♙</span>
-      <small>ลูกค้า</small>
-    </button>
+    <!-- =========================
+         BOTTOM NAVIGATION
+    ========================== -->
+    <nav class="bottom-nav" aria-label="เมนูหลัก">
+      <button
+        class="nav-item active"
+        type="button"
+        data-page="dashboard"
+        aria-label="ภาพรวม"
+        aria-current="page"
+      >
+        <span class="nav-icon" aria-hidden="true">⌂</span>
+        <small>ภาพรวม</small>
+      </button>
 
-    <button type="button" data-page="settings" class="nav-item" aria-label="ตั้งค่า">
-      <span aria-hidden="true">⚙</span>
-      <small>ตั้งค่า</small>
-    </button>
-  </nav>
+      <button
+        class="nav-item"
+        type="button"
+        data-page="contracts"
+        aria-label="สัญญา"
+      >
+        <span class="nav-icon" aria-hidden="true">▣</span>
+        <small>สัญญา</small>
+      </button>
 
-</div>
+      <button
+        class="nav-item"
+        type="button"
+        data-page="customers"
+        aria-label="ลูกค้า"
+      >
+        <span class="nav-icon" aria-hidden="true">♙</span>
+        <small>ลูกค้า</small>
+      </button>
 
-<!-- ==============================
-     MODAL ROOT
-=============================== -->
-<div id="modalRoot" aria-live="polite"></div>
-
-<!-- ==============================
-     IMPORT
-=============================== -->
-<input
-  id="importFile"
-  type="file"
-  accept=".json,application/json"
-  hidden
->
-
-<noscript>
-  <div style="padding:24px;font-family:sans-serif;background:#09090a;color:#fff;min-height:100vh">
-    PayNest ต้องเปิดใช้งาน JavaScript เพื่อให้ระบบทำงานได้ครบถ้วน
+      <button
+        class="nav-item"
+        type="button"
+        data-page="settings"
+        aria-label="ตั้งค่า"
+      >
+        <span class="nav-icon" aria-hidden="true">⚙</span>
+        <small>ตั้งค่า</small>
+      </button>
+    </nav>
   </div>
-</noscript>
 
-<!-- ==============================
-     APP
-=============================== -->
-<script type="module" src="./app.js"></script>
-<script src="./pwa-install.js" defer></script>
+  <!-- =========================
+       MODAL / SHEET ROOT
+  ========================== -->
+  <div id="backdrop" class="backdrop" hidden></div>
 
+  <section
+    id="sheet"
+    class="bottom-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sheetTitle"
+    hidden
+  >
+    <div class="sheet-handle" aria-hidden="true"></div>
 
+    <div class="sheet-header">
+      <div>
+        <span class="section-kicker">PAYNEST</span>
+        <h2 id="sheetTitle">เพิ่มสัญญา</h2>
+      </div>
+
+      <button
+        id="closeSheet"
+        class="icon-btn"
+        type="button"
+        aria-label="ปิด"
+        title="ปิด"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    <form id="contractForm" novalidate>
+      <input id="contractId" type="hidden">
+
+      <div class="form-field">
+        <label for="contractName">ชื่อลูกค้า</label>
+        <input
+          id="contractName"
+          name="name"
+          type="text"
+          autocomplete="name"
+          placeholder="เช่น สมชาย"
+          required
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="contractShop">รายการ / ร้านค้า</label>
+        <input
+          id="contractShop"
+          name="shop"
+          type="text"
+          autocomplete="off"
+          placeholder="เช่น iPhone 17 Pro"
+          required
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contractPrice">ราคาสินค้า</label>
+          <input
+            id="contractPrice"
+            name="price"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="contractDown">เงินดาวน์</label>
+          <input
+            id="contractDown"
+            name="down"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            value="0"
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contractMonths">จำนวนเดือน</label>
+          <input
+            id="contractMonths"
+            name="months"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            placeholder="12"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="contractMonthly">ค่างวดต่อเดือน</label>
+          <input
+            id="contractMonthly"
+            name="monthly"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="contractDue">วันครบกำหนดชำระ</label>
+        <input
+          id="contractDue"
+          name="due"
+          type="date"
+        >
+      </div>
+
+      <div id="formError" class="form-error" role="alert" hidden></div>
+
+      <div class="sheet-actions">
+        <button id="cancelBtn" class="secondary-btn" type="button">
+          ยกเลิก
+        </button>
+
+        <button id="saveBtn" class="primary-btn" type="submit">
+          บันทึกสัญญา
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- =========================
+       TOAST
+  ========================== -->
+  <div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    hidden
+  ></div>
+
+  <!-- =========================
+       IMPORT INPUT
+  ========================== -->
+  <input
+    id="importFile"
+    type="file"
+    accept=".json,application/json"
+    hidden
+  >
+
+  <noscript>
+    <div class="noscript-message">
+      <h1>PayNest</h1>
+      <p>กรุณาเปิดใช้งาน JavaScript เพื่อใช้งาน PayNest</p>
+    </div>
+  </noscript>
+
+  <!--
+    app.js จะเป็นตัวควบคุมข้อมูล การแสดงผล
+    การนำทาง และการทำงานของฟอร์มทั้งหมด
+  -->
+  <script src="./app.js" defer></script>
 </body>
 </html>
