@@ -1,0 +1,16 @@
+{
+  "name": "PayNest – Smart Installment Manager",
+  "short_name": "PayNest",
+  "description": "ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "display_override": ["standalone"],
+  "orientation": "portrait-primary",
+  "background_color": "#040406",
+  "theme_color": "#040406",
+  "prefer_related_applications": false
+}

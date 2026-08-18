@@ -1,0 +1,22 @@
+PayNest PWA validation — 2026-08-14
+
+Base: PayNest-v1-main.zip
+
+Verified:
+- manifest.json exists and is valid JSON
+- start_url and scope are root-relative and aligned
+- display is standalone
+- prefer_related_applications is false
+- 192x192 and 512x512 PNG icons exist
+- Service Worker registration is in pwa-install.js only
+- app.js contains no beforeinstallprompt / Service Worker registration
+- pwa-install.js is included in the Service Worker app shell
+- Service Worker cache version was advanced to v2
+- native beforeinstallprompt is supported when Chrome considers the site installable
+- manual install guidance is available when beforeinstallprompt is unavailable
+
+Important:
+Chrome still decides whether to expose the native install prompt based on
+the live deployed origin, HTTPS, manifest, Service Worker control, browser
+state, and other current installability conditions. This ZIP cannot force
+Chrome to expose beforeinstallprompt if the live deployment is not eligible.
