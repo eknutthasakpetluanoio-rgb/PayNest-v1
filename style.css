@@ -794,3 +794,27 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .installment-paid .installment-side span{color:var(--success);border-color:rgba(48,209,88,.25);background:rgba(48,209,88,.08)}
 .installment-partial .installment-side span{color:#ffd60a;border-color:rgba(255,214,10,.25);background:rgba(255,214,10,.08)}
 .installment-pending .installment-side span{color:var(--soft)}
+
+/* Payment history + schedule status polish */
+.payment-row{gap:12px}
+.payment-row small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.payment-actions{display:flex;gap:6px;align-items:center;flex:0 0 auto}
+
+.pill.due-soon,.status-text.due-soon{
+  color:#d7a33d;
+  background:rgba(215,163,61,.10);
+  border-color:rgba(215,163,61,.25);
+}
+.pill.due-today,.status-text.due-today{
+  color:#f08a63;
+  background:rgba(240,138,99,.10);
+  border-color:rgba(240,138,99,.25);
+}
+.pill.overdue,.pill.overdue-partial,.status-text.overdue,.status-text.overdue-partial{
+  color:#e87575;
+  background:rgba(232,117,117,.10);
+  border-color:rgba(232,117,117,.25);
+}
+.installment-due-soon .installment-side span{color:#d7a33d;border-color:rgba(215,163,61,.25);background:rgba(215,163,61,.08)}
+.installment-due-today .installment-side span{color:#f08a63;border-color:rgba(240,138,99,.25);background:rgba(240,138,99,.08)}
+.installment-overdue .installment-side span{color:#e87575;border-color:rgba(232,117,117,.25);background:rgba(232,117,117,.08)}
