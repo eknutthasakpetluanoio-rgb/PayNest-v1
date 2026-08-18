@@ -26,3 +26,7 @@ PayNest/
 ## การใช้งาน
 
 เปิด `index.html` ผ่านเว็บเซิร์ฟเวอร์หรือ GitHub Pages เพื่อให้ ES Modules, Firebase และ Service Worker ทำงานได้ตามปกติ
+
+
+## PWA Install
+PayNest includes 192x192 and 512x512 PNG launcher icons required for Chrome/Android PWA installation. The icons are kept at the project root so no icon subfolder is required.
