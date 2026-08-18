@@ -1,12 +1,358 @@
-import {loadData, saveData, saveLocalData, resetData, exportData, importData} from "./storage.js";
+/* =========================================================
+   PayNest – Smart Installment Manager
+   Single-file application controller.
+   The original PayNest business/UI logic is preserved here;
+   storage, Firebase sync, and PWA controller are consolidated
+   so the project remains exactly six files.
+========================================================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import {
-  auth,
+  getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut
-} from "./firebase.js";
-import {syncInitialData, startRealtimeSync, stopRealtimeSync} from "./firestore-sync.js";
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+/* ---------- Firebase ---------- */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCGc0iB3dZe_CZe8vLfEuPwgnn5XCgI5gs",
+  authDomain: "paynest-cloud.firebaseapp.com",
+  projectId: "paynest-cloud",
+  storageBucket: "paynest-cloud.firebasestorage.app",
+  messagingSenderId: "469151372030",
+  appId: "1:469151372030:web:625320d22038fe42484baf"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+/* ---------- Local Storage ---------- */
+
+const STORAGE_KEY = "paynest_v1_data";
+
+const DEFAULT_DATA = {
+  version: 1,
+  contracts: [],
+  customers: [],
+  settings: {
+    currency: "฿"
+  }
+};
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalize(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return clone(DEFAULT_DATA);
+  }
+
+  const contracts = Array.isArray(data.contracts)
+    ? data.contracts.filter(item => item && typeof item === "object")
+    : [];
+
+  const customers = Array.isArray(data.customers)
+    ? data.customers.filter(item => item && typeof item === "object")
+    : [];
+
+  return {
+    version: 1,
+    contracts,
+    customers,
+    settings: {
+      ...DEFAULT_DATA.settings,
+      ...(data.settings || {})
+    }
+  };
+}
+
+function validateImportData(imported) {
+  if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
+    return {ok: false, message: "ไฟล์ต้องเป็นข้อมูล PayNest JSON"};
+  }
+
+  if (!Array.isArray(imported.contracts) || !Array.isArray(imported.customers)) {
+    return {ok: false, message: "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ PayNest"};
+  }
+
+  for (const contract of imported.contracts) {
+    if (!contract || typeof contract !== "object") {
+      return {ok: false, message: "พบข้อมูลสัญญาที่ไม่ถูกต้อง"};
+    }
+  }
+
+  for (const customer of imported.customers) {
+    if (!customer || typeof customer !== "object") {
+      return {ok: false, message: "พบข้อมูลลูกค้าที่ไม่ถูกต้อง"};
+    }
+  }
+
+  return {ok: true};
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return clone(DEFAULT_DATA);
+    return normalize(JSON.parse(raw));
+  } catch (error) {
+    console.error("PayNest storage load error:", error);
+    return clone(DEFAULT_DATA);
+  }
+}
+
+function saveLocalData(value) {
+  const safe = normalize(value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+  return safe;
+}
+
+function exportData(value = loadData()) {
+  return JSON.stringify(normalize(value), null, 2);
+}
+
+function importData(text) {
+  const parsed = JSON.parse(text);
+  const validation = validateImportData(parsed);
+  if (!validation.ok) throw new Error(validation.message);
+
+  const safe = normalize(parsed);
+  saveLocalData(safe);
+  setCloudData(safe).catch(error =>
+    console.warn("PayNest cloud sync skipped:", error)
+  );
+  return safe;
+}
+
+function resetData() {
+  localStorage.removeItem(STORAGE_KEY);
+  return clone(DEFAULT_DATA);
+}
+
+/* ---------- Firestore Sync ---------- */
+
+let unsubscribeRealtime = null;
+
+function currentUser() {
+  return auth.currentUser;
+}
+
+function userDocumentRef() {
+  const user = currentUser();
+  return user ? doc(db, "users", user.uid) : null;
+}
+
+async function getCloudData() {
+  const ref = userDocumentRef();
+  if (!ref) return null;
+
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) return null;
+
+  const cloudData = snapshot.data()?.data;
+  return cloudData && typeof cloudData === "object" ? clone(cloudData) : null;
+}
+
+async function setCloudData(value) {
+  const ref = userDocumentRef();
+  if (!ref) return false;
+
+  await setDoc(ref, {
+    data: clone(normalize(value)),
+    updatedAt: serverTimestamp()
+  }, {merge: true});
+
+  return true;
+}
+
+async function syncInitialData(localData) {
+  const ref = userDocumentRef();
+  if (!ref) return localData;
+
+  const snapshot = await getDoc(ref);
+
+  if (snapshot.exists()) {
+    const cloudData = snapshot.data()?.data;
+    if (cloudData && typeof cloudData === "object") {
+      return clone(cloudData);
+    }
+  }
+
+  const safeLocal = clone(normalize(localData));
+  await setDoc(ref, {
+    data: safeLocal,
+    updatedAt: serverTimestamp()
+  }, {merge: true});
+
+  return safeLocal;
+}
+
+function startRealtimeSync(onData) {
+  stopRealtimeSync();
+
+  const ref = userDocumentRef();
+  if (!ref) return () => {};
+
+  unsubscribeRealtime = onSnapshot(
+    ref,
+    snapshot => {
+      if (!snapshot.exists()) return;
+
+      const cloudData = snapshot.data()?.data;
+      if (!cloudData || typeof cloudData !== "object") return;
+
+      try {
+        onData(clone(cloudData));
+      } catch (error) {
+        console.error("PayNest realtime data handler error:", error);
+      }
+    },
+    error => console.warn("PayNest realtime sync error:", error)
+  );
+
+  return unsubscribeRealtime;
+}
+
+function stopRealtimeSync() {
+  if (typeof unsubscribeRealtime === "function") unsubscribeRealtime();
+  unsubscribeRealtime = null;
+}
+
+/* ---------- PWA ---------- */
+
+(() => {
+  "use strict";
+
+  const SW_URL = "./sw.js";
+  const SW_SCOPE = "./";
+  let deferredInstallPrompt = null;
+
+  const getById = id => document.getElementById(id);
+
+  const isStandalone = () =>
+    window.matchMedia?.("(display-mode: standalone)")?.matches === true ||
+    window.navigator.standalone === true;
+
+  async function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return null;
+
+    try {
+      const registration = await navigator.serviceWorker.register(SW_URL, {
+        scope: SW_SCOPE,
+        updateViaCache: "none"
+      });
+      try { await registration.update(); } catch (_) {}
+      return registration;
+    } catch (error) {
+      console.error("[PayNest PWA] Service Worker registration failed:", error);
+      return null;
+    }
+  }
+
+  function showInstallButton() {
+    const el = getById("installApp");
+    if (!el) return;
+    const hidden = isStandalone() && !deferredInstallPrompt;
+    el.hidden = hidden;
+    el.setAttribute("aria-hidden", String(hidden));
+  }
+
+  function closeInstallHelp() {
+    const root = getById("pwaInstallRoot");
+    if (root) root.innerHTML = "";
+  }
+
+  function showInstallHelp() {
+    let root = getById("pwaInstallRoot");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "pwaInstallRoot";
+      document.body.appendChild(root);
+    }
+
+    root.innerHTML = `
+      <div class="overlay" role="dialog" aria-modal="true" aria-label="ติดตั้ง PayNest">
+        <div class="modal small">
+          <div class="modal-head">
+            <div>
+              <div class="eyebrow">PAYNEST PWA</div>
+              <h2>ติดตั้ง PayNest</h2>
+            </div>
+            <button class="icon-btn" type="button" data-pwa-close aria-label="ปิด">×</button>
+          </div>
+
+          <div class="form-note">
+            <b>เพิ่ม PayNest ลงหน้าจอหลัก</b>
+            <span>
+              หาก Chrome ยังไม่แสดงหน้าต่างติดตั้งอัตโนมัติ
+              ให้เปิดเมนู <b>⋮</b> ของ Chrome แล้วเลือก
+              <b>ติดตั้งแอป</b> หรือ <b>เพิ่มไปยังหน้าจอหลัก</b>
+            </span>
+          </div>
+
+          <button class="wide-btn" type="button" data-pwa-close>เข้าใจแล้ว</button>
+        </div>
+      </div>`;
+
+    root.querySelectorAll("[data-pwa-close]").forEach(el =>
+      el.addEventListener("click", closeInstallHelp)
+    );
+  }
+
+  async function install() {
+    if (isStandalone()) return;
+
+    if (!deferredInstallPrompt) {
+      showInstallHelp();
+      return;
+    }
+
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+
+    try {
+      await promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (error) {
+      console.warn("[PayNest PWA] Install prompt failed:", error);
+    }
+
+    showInstallButton();
+  }
+
+  registerServiceWorker();
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallButton();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    showInstallButton();
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    getById("installApp")?.addEventListener("click", install);
+    showInstallButton();
+  });
+
+  window.addEventListener("pageshow", showInstallButton);
+})();
 
 let data = loadData();
 let page = "dashboard";

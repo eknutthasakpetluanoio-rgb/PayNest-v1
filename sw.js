@@ -1,18 +1,13 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v2-20260814";
+const CACHE_NAME = "paynest-pwa-v3-20260819";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
-  "./storage.js",
-  "./firebase.js",
-  "./firestore-sync.js",
-  "./pwa-install.js",
   "./manifest.json",
-  "./icon/icon-192.png",
-  "./icon/icon-512.png"
+  "./sw.js"
 ];
 
 self.addEventListener("install", event => {
