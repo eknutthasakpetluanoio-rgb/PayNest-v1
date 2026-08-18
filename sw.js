@@ -1,15 +1,13 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v5-20260819";
+const CACHE_NAME = "paynest-pwa-v5-firebase-delete-20260819";
 
 const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/app.js",
-  "/manifest.json",
-  "/sw.js",
-  "/icon-192.png",
-  "/icon-512.png"
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./manifest.json",
+  "./sw.js"
 ];
 
 self.addEventListener("install", event => {
@@ -50,12 +48,12 @@ self.addEventListener("fetch", event => {
           if (response.ok) {
             const copy = response.clone();
             caches.open(CACHE_NAME)
-              .then(cache => cache.put("/index.html", copy))
+              .then(cache => cache.put("./index.html", copy))
               .catch(() => {});
           }
           return response;
         })
-        .catch(() => caches.match("/index.html"))
+        .catch(() => caches.match("./index.html"))
     );
     return;
   }
@@ -72,7 +70,7 @@ self.addEventListener("fetch", event => {
           }
           return response;
         }))
-        .catch(() => caches.match("/index.html"))
+        .catch(() => caches.match("./index.html"))
     );
     return;
   }

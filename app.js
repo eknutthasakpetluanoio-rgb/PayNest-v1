@@ -214,6 +214,8 @@ function startRealtimeSync(onData) {
       const cloudData = snapshot.data()?.data;
       if (!cloudData || typeof cloudData !== "object") return;
 
+      if (cloudWriteInProgress) return;
+
       try {
         onData(clone(cloudData));
       } catch (error) {
@@ -265,7 +267,7 @@ function stopRealtimeSync() {
   function showInstallButton() {
     const el = getById("installApp");
     if (!el) return;
-    const hidden = isStandalone() || !deferredInstallPrompt;
+    const hidden = isStandalone() && !deferredInstallPrompt;
     el.hidden = hidden;
     el.setAttribute("aria-hidden", String(hidden));
   }
@@ -336,6 +338,7 @@ function stopRealtimeSync() {
   registerServiceWorker();
 
   window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
     deferredInstallPrompt = event;
     showInstallButton();
   });
@@ -390,21 +393,25 @@ function fmtDate(value) {
       });
 }
 
-function saveData(value) {
-  const safe = saveLocalData(value);
-
-  // User-initiated changes must be persisted locally first and then synced
-  // to Firestore when a PayNest Cloud account is signed in.
-  setCloudData(safe).catch(error =>
-    console.warn("PayNest cloud sync skipped:", error)
-  );
-
-  return safe;
-}
+let cloudWriteInProgress = false;
 
 function persist() {
-  data = saveData(data);
+  data = saveLocalData(data);
   render();
+
+  if (currentUser()) {
+    cloudWriteInProgress = true;
+    setCloudData(data)
+      .catch(error => {
+        console.error("PayNest cloud save error:", error);
+        console.warn("ข้อมูลถูกเก็บไว้ในเครื่อง แต่การบันทึก Firebase ไม่สำเร็จ");
+      })
+      .finally(() => {
+        cloudWriteInProgress = false;
+      });
+  }
+
+  return data;
 }
 
 function authErrorMessage(error) {
@@ -1149,10 +1156,12 @@ function openCustomer(id) {
 
       ${customer.note ? `<div class="note-box">${esc(customer.note)}</div>` : ""}
 
+      <div class="modal-actions">
+        <button type="button" class="wide-btn danger" data-delete-customer="${customer.id}">ลบลูกค้านี้</button>
+      </div>
+
       <div class="modal-section-title">สัญญาของลูกค้า</div>
       ${contracts.length ? contracts.map(contractCard).join("") : emptyState("＋", "ยังไม่มีสัญญา", "สร้างสัญญาใหม่ได้จากปุ่ม +")}
-
-      <button type="button" class="wide-btn danger" data-delete-customer="${customer.id}">ลบลูกค้านี้</button>
     </div>
   </div>`;
 }
@@ -1161,29 +1170,18 @@ function deleteCustomer(id) {
   const customer = customerById(id);
   if (!customer) return;
 
-  const linkedContracts = data.contracts.filter(contract => contract.customerId === id);
-  const contractMessage = linkedContracts.length
-    ? `\n\nมี ${linkedContracts.length} สัญญาที่ผูกกับลูกค้านี้\nสัญญาจะไม่ถูกลบ แต่จะยกเลิกการผูกกับลูกค้าเพื่อป้องกันข้อมูลสัญญาหาย`
-    : "";
+  const linkedContracts = data.contracts.filter(c => c.customerId === id);
 
   const confirmed = confirm(
-    `ลบลูกค้า "${customer.name}" ใช่หรือไม่?` +
-    contractMessage +
-    `\n\nการลบนี้ไม่สามารถย้อนกลับได้`
+    `ลบลูกค้า "${customer.name}" ใช่หรือไม่?\\n\\n` +
+    `สัญญาที่ผูกอยู่ ${linkedContracts.length} รายการจะไม่ถูกลบ ` +
+    `และจะยังคงเก็บประวัติสัญญาไว้`
   );
 
   if (!confirmed) return;
 
-  // Keep existing contract snapshots (name/phone) intact, but remove the
-  // customer relationship so no contract points to a deleted customer.
-  data.contracts = data.contracts.map(contract => {
-    if (contract.customerId !== id) return contract;
-    const updated = { ...contract };
-    delete updated.customerId;
-    return updated;
-  });
-
-  data.customers = data.customers.filter(item => item.id !== id);
+  // Keep contracts/history safe; only remove the customer record.
+  data.customers = data.customers.filter(c => c.id !== id);
 
   $("#modalRoot").innerHTML = "";
   persist();
