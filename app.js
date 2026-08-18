@@ -100,7 +100,13 @@ function normalize(data) {
     : [];
 
   const customers = Array.isArray(data.customers)
-    ? data.customers.filter(item => item && typeof item === "object")
+    ? data.customers.filter(item => item && typeof item === "object").map(customer => ({
+        ...customer,
+        contacts: customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {},
+        address: String(customer.address || ""),
+        note: String(customer.note || ""),
+        photo: String(customer.photo || "")
+      }))
     : [];
 
   return {
@@ -972,8 +978,12 @@ function customerCard(c) {
     .filter(x => getStatus(x) === "active")
     .reduce((sum, x) => sum + remaining(x), 0);
 
+  const photo = c.photo
+    ? `<img src="${esc(c.photo)}" alt="${esc(c.name || "ลูกค้า")}">`
+    : `<span>${esc((c.name || "?").charAt(0))}</span>`;
+
   return `<article class="customer card">
-    <div class="avatar">${esc((c.name || "?").charAt(0))}</div>
+    <div class="avatar customer-avatar">${photo}</div>
     <div class="customer-main">
       <b>${esc(c.name)}</b>
       <span>${esc(c.phone || "ไม่มีเบอร์โทร")}</span>
@@ -1247,12 +1257,83 @@ function openContractModal(prefill = {}, editId = null) {
   });
 }
 
+
+function readImageAsDataURL(file, maxSize = 160) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve("");
+    if (!file.type.startsWith("image/")) return reject(new Error("กรุณาเลือกไฟล์รูปภาพ"));
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => reject(new Error("อ่านรูปภาพไม่สำเร็จ"));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error("อ่านไฟล์ไม่สำเร็จ"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function customerContactValues(customer = {}) {
+  const contacts = customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {};
+  return {
+    line: String(contacts.line || ""),
+    facebook: String(contacts.facebook || ""),
+    tiktok: String(contacts.tiktok || ""),
+    instagram: String(contacts.instagram || "")
+  };
+}
+
+function customerContactFields(customer = {}) {
+  const c = customerContactValues(customer);
+  const rows = [
+    ["line", "LINE", "ID / ชื่อบัญชี", "💚"],
+    ["facebook", "Facebook", "ชื่อโปรไฟล์ / ลิงก์", "🔵"],
+    ["tiktok", "TikTok", "ชื่อบัญชี / ลิงก์", "⚫"],
+    ["instagram", "Instagram", "ชื่อบัญชี / ลิงก์", "🟣"]
+  ];
+  return `<div class="contact-options">
+    ${rows.map(([key,label,placeholder,icon]) => `
+      <label class="contact-option">
+        <span class="contact-option-head"><input type="checkbox" name="contact_${key}" value="1" ${c[key] ? "checked" : ""}> ${icon} ${label}</span>
+        <input name="contact_${key}_value" placeholder="${placeholder}" value="${esc(c[key])}">
+      </label>`).join("")}
+  </div>`;
+}
+
+function collectCustomerContacts(form) {
+  const out = {};
+  ["line","facebook","tiktok","instagram"].forEach(key => {
+    const enabled = form.querySelector(`[name="contact_${key}"]`)?.checked;
+    const value = String(form.querySelector(`[name="contact_${key}_value"]`)?.value || "").trim();
+    if (enabled && value) out[key] = value;
+  });
+  return out;
+}
+
 function openCustomerForm(prefill = {}) {
   $("#modalRoot").innerHTML = `<div class="overlay">
     <form class="modal small" id="customerForm">
       <div class="modal-head">
         <div><div class="eyebrow">NEW CUSTOMER</div><h2>เพิ่มลูกค้า</h2></div>
         <button type="button" class="icon-btn" data-close>×</button>
+      </div>
+
+      <div class="customer-photo-editor">
+        <div class="customer-photo-preview" id="newCustomerPhotoPreview">
+          ${prefill.photo ? `<img src="${esc(prefill.photo)}" alt="">` : `<span>${esc((prefill.name || "?").charAt(0))}</span>`}
+        </div>
+        <label class="mini-upload">เพิ่มรูปลูกค้า
+          <input id="newCustomerPhoto" name="photoFile" type="file" accept="image/*">
+        </label>
       </div>
 
       <label>ชื่อลูกค้า
@@ -1263,6 +1344,13 @@ function openCustomerForm(prefill = {}) {
         <input name="phone" inputmode="tel" placeholder="08xxxxxxxx" value="${esc(prefill.phone || "")}">
       </label>
 
+      <div class="form-group-label">ช่องทางติดต่อ <small>เลือกได้มากกว่า 1 ช่องทาง</small></div>
+      ${customerContactFields(prefill)}
+
+      <label>ที่อยู่
+        <textarea name="address" rows="3" placeholder="ที่อยู่สำหรับติดต่อ">${esc(prefill.address || "")}</textarea>
+      </label>
+
       <label>หมายเหตุ
         <textarea name="note" rows="3" placeholder="ข้อมูลเพิ่มเติม">${esc(prefill.note || "")}</textarea>
       </label>
@@ -1271,7 +1359,21 @@ function openCustomerForm(prefill = {}) {
     </form>
   </div>`;
 
-  $("#customerForm").addEventListener("submit", event => {
+  const form = $("#customerForm");
+  let photo = String(prefill.photo || "");
+  form.querySelector("#newCustomerPhoto")?.addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      photo = await readImageAsDataURL(file);
+      $("#newCustomerPhotoPreview").innerHTML = `<img src="${esc(photo)}" alt="รูปลูกค้า">`;
+    } catch (error) {
+      alert(error.message || "ไม่สามารถใช้รูปนี้ได้");
+      event.target.value = "";
+    }
+  });
+
+  form.addEventListener("submit", async event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
     const name = String(f.get("name") || "").trim();
@@ -1281,7 +1383,10 @@ function openCustomerForm(prefill = {}) {
       id: uid(),
       name,
       phone: String(f.get("phone") || "").trim(),
+      contacts: collectCustomerContacts(form),
+      address: String(f.get("address") || "").trim(),
       note: String(f.get("note") || "").trim(),
+      photo,
       createdAt: new Date().toISOString()
     });
 
@@ -1424,11 +1529,19 @@ function openCustomer(id) {
   const outstanding = contracts
     .filter(c => getStatus(c) === "active")
     .reduce((sum, c) => sum + remaining(c), 0);
+  const contacts = customerContactValues(customer);
+  const contactEntries = [
+    ["LINE", contacts.line], ["Facebook", contacts.facebook],
+    ["TikTok", contacts.tiktok], ["Instagram", contacts.instagram]
+  ].filter(([,value]) => value);
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <div class="modal small">
       <div class="modal-head">
-        <div><div class="eyebrow">CUSTOMER</div><h2>${esc(customer.name)}</h2></div>
+        <div class="customer-detail-heading">
+          <div class="avatar customer-avatar large">${customer.photo ? `<img src="${esc(customer.photo)}" alt="">` : `<span>${esc((customer.name || "?").charAt(0))}</span>`}</div>
+          <div><div class="eyebrow">CUSTOMER</div><h2>${esc(customer.name)}</h2></div>
+        </div>
         <div class="modal-head-actions">
           <button type="button" class="mini-btn ghost-mini" data-edit-customer="${customer.id}">แก้ไข</button>
           <button class="icon-btn" data-close>×</button>
@@ -1441,7 +1554,9 @@ function openCustomer(id) {
         <div><span>ค้างรับ</span><b>${money(outstanding)}</b></div>
       </div>
 
-      ${customer.note ? `<div class="note-box">${esc(customer.note)}</div>` : ""}
+      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value]) => `<div><span>${label}</span><b>${esc(value)}</b></div>`).join("")}</div>` : ""}
+      ${customer.address ? `<div class="note-box"><b>ที่อยู่</b><br>${esc(customer.address)}</div>` : ""}
+      ${customer.note ? `<div class="note-box"><b>หมายเหตุ</b><br>${esc(customer.note)}</div>` : ""}
 
       <div class="modal-actions">
         <button type="button" class="wide-btn danger" data-delete-customer="${customer.id}">ลบลูกค้านี้</button>
@@ -1490,12 +1605,29 @@ function openCustomerEdit(id) {
         <span>การแก้ไขชื่อหรือเบอร์โทรจะอัปเดตไปยังสัญญาที่ผูกกับลูกค้าคนนี้ด้วย</span>
       </div>
 
+      <div class="customer-photo-editor">
+        <div class="customer-photo-preview" id="editCustomerPhotoPreview">
+          ${customer.photo ? `<img src="${esc(customer.photo)}" alt="">` : `<span>${esc((customer.name || "?").charAt(0))}</span>`}
+        </div>
+        <label class="mini-upload">เปลี่ยนรูปลูกค้า
+          <input id="editCustomerPhoto" type="file" accept="image/*">
+        </label>
+        ${customer.photo ? `<button type="button" class="mini-btn ghost-mini" id="removeCustomerPhoto">ลบรูป</button>` : ""}
+      </div>
+
       <label>ชื่อลูกค้า
         <input name="name" required placeholder="ชื่อ-นามสกุล" value="${esc(customer.name || "")}">
       </label>
 
       <label>เบอร์โทร
         <input name="phone" inputmode="tel" placeholder="08xxxxxxxx" value="${esc(customer.phone || "")}">
+      </label>
+
+      <div class="form-group-label">ช่องทางติดต่อ <small>เลือกได้มากกว่า 1 ช่องทาง</small></div>
+      ${customerContactFields(customer)}
+
+      <label>ที่อยู่
+        <textarea name="address" rows="3" placeholder="ที่อยู่สำหรับติดต่อ">${esc(customer.address || "")}</textarea>
       </label>
 
       <label>หมายเหตุ
@@ -1506,19 +1638,42 @@ function openCustomerEdit(id) {
     </form>
   </div>`;
 
-  $("#customerEditForm").addEventListener("submit", event => {
+  const form = $("#customerEditForm");
+  let photo = String(customer.photo || "");
+  form.querySelector("#editCustomerPhoto")?.addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      photo = await readImageAsDataURL(file);
+      $("#editCustomerPhotoPreview").innerHTML = `<img src="${esc(photo)}" alt="รูปลูกค้า">`;
+    } catch (error) {
+      alert(error.message || "ไม่สามารถใช้รูปนี้ได้");
+      event.target.value = "";
+    }
+  });
+
+  form.querySelector("#removeCustomerPhoto")?.addEventListener("click", () => {
+    photo = "";
+    $("#editCustomerPhotoPreview").innerHTML = `<span>${esc((customer.name || "?").charAt(0))}</span>`;
+    form.querySelector("#removeCustomerPhoto")?.remove();
+  });
+
+  form.addEventListener("submit", event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
     const name = String(f.get("name") || "").trim();
     const phone = String(f.get("phone") || "").trim();
+    const address = String(f.get("address") || "").trim();
     const note = String(f.get("note") || "").trim();
     if (!name) return;
 
     customer.name = name;
     customer.phone = phone;
+    customer.contacts = collectCustomerContacts(form);
+    customer.address = address;
     customer.note = note;
+    customer.photo = photo;
 
-    // Keep linked contract snapshots aligned with the customer record.
     data.contracts
       .filter(contract => contract.customerId === customer.id)
       .forEach(contract => {

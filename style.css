@@ -1039,3 +1039,128 @@ html[data-theme="light"] .installment-partial .installment-side span{
   border-color:rgba(184,125,0,.20);
   background:rgba(235,175,45,.10);
 }
+
+/* Customer profile enhancements */
+.customer-avatar{
+  width:52px;
+  height:52px;
+  min-width:52px;
+  border-radius:16px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+.customer-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.customer-avatar.large{
+  width:58px;
+  height:58px;
+  min-width:58px;
+  border-radius:18px;
+}
+.customer-detail-heading{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.customer-photo-editor{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0 14px;
+}
+.customer-photo-preview{
+  width:58px;
+  height:58px;
+  min-width:58px;
+  border-radius:18px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  background:var(--glass2,rgba(255,255,255,.08));
+  border:1px solid var(--border,rgba(255,255,255,.12));
+  font-weight:700;
+  font-size:20px;
+}
+.customer-photo-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.mini-upload{
+  width:auto !important;
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  padding:9px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  background:var(--glass2,rgba(255,255,255,.08));
+  border:1px solid var(--border,rgba(255,255,255,.12));
+  font-size:12px;
+}
+.mini-upload input{
+  display:none;
+}
+.form-group-label{
+  margin:8px 0 6px;
+  font-size:13px;
+  font-weight:700;
+}
+.form-group-label small{
+  display:block;
+  margin-top:3px;
+  font-weight:400;
+  opacity:.6;
+}
+.contact-options{
+  display:grid;
+  gap:8px;
+  margin-bottom:12px;
+}
+.contact-option{
+  display:grid !important;
+  grid-template-columns:auto 1fr;
+  gap:9px;
+  align-items:center;
+  padding:9px 10px;
+  border-radius:13px;
+  background:var(--glass2,rgba(255,255,255,.06));
+  border:1px solid var(--border,rgba(255,255,255,.1));
+}
+.contact-option-head{
+  white-space:nowrap;
+  font-size:12px;
+  font-weight:600;
+}
+.contact-option > input{
+  min-width:0;
+  margin:0 !important;
+}
+.customer-contacts{
+  display:grid;
+  gap:7px;
+  margin:10px 0;
+  padding:12px;
+  border-radius:14px;
+  background:var(--glass2,rgba(255,255,255,.05));
+}
+.customer-contacts > b{
+  font-size:12px;
+  margin-bottom:2px;
+}
+.customer-contacts > div{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:12px;
+}
+.customer-contacts span{
+  opacity:.6;
+}
