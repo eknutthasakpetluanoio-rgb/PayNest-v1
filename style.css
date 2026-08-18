@@ -1268,3 +1268,38 @@ html[data-theme="light"] .installment-partial .installment-side span{
   .product-thumb-small{width:46px;height:46px}
   .customer-avatar{width:42px;height:42px;min-width:42px}
 }
+
+
+/* =========================================
+   PayNest UI SIZE PASS — 2026-08
+   Only size / spacing adjustments.
+   Existing functionality and locked UI remain unchanged.
+========================================= */
+.hero{padding:20px}
+.hero-number{font-size:34px;margin:8px 0 12px;letter-spacing:-.8px}
+.modal h2{font-size:21px}
+.fab{width:54px;height:54px;font-size:27px;right:18px;bottom:88px}
+.bottom-nav{height:60px;border-radius:30px;bottom:12px}
+.customer-avatar{width:44px;height:44px;min-width:44px;border-radius:14px}
+.product-thumb-small{width:48px;height:48px;border-radius:12px}
+.product-thumb-large{width:54px;height:54px;border-radius:14px}
+
+/* Keep the approved app logo compact. */
+.app-logo{width:24px;height:24px}
+
+/* Compact customer/contact presentation. */
+.customer-detail-heading .customer-avatar.large{width:52px;height:52px;min-width:52px}
+.customer-contacts > div{min-height:38px;padding:7px 0}
+.customer-contacts b{font-size:13px}
+.contact-option{padding:8px 10px}
+.contact-option input:not([type="checkbox"]){min-height:42px}
+
+.customer-contact-link{
+  color:inherit;
+  text-decoration:none;
+  font-weight:700;
+  cursor:pointer;
+  border-bottom:1px dashed currentColor;
+  padding-bottom:1px;
+}
+.customer-contact-link:active{opacity:.7}
