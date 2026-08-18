@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#040406">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <meta name="description" content="PayNest – Smart Installment Manager ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
 <meta name="application-name" content="PayNest">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,8 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="theme-color" content="#040406">
 
 </head>
@@ -41,6 +39,7 @@
     </div>
 
     <div style="display:flex;gap:8px;align-items:center">
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="สลับโหมดกลางวัน/กลางคืน" title="สลับโหมดกลางวัน/กลางคืน">☀️</button>
       <button class="icon-btn" id="cloudAccount" type="button" aria-label="เข้าสู่ระบบ PayNest Cloud" title="เข้าสู่ระบบ PayNest Cloud">☁</button>
       <button class="icon-btn" id="installApp" type="button" aria-label="ติดตั้ง PayNest" title="ติดตั้ง PayNest" hidden>⇩</button>
       <button
@@ -123,10 +122,8 @@
 <!-- ==============================
      APP
 =============================== -->
-
-
-<script src="./pwa-install.js" defer></script>
 <script type="module" src="./app.js"></script>
+
 
 </body>
 </html>

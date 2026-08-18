@@ -26,9 +26,3 @@ PayNest/
 ## การใช้งาน
 
 เปิด `index.html` ผ่านเว็บเซิร์ฟเวอร์หรือ GitHub Pages เพื่อให้ ES Modules, Firebase และ Service Worker ทำงานได้ตามปกติ
-
-
-## PWA deployment requirement
-- ต้อง deploy ผ่าน HTTPS (หรือ localhost สำหรับการทดสอบ)
-- ห้ามเปิด index.html ด้วย file:// หากต้องการติดตั้งเป็น PWA
-- หลัง deploy ให้เปิด URL ของโฟลเดอร์นี้โดยตรงใน Chrome Android แล้วตรวจเมนู ⋮ > ติดตั้งแอป/เพิ่มไปยังหน้าจอหลัก

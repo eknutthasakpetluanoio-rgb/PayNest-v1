@@ -41,6 +41,13 @@
   --success:#30d158;
   --danger:#ff453a;
   --radius:28px;
+  --topbar-bg:rgba(4, 4, 6, 0.62);
+  --nav-bg:rgba(4, 4, 6, 0.64);
+  --modal-bg:rgba(0,0,0,0.68);
+  --field-bg:rgba(10,10,14,0.78);
+  --accent-soft:rgba(255,255,255,0.08);
+  --button-text:#000;
+  --shadow-color:rgba(0,0,0,0.55);
 }
 
 html{
@@ -73,11 +80,11 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:rgba(4, 4, 6, 0.62);
+  background:var(--topbar-bg);
   backdrop-filter:blur(30px) saturate(180%);
   -webkit-backdrop-filter:blur(30px) saturate(180%);
   border-bottom:1px solid var(--line);
-  box-shadow:0 15px 35px rgba(0,0,0,0.7), inset 0 1px 0 var(--glass-highlight);
+  box-shadow:0 15px 35px var(--shadow-color), inset 0 1px 0 var(--glass-highlight);
 }
 
 .brand{
@@ -560,7 +567,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   left:16px;
   right:16px;
   height:64px;
-  background:rgba(4, 4, 6, 0.64);
+  background:var(--nav-bg);
   backdrop-filter:blur(40px) saturate(200%);
   -webkit-backdrop-filter:blur(40px) saturate(200%);
   border:1px solid var(--line);
@@ -590,7 +597,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.68);
+  background:var(--modal-bg);
   backdrop-filter:blur(12px);
   z-index:100;
   display:flex;
@@ -603,7 +610,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   max-width:600px;
   max-height:90vh;
   overflow-y:auto;
-  background:rgba(10, 10, 14, 0.78);
+  background:var(--field-bg);
   backdrop-filter:blur(50px) saturate(200%);
   -webkit-backdrop-filter:blur(50px) saturate(200%);
   border:1px solid var(--line);
@@ -795,26 +802,79 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .installment-partial .installment-side span{color:#ffd60a;border-color:rgba(255,214,10,.25);background:rgba(255,214,10,.08)}
 .installment-pending .installment-side span{color:var(--soft)}
 
-/* Payment history + schedule status polish */
-.payment-row{gap:12px}
-.payment-row small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
-.payment-actions{display:flex;gap:6px;align-items:center;flex:0 0 auto}
 
-.pill.due-soon,.status-text.due-soon{
-  color:#d7a33d;
-  background:rgba(215,163,61,.10);
-  border-color:rgba(215,163,61,.25);
+/* =========================================================
+   PAYNEST THEME SYSTEM
+   Dark remains the default. Light mode changes the palette
+   without changing layout, Firebase, or data behaviour.
+========================================================= */
+[data-theme="light"]{
+  --bg:#eef1f5;
+  --surface:rgba(255,255,255,0.72);
+  --surface-2:rgba(255,255,255,0.92);
+  --line:rgba(25,30,40,0.12);
+  --glass-highlight:rgba(255,255,255,0.95);
+  --text:#17191f;
+  --muted:#6d7280;
+  --soft:#3f444f;
+  --accent:#17191f;
+  --success:#16803c;
+  --danger:#c52f2f;
+  --topbar-bg:rgba(245,247,250,0.78);
+  --nav-bg:rgba(245,247,250,0.86);
+  --modal-bg:rgba(35,40,50,0.28);
+  --field-bg:rgba(255,255,255,0.96);
+  --accent-soft:rgba(20,25,35,0.07);
+  --button-text:#fff;
+  --shadow-color:rgba(35,45,60,0.14);
 }
-.pill.due-today,.status-text.due-today{
-  color:#f08a63;
-  background:rgba(240,138,99,.10);
-  border-color:rgba(240,138,99,.25);
+
+html[data-theme="light"],
+body[data-theme="light"]{
+  background:var(--bg);
 }
-.pill.overdue,.pill.overdue-partial,.status-text.overdue,.status-text.overdue-partial{
-  color:#e87575;
-  background:rgba(232,117,117,.10);
-  border-color:rgba(232,117,117,.25);
+
+[data-theme="light"] body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.95), transparent 62%),
+    radial-gradient(circle at 50% 90%, rgba(180,190,205,0.16), transparent 52%);
 }
-.installment-due-soon .installment-side span{color:#d7a33d;border-color:rgba(215,163,61,.25);background:rgba(215,163,61,.08)}
-.installment-due-today .installment-side span{color:#f08a63;border-color:rgba(240,138,99,.25);background:rgba(240,138,99,.08)}
-.installment-overdue .installment-side span{color:#e87575;border-color:rgba(232,117,117,.25);background:rgba(232,117,117,.08)}
+
+[data-theme="light"] .topbar{
+  box-shadow:0 15px 35px var(--shadow-color), inset 0 1px 0 var(--glass-highlight);
+}
+
+[data-theme="light"] .icon-btn{
+  box-shadow:0 8px 25px var(--shadow-color), inset 0 1px 0 var(--glass-highlight);
+}
+
+[data-theme="light"] .card{
+  box-shadow:0 14px 34px rgba(35,45,60,0.08), inset 0 1px 0 var(--glass-highlight);
+}
+
+[data-theme="light"] .nav-item.active{
+  color:#17191f;
+  text-shadow:0 0 15px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .skip-link{
+  background:#17191f;
+  color:#fff;
+}
+
+[data-theme="light"] .wide-btn,
+[data-theme="light"] .mini-btn:not(.danger),
+[data-theme="light"] .fab{
+  color:#fff;
+}
+
+[data-theme="light"] .installment-partial .installment-side span{
+  color:#9a6b00;
+}
+
+.theme-toggle-icon{
+  display:block;
+  font-size:17px;
+  line-height:1;
+}

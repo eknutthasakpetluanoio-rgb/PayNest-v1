@@ -25,4 +25,3 @@ PWA:
 - รองรับ offline shell หลังเปิดเว็บออนไลน์อย่างน้อย 1 ครั้ง
 
 ไม่เพิ่มฟีเจอร์ธุรกิจใหม่
-\n\nPWA FIX 2 — 2026-08-19\n- index.html now explicitly loads pwa-install.js before app.js.\n- manifest id/start_url use index.html for a stable app identity.\n- pwa-install.js verifies the live manifest and controls the native install prompt.\n- Chrome install still requires the deployed site to be HTTPS and meet Chrome's installability rules; no ZIP can bypass that browser requirement.\n
