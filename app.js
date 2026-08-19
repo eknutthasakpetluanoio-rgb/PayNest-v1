@@ -2124,3 +2124,182 @@ onAuthStateChanged(auth, async user => {
 });
 
 render();
+
+
+
+/* ===================================
+   PayNest Core Revision
+   Single source of truth for:
+   Customer / Contract / Installment / Payment
+=================================== */
+
+const PayNestCore = (() => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const num = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    const dateOnly = (value) => {
+        const d = value instanceof Date ? new Date(value) : new Date(value);
+        if (Number.isNaN(d.getTime())) return null;
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
+
+    const isoDate = (value) => {
+        const d = dateOnly(value);
+        if (!d) return "";
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+    };
+
+    const addDays = (value, days) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        d.setDate(d.getDate() + num(days));
+        return d;
+    };
+
+    const addMonths = (value, months) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        const originalDay = d.getDate();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + num(months));
+        const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(originalDay, last));
+        return d;
+    };
+
+    const frequencyDays = (frequency) => {
+        const f = String(frequency || "").toLowerCase();
+        if (f.includes("day") || f.includes("วัน")) return 1;
+        if (f.includes("week") || f.includes("สัปดาห์")) return 7;
+        if (f.includes("2") && (f.includes("week") || f.includes("สัปดาห์"))) return 14;
+        return null;
+    };
+
+    const installmentDate = (start, index, frequency) => {
+        const i = Math.max(0, num(index));
+        const days = frequencyDays(frequency);
+        if (days) return addDays(start, i * days);
+        return addMonths(start, i);
+    };
+
+    const buildInstallments = (contract) => {
+        const total = Math.max(0, Math.round(num(contract.months)));
+        const monthly = num(contract.monthly);
+        const start = contract.startDate || contract.start || contract.due;
+        const frequency = contract.frequency || contract.type || "monthly";
+        const items = [];
+
+        for (let i = 0; i < total; i++) {
+            const due = installmentDate(start, i, frequency);
+            items.push({
+                no: i + 1,
+                dueDate: isoDate(due),
+                amount: monthly,
+                paid: 0,
+                penalty: 0,
+                remaining: monthly,
+                status: "pending"
+            });
+        }
+        return items;
+    };
+
+    const classify = (installment, today = new Date()) => {
+        const due = dateOnly(installment.dueDate);
+        const now = dateOnly(today);
+        const paid = num(installment.paid);
+        const amount = num(installment.amount);
+        const remaining = Math.max(0, amount - paid);
+
+        if (remaining <= 0) return "paid";
+        if (!due) return paid > 0 ? "partial" : "pending";
+
+        const diff = Math.round((due - now) / DAY);
+        if (diff < 0) return paid > 0 ? "overdue_partial" : "overdue";
+        if (paid > 0) return "partial";
+        if (diff <= 3) return "due_soon";
+        return "pending";
+    };
+
+    const summarizePayments = (payments = []) => {
+        const map = new Map();
+        for (const payment of payments) {
+            const no = num(payment.installmentNo || payment.installment || payment.no);
+            if (!no) continue;
+            const current = map.get(no) || { paid: 0, penalty: 0 };
+            current.paid += num(payment.amount || payment.paid);
+            current.penalty += num(payment.penalty);
+            map.set(no, current);
+        }
+        return map;
+    };
+
+    const calculate = (contract, payments = [], today = new Date()) => {
+        const installments = buildInstallments(contract);
+        const paymentMap = summarizePayments(payments);
+
+        // Apply payment history to its exact installment.
+        for (const item of installments) {
+            const p = paymentMap.get(item.no) || { paid: 0, penalty: 0 };
+            item.paid = Math.min(item.amount, p.paid);
+            item.penalty = p.penalty;
+            item.remaining = Math.max(0, item.amount - item.paid);
+            item.status = classify(item, today);
+        }
+
+        const paidPrincipal = installments.reduce((s, x) => s + x.paid, 0);
+        const penalties = installments.reduce((s, x) => s + x.penalty, 0);
+        const total = installments.reduce((s, x) => s + x.amount, 0);
+        const outstanding = Math.max(0, total - paidPrincipal);
+
+        const next = installments.find(x => x.remaining > 0) || null;
+        const overdue = installments.filter(x => x.status === "overdue" || x.status === "overdue_partial");
+        const dueSoon = installments.filter(x => x.status === "due_soon");
+
+        const todayKey = isoDate(today);
+        const dueToday = installments.filter(x => x.dueDate === todayKey && x.remaining > 0);
+
+        return {
+            installments,
+            total,
+            paidPrincipal,
+            penalties,
+            outstanding,
+            nextInstallment: next,
+            overdue,
+            dueSoon,
+            dueToday,
+            isComplete: outstanding <= 0
+        };
+    };
+
+    const validatePayment = (installment, amount) => {
+        const value = num(amount);
+        const remaining = Math.max(0, num(installment.amount) - num(installment.paid));
+        return {
+            valid: value > 0 && remaining > 0,
+            amount: value,
+            remaining,
+            exceeds: value > remaining
+        };
+    };
+
+    return Object.freeze({
+        buildInstallments,
+        calculate,
+        classify,
+        validatePayment,
+        isoDate
+    });
+})();
+
+/* Backward-compatible global access for existing UI code. */
+window.PayNestCore = PayNestCore;
