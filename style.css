@@ -494,6 +494,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   align-items:center;
   gap:14px;
 }
+.customer > .avatar,.customer > .mini-btn{flex-shrink:0}
 
 .avatar{
   width:46px;
@@ -508,6 +509,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   box-shadow:inset 0 1px 0 var(--glass-highlight);
 }
 
+.customer-main{flex:1;min-width:0}
 .customer-main b{font-size:15px;display:block}
 .customer-main span,.customer-main small{color:var(--muted);font-size:12px;display:block;margin-top:3px}
 
