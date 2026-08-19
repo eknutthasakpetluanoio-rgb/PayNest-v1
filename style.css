@@ -569,9 +569,6 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   justify-content:center;
   transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
 }
-@supports (backdrop-filter:url(#liquid-glass-distortion)){
-  .fab{backdrop-filter:url(#liquid-glass-distortion) blur(6px) saturate(220%);-webkit-backdrop-filter:blur(18px) saturate(220%)}
-}
 .fab:active{transform:scale(0.9)}
 .fab small{display:none}
 
@@ -596,9 +593,6 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
     inset 0 -1px 1px rgba(0,0,0,0.35),
     inset 2px 0 10px rgba(255,120,140,0.06),
     inset -2px 0 10px rgba(120,180,255,0.08);
-}
-@supports (backdrop-filter:url(#liquid-glass-distortion)){
-  .bottom-nav{backdrop-filter:url(#liquid-glass-distortion) blur(14px) saturate(200%);-webkit-backdrop-filter:blur(28px) saturate(200%)}
 }
 /* faint top specular sweep, brightest at the middle of the pill */
 .bottom-nav::before{
@@ -1633,17 +1627,6 @@ textarea,
   --lg-shadow:0 20px 50px rgba(0,0,0,.28);
 }
 
-/* 1) BACKDROP — glass needs something visible behind it */
-body.dark,
-body.dark-mode,
-[data-theme="dark"]{
-  background:
-    radial-gradient(420px 280px at 8% 8%, rgba(90,130,190,.10), transparent 72%),
-    radial-gradient(420px 300px at 92% 18%, rgba(150,115,190,.08), transparent 72%),
-    radial-gradient(520px 360px at 50% 100%, rgba(70,110,160,.055), transparent 74%),
-    #0e1013;
-}
-
 /* 2) MATERIAL — genuinely translucent, with background blur */
 .card,
 .contract-card,
@@ -1857,39 +1840,18 @@ textarea,
 
 /* =========================================================
    LIQUID GLASS — WHOLE-APP PASS
-   Applies the same refractive glass material (SVG turbulence
-   distortion + specular rim light) used on the bottom dock
-   to every glass surface in the app: topbar, icon buttons,
-   cards, chips, avatars, product tiles, modal sheet & inputs.
+   Applies the same glass material used on the bottom dock
+   (blur + saturate + specular rim light) to every glass
+   surface in the app: topbar, icon buttons, cards, chips,
+   avatars, product tiles, modal sheet & inputs.
    Appended last on purpose so it wins the cascade over the
    earlier glass revisions above, without deleting them.
+   Note: an earlier draft tried to add real optical refraction
+   via an SVG feTurbulence/feDisplacementMap filter on
+   backdrop-filter. Removed — it rendered a stray colored
+   blob artifact in Chrome on plain dark backgrounds, so this
+   sticks to the reliable blur/gradient/shadow approach only.
 ========================================================= */
-
-/* ---- Large panels: topbar, cards, modal, product stage ---- */
-@supports (backdrop-filter:url(#liquid-glass-distortion)){
-  .topbar,
-  .card,
-  .hero,.hero-card,
-  .stat,.stat-card,
-  .task,.contract-card,.customer,.customer-card,
-  .panel,.sheet,.bottom-sheet,.search-box,.search-wrap,.filter-bar,
-  .modal,
-  .payment-list,
-  .product-image,.product-thumb,.product-media,.product-photo,.product-container{
-    backdrop-filter:url(#liquid-glass-distortion) blur(10px) saturate(180%);
-  }
-}
-
-/* ---- Small controls: icon buttons, chips, avatars, inputs ---- */
-@supports (backdrop-filter:url(#liquid-glass-distortion-sm)){
-  .icon-btn,
-  .today-chip,.count,.pill,
-  .avatar,.customer-avatar,.profile-avatar,
-  input,select,textarea,.form-control,
-  .form-note,.payment-summary,.detail-status,.detail-grid div,.subtle-box,.note-box{
-    backdrop-filter:url(#liquid-glass-distortion-sm) blur(8px) saturate(180%);
-  }
-}
 
 /* ---- Topbar: specular sweep along the top edge, like the dock ---- */
 .topbar{position:relative;isolation:isolate}
