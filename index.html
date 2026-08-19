@@ -32,6 +32,11 @@
       <feGaussianBlur in="noise" stdDeviation="2" result="blurredNoise"/>
       <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
+    <filter id="liquid-glass-distortion-sm" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.06" numOctaves="2" seed="11" result="noise"/>
+      <feGaussianBlur in="noise" stdDeviation="1.2" result="blurredNoise"/>
+      <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
   </defs>
 </svg>
 

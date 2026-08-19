@@ -1854,3 +1854,117 @@ textarea,
   backdrop-filter:blur(28px) saturate(130%);
   -webkit-backdrop-filter:blur(28px) saturate(130%);
 }
+
+/* =========================================================
+   LIQUID GLASS — WHOLE-APP PASS
+   Applies the same refractive glass material (SVG turbulence
+   distortion + specular rim light) used on the bottom dock
+   to every glass surface in the app: topbar, icon buttons,
+   cards, chips, avatars, product tiles, modal sheet & inputs.
+   Appended last on purpose so it wins the cascade over the
+   earlier glass revisions above, without deleting them.
+========================================================= */
+
+/* ---- Large panels: topbar, cards, modal, product stage ---- */
+@supports (backdrop-filter:url(#liquid-glass-distortion)){
+  .topbar,
+  .card,
+  .hero,.hero-card,
+  .stat,.stat-card,
+  .task,.contract-card,.customer,.customer-card,
+  .panel,.sheet,.bottom-sheet,.search-box,.search-wrap,.filter-bar,
+  .modal,
+  .payment-list,
+  .product-image,.product-thumb,.product-media,.product-photo,.product-container{
+    backdrop-filter:url(#liquid-glass-distortion) blur(10px) saturate(180%);
+  }
+}
+
+/* ---- Small controls: icon buttons, chips, avatars, inputs ---- */
+@supports (backdrop-filter:url(#liquid-glass-distortion-sm)){
+  .icon-btn,
+  .today-chip,.count,.pill,
+  .avatar,.customer-avatar,.profile-avatar,
+  input,select,textarea,.form-control,
+  .form-note,.payment-summary,.detail-status,.detail-grid div,.subtle-box,.note-box{
+    backdrop-filter:url(#liquid-glass-distortion-sm) blur(8px) saturate(180%);
+  }
+}
+
+/* ---- Topbar: specular sweep along the top edge, like the dock ---- */
+.topbar{position:relative;isolation:isolate}
+.topbar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(220px 46px at 18% 0%, rgba(255,255,255,0.16), transparent 70%);
+  z-index:0;
+}
+.topbar > *{position:relative;z-index:1}
+
+/* ---- Icon buttons: circular glass lens with press-glow, matching FAB/nav ---- */
+.icon-btn{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), filter .15s ease, box-shadow .2s ease;
+}
+.icon-btn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:radial-gradient(circle at 30% 22%, rgba(255,255,255,0.5), transparent 60%);
+  opacity:.7;
+}
+.icon-btn:active{transform:scale(0.9);filter:brightness(1.35)}
+
+/* ---- Chips & pills: same lens capsule language as the active nav tab ---- */
+.today-chip,.count,.pill{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.today-chip::before,.count::before,.pill::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,0.22), transparent 60%);
+}
+
+/* ---- Avatars: glossy glass disc highlight ---- */
+.avatar,.customer-avatar,.profile-avatar{position:relative;isolation:isolate;overflow:hidden}
+.avatar::before,.customer-avatar::before,.profile-avatar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:radial-gradient(circle at 32% 22%, rgba(255,255,255,0.45), transparent 55%);
+}
+
+/* ---- Modal sheet: top specular edge like the dock ---- */
+.modal{position:relative;isolation:isolate}
+.modal::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:radial-gradient(280px 60px at 50% 0%, rgba(255,255,255,0.14), transparent 70%);
+  z-index:0;
+}
+.modal > *{position:relative;z-index:1}
+
+/* ---- Inputs: soft inner glass sheen without hurting legibility ---- */
+.modal input,.modal select,.modal textarea{
+  background-image:linear-gradient(180deg, rgba(255,255,255,0.05), transparent 40%);
+}
+
+/* Respect reduced-motion / no-backdrop-filter fallbacks: if backdrop-filter
+   is unsupported entirely, everything above degrades to the solid
+   var(--surface) backgrounds already defined earlier in this file. */
