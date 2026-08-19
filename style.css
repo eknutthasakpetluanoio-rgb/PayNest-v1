@@ -1327,336 +1327,32 @@ html[data-theme="light"] .installment-partial .installment-side span{
 }
 
 
-
-/* PayNest Glass UI Revision v1
-   Visual-only refinement:
-   brighter graphite surfaces, soft glass reflection,
-   subtle borders and shadows. Core/data logic untouched.
-*/
+/* =========================================================
+   PayNest True Glass v1
+   Material-first glass: transparency + depth + reflection.
+   No stacked experimental glass layers.
+   Visual-only. Core/data logic untouched.
+========================================================= */
 
 :root{
-  --pn-glass-bg:rgba(255,255,255,.075);
-  --pn-glass-bg-strong:rgba(255,255,255,.105);
-  --pn-glass-border:rgba(255,255,255,.14);
-  --pn-glass-highlight:rgba(255,255,255,.16);
-  --pn-glass-shadow:0 14px 38px rgba(0,0,0,.28);
-  --pn-glass-shadow-soft:0 8px 24px rgba(0,0,0,.20);
+  --pg-bg:#101114;
+  --pg-glass:rgba(255,255,255,.055);
+  --pg-glass-deep:rgba(255,255,255,.035);
+  --pg-edge:rgba(255,255,255,.115);
+  --pg-shadow:rgba(0,0,0,.32);
 }
 
-/* Dark graphite base */
+/* Dark graphite environment */
 body.dark,
 body.dark-mode,
 [data-theme="dark"]{
   background:
-    radial-gradient(circle at 15% 0%, rgba(255,255,255,.035), transparent 30%),
-    radial-gradient(circle at 90% 15%, rgba(255,255,255,.025), transparent 28%),
-    var(--pn-bg, #111214);
+    radial-gradient(520px 360px at 12% 0%, rgba(255,255,255,.045), transparent 70%),
+    radial-gradient(480px 320px at 92% 18%, rgba(255,255,255,.030), transparent 72%),
+    var(--pg-bg, #101114);
 }
 
-/* Glass surfaces: target existing cards/panels without changing layout */
-.card,
-.contract-card,
-.customer-card,
-.hero-card,
-.summary-card,
-.stat-card,
-.sheet,
-.bottom-sheet,
-.modal,
-.panel,
-.search-box,
-.filter-bar{
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.095),
-      rgba(255,255,255,.045)
-    );
-  border:1px solid var(--pn-glass-border);
-  box-shadow:
-    var(--pn-glass-shadow-soft),
-    inset 0 1px 0 var(--pn-glass-highlight);
-  backdrop-filter:blur(18px) saturate(115%);
-  -webkit-backdrop-filter:blur(18px) saturate(115%);
-}
-
-/* Stronger hero/detail surfaces */
-.hero-card,
-.summary-card{
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.125),
-      rgba(255,255,255,.055)
-    );
-  box-shadow:
-    var(--pn-glass-shadow),
-    inset 0 1px 0 rgba(255,255,255,.18);
-}
-
-/* Inputs should be visibly one level below cards */
-input,
-select,
-textarea,
-.form-control{
-  background:rgba(0,0,0,.20);
-  border-color:rgba(255,255,255,.12);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.035),
-    0 5px 16px rgba(0,0,0,.12);
-}
-
-input:focus,
-select:focus,
-textarea:focus,
-.form-control:focus{
-  border-color:rgba(255,255,255,.22);
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,.045),
-    inset 0 1px 0 rgba(255,255,255,.06);
-}
-
-/* Product containers: lighter than the page so black products remain visible */
-.product-image,
-.product-thumb,
-.product-media,
-.product-photo,
-.product-container{
-  background:
-    radial-gradient(circle at 50% 32%, rgba(255,255,255,.16), transparent 48%),
-    linear-gradient(145deg, #2a2e34, #1b1e23);
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.24),
-    inset 0 1px 0 rgba(255,255,255,.13);
-}
-
-/* Customer avatars */
-.customer-avatar,
-.avatar,
-.profile-avatar{
-  background:
-    linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.055));
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:
-    0 8px 20px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.15);
-}
-
-/* Status chips */
-.badge,
-.status-badge,
-.status{
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    0 4px 12px rgba(0,0,0,.12);
-}
-
-/* Bottom navigation / floating controls */
-.bottom-nav,
-.nav-bar,
-.fab{
-  box-shadow:
-    0 12px 30px rgba(0,0,0,.30),
-    inset 0 1px 0 rgba(255,255,255,.12);
-  border-color:rgba(255,255,255,.13);
-}
-
-/* Keep light mode independent from the darker glass treatment */
-
-
-/* PayNest Glass UI Revision v2
-   Slightly brighter premium glass treatment.
-   Visual-only: no data/core logic changes.
-*/
-
-:root{
-  --pn-glass-bg-v2:rgba(255,255,255,.095);
-  --pn-glass-bg-v2-strong:rgba(255,255,255,.135);
-  --pn-glass-border-v2:rgba(255,255,255,.17);
-  --pn-glass-line-v2:rgba(255,255,255,.20);
-}
-
-/* Add a little more ambient light without turning the page gray. */
-body.dark,
-body.dark-mode,
-[data-theme="dark"]{
-  background:
-    radial-gradient(700px 360px at 8% -5%, rgba(255,255,255,.055), transparent 68%),
-    radial-gradient(620px 340px at 100% 8%, rgba(255,255,255,.040), transparent 70%),
-    radial-gradient(520px 300px at 50% 100%, rgba(255,255,255,.025), transparent 72%),
-    var(--pn-bg, #111214);
-}
-
-/* Brighter glass with a stronger but still soft edge. */
-.card,
-.contract-card,
-.customer-card,
-.hero-card,
-.summary-card,
-.stat-card,
-.sheet,
-.bottom-sheet,
-.modal,
-.panel,
-.search-box,
-.filter-bar{
-  background:
-    linear-gradient(145deg,
-      rgba(255,255,255,.115) 0%,
-      rgba(255,255,255,.070) 52%,
-      rgba(255,255,255,.050) 100%);
-  border-color:var(--pn-glass-border-v2);
-  box-shadow:
-    0 16px 42px rgba(0,0,0,.24),
-    0 2px 8px rgba(0,0,0,.14),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -1px 0 rgba(0,0,0,.10);
-}
-
-/* A subtle glass highlight that catches the eye at the top edge. */
-.card::before,
-.contract-card::before,
-.customer-card::before,
-.hero-card::before,
-.summary-card::before,
-.stat-card::before{
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.075),
-    transparent
-  );
-  opacity:.8;
-}
-
-/* Hero gets the most visual depth. */
-.hero-card,
-.summary-card{
-  background:
-    linear-gradient(145deg,
-      rgba(255,255,255,.145),
-      rgba(255,255,255,.075) 55%,
-      rgba(255,255,255,.055));
-  box-shadow:
-    0 20px 52px rgba(0,0,0,.28),
-    inset 0 1px 0 rgba(255,255,255,.23);
-}
-
-/* Inner surfaces: visible but still below the main card. */
-.inner-card,
-.card-inner,
-.contract-info,
-.summary-item,
-.detail-item{
-  background:rgba(255,255,255,.045);
-  border-color:rgba(255,255,255,.10);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
-}
-
-/* Product stage: more light behind dark products. */
-.product-image,
-.product-thumb,
-.product-media,
-.product-photo,
-.product-container{
-  background:
-    radial-gradient(circle at 50% 35%, rgba(255,255,255,.22), transparent 46%),
-    radial-gradient(circle at 20% 80%, rgba(255,255,255,.075), transparent 42%),
-    linear-gradient(145deg, #343941, #22262c 58%, #1b1f24);
-  border-color:rgba(255,255,255,.18);
-  box-shadow:
-    0 14px 32px rgba(0,0,0,.26),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(0,0,0,.16);
-}
-
-/* Images should not be dimmed by the UI layer. */
-.product-image img,
-.product-thumb img,
-.product-media img,
-.product-photo img,
-.product-container img{
-  filter:none;
-  opacity:1;
-}
-
-/* Avatars get a soft halo rather than a hard ring. */
-.customer-avatar,
-.avatar,
-.profile-avatar{
-  border-color:rgba(255,255,255,.19);
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,.025),
-    0 10px 24px rgba(0,0,0,.24),
-    inset 0 1px 0 rgba(255,255,255,.18);
-}
-
-/* Buttons: stronger depth, not stronger color. */
-button,
-.btn,
-.action-btn{
-  box-shadow:
-    0 8px 20px rgba(0,0,0,.18),
-    inset 0 1px 0 rgba(255,255,255,.10);
-}
-
-button:hover,
-.btn:hover,
-.action-btn:hover{
-  box-shadow:
-    0 10px 24px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.14);
-}
-
-/* Main content text gets a touch more separation. */
-.muted,
-.sub,
-.secondary-text,
-.text-muted{
-  color:rgba(255,255,255,.68);
-}
-
-/* Dividers become visible through glass. */
-hr,
-.divider,
-.separator{
-  border-color:rgba(255,255,255,.095);
-}
-
-/* Avoid excessive brightness on disabled controls. */
-button:disabled,
-.btn:disabled{
-  opacity:.55;
-  box-shadow:none;
-}
-
-
-/* PayNest Liquid Glass iOS27-inspired Revision v1
-   Visual-only layer. Core/data/app logic untouched.
-   Inspired by translucent, glossy, reflective glass UI.
-*/
-
-:root{
-  --liquid-glass-bg:rgba(255,255,255,.085);
-  --liquid-glass-bg-2:rgba(255,255,255,.035);
-  --liquid-glass-border:rgba(255,255,255,.20);
-  --liquid-glass-shine:rgba(255,255,255,.30);
-  --liquid-glass-shadow:0 18px 48px rgba(0,0,0,.30);
-}
-
-/* Ambient light behind the glass */
-body.dark,
-body.dark-mode,
-[data-theme="dark"]{
-  background:
-    radial-gradient(650px 420px at 12% -8%, rgba(255,255,255,.075), transparent 66%),
-    radial-gradient(560px 360px at 92% 4%, rgba(255,255,255,.055), transparent 68%),
-    radial-gradient(500px 380px at 55% 108%, rgba(255,255,255,.035), transparent 70%),
-    var(--pn-bg,#111214);
-}
-
-/* Main liquid-glass surfaces */
+/* The actual glass material */
 .card,
 .contract-card,
 .customer-card,
@@ -1671,184 +1367,183 @@ body.dark-mode,
 .filter-bar{
   position:relative;
   overflow:hidden;
+
+  /* Transparent smoke glass: background remains visible through it. */
   background:
-    linear-gradient(135deg,
-      rgba(255,255,255,.125) 0%,
-      rgba(255,255,255,.065) 38%,
-      rgba(255,255,255,.040) 100%);
-  border:1px solid var(--liquid-glass-border);
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.075) 0%,
+      rgba(255,255,255,.045) 45%,
+      rgba(255,255,255,.028) 100%
+    );
+
+  border:1px solid var(--pg-edge);
+
+  /* Depth comes mostly from the shadow, not a dark card fill. */
   box-shadow:
-    var(--liquid-glass-shadow),
-    inset 0 1px 0 rgba(255,255,255,.25),
-    inset 0 -1px 0 rgba(0,0,0,.16);
-  backdrop-filter:blur(24px) saturate(135%);
-  -webkit-backdrop-filter:blur(24px) saturate(135%);
+    0 18px 40px var(--pg-shadow),
+    inset 0 1px 0 rgba(255,255,255,.115);
+
+  backdrop-filter:blur(22px) saturate(125%);
+  -webkit-backdrop-filter:blur(22px) saturate(125%);
 }
 
-/* Moving-looking glossy reflection, static for performance */
+/* Soft internal reflection: broad and translucent, never a white stripe. */
 .card::after,
 .contract-card::after,
 .customer-card::after,
 .hero-card::after,
 .summary-card::after,
 .stat-card::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  left:-18%;
+  top:-48%;
+  width:136%;
+  height:80%;
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(255,255,255,.095) 0%,
+      rgba(255,255,255,.035) 35%,
+      transparent 70%
+    );
+  filter:blur(10px);
+  opacity:.65;
+}
+
+/* Reflection is stronger only along a small portion of the rim. */
+.card::before,
+.contract-card::before,
+.customer-card::before,
+.hero-card::before,
+.summary-card::before,
+.stat-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:
+    linear-gradient(
+      125deg,
+      rgba(255,255,255,.14) 0%,
+      transparent 13%,
+      transparent 76%,
+      rgba(255,255,255,.045) 100%
+    );
+  opacity:.65;
+}
+
+/* Hero = slightly thicker glass, not a brighter opaque card. */
+.hero-card,
+.summary-card{
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.085),
+      rgba(255,255,255,.040) 55%,
+      rgba(255,255,255,.025)
+    );
+  box-shadow:
+    0 24px 54px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* Frosted input glass */
+input,
+select,
+textarea,
+.form-control{
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* Product stage: transparent glass platform, not a solid black tile. */
+.product-image,
+.product-thumb,
+.product-media,
+.product-photo,
+.product-container{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(
+      ellipse at 50% 30%,
+      rgba(255,255,255,.115),
+      transparent 55%
+    ),
+    rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* Very soft reflection on the product platform */
+.product-image::after,
+.product-thumb::after,
+.product-media::after,
+.product-photo::after,
+.product-container::after{
   content:"";
   position:absolute;
   pointer-events:none;
   left:-20%;
-  top:-55%;
+  top:-42%;
   width:140%;
   height:75%;
-  background:
-    linear-gradient(
-      112deg,
-      transparent 18%,
-      rgba(255,255,255,.035) 34%,
-      rgba(255,255,255,.15) 48%,
-      rgba(255,255,255,.045) 56%,
-      transparent 72%
-    );
-  transform:rotate(-3deg);
-  opacity:.72;
-  mix-blend-mode:screen;
-}
-
-/* Thin luminous glass rim */
-.card::before,
-.contract-card::before,
-.customer-card::before,
-.hero-card::before,
-.summary-card::before,
-.stat-card::before{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  inset:0;
-  border-radius:inherit;
-  padding:1px;
-  background:linear-gradient(
-    135deg,
-    rgba(255,255,255,.27),
-    rgba(255,255,255,.055) 42%,
-    rgba(255,255,255,.13) 72%,
-    rgba(255,255,255,.035)
+  background:radial-gradient(
+    ellipse,
+    rgba(255,255,255,.09),
+    transparent 65%
   );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
+  filter:blur(11px);
 }
 
-/* Hero receives stronger glass depth */
-.hero-card,
-.summary-card{
-  background:
-    linear-gradient(135deg,
-      rgba(255,255,255,.155),
-      rgba(255,255,255,.075) 45%,
-      rgba(255,255,255,.045));
-  box-shadow:
-    0 24px 60px rgba(0,0,0,.34),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -1px 0 rgba(0,0,0,.18);
-}
-
-/* Glass inputs */
-input,
-select,
-textarea,
-.form-control{
-  background:
-    linear-gradient(135deg,
-      rgba(255,255,255,.065),
-      rgba(255,255,255,.025));
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    0 8px 20px rgba(0,0,0,.14);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-}
-
-/* Glass product showcase: bright enough for black products */
-.product-image,
-.product-thumb,
-.product-media,
-.product-photo,
-.product-container{
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 48% 28%, rgba(255,255,255,.30), transparent 34%),
-    radial-gradient(circle at 82% 80%, rgba(255,255,255,.095), transparent 42%),
-    linear-gradient(145deg,#3b414a,#292e35 55%,#20242a);
-  border:1px solid rgba(255,255,255,.22);
-  box-shadow:
-    0 16px 34px rgba(0,0,0,.30),
-    inset 0 1px 0 rgba(255,255,255,.24);
-}
-
-/* Gloss over product stage */
-.product-image::after,
-.product-thumb::after,
-.product-media::after,
-.product-photo::after,
-.product-container::after{
-  content:"";
-  position:absolute;
-  inset:-30% -20%;
-  pointer-events:none;
-  background:linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255,255,255,.16) 48%,
-    transparent 62%
-  );
-  transform:rotate(-8deg);
-  opacity:.7;
-}
-
-/* Glass avatars */
+/* Customer avatar: glass disc with a restrained rim */
 .customer-avatar,
 .avatar,
 .profile-avatar{
   background:
-    linear-gradient(145deg,
-      rgba(255,255,255,.16),
-      rgba(255,255,255,.055));
-  border:1px solid rgba(255,255,255,.22);
+    radial-gradient(
+      circle at 34% 25%,
+      rgba(255,255,255,.12),
+      transparent 52%
+    ),
+    rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.105);
   box-shadow:
-    0 12px 28px rgba(0,0,0,.25),
-    inset 0 1px 0 rgba(255,255,255,.23);
+    0 9px 22px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.11);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
 }
 
-/* Glass controls */
-button,
-.btn,
-.action-btn,
-.fab{
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.25),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-/* Bottom navigation as a floating glass slab */
+/* Floating navigation = one continuous glass slab */
 .bottom-nav,
 .nav-bar{
   background:
-    linear-gradient(135deg,
-      rgba(255,255,255,.105),
-      rgba(255,255,255,.045));
-  border:1px solid rgba(255,255,255,.18);
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.070),
+      rgba(255,255,255,.030)
+    );
+  border:1px solid rgba(255,255,255,.105);
   box-shadow:
-    0 18px 44px rgba(0,0,0,.32),
-    inset 0 1px 0 rgba(255,255,255,.22);
-  backdrop-filter:blur(28px) saturate(140%);
-  -webkit-backdrop-filter:blur(28px) saturate(140%);
+    0 18px 42px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(24px) saturate(125%);
+  -webkit-backdrop-filter:blur(24px) saturate(125%);
 }
 
-/* Keep product images at full visual strength */
+/* Keep actual product colors and details untouched. */
 .product-image img,
 .product-thumb img,
 .product-media img,
@@ -1859,218 +1554,239 @@ button,
 }
 
 
-/* PayNest Soft Liquid Glass Revision v1
-   Softer, more translucent, less card-like.
-   Visual-only layer; Core/data logic untouched.
-*/
+/* =========================================================
+   PayNest Liquid Glass — Material Revision v1
+   Built around the real UI structure.
+   Goal: transparent glass, not a dark card with effects.
+   Visual-only; no application/data logic changed.
+========================================================= */
 
 :root{
-  --soft-glass-fill:rgba(255,255,255,.045);
-  --soft-glass-fill-hover:rgba(255,255,255,.065);
-  --soft-glass-edge:rgba(255,255,255,.105);
-  --soft-glass-glow:rgba(255,255,255,.12);
+  --lg-surface:rgba(255,255,255,.035);
+  --lg-surface-2:rgba(255,255,255,.055);
+  --lg-edge:rgba(255,255,255,.105);
+  --lg-white:rgba(255,255,255,.72);
+  --lg-shadow:0 20px 50px rgba(0,0,0,.28);
 }
 
-/* A darker, more dimensional backdrop gives transparent glass something to reveal. */
+/* 1) BACKDROP — glass needs something visible behind it */
 body.dark,
 body.dark-mode,
 [data-theme="dark"]{
   background:
-    radial-gradient(680px 430px at 8% -8%, rgba(145,180,220,.055), transparent 68%),
-    radial-gradient(600px 420px at 94% 5%, rgba(190,170,230,.045), transparent 70%),
-    radial-gradient(760px 520px at 52% 110%, rgba(120,150,190,.035), transparent 72%),
-    var(--pn-bg,#111214);
+    radial-gradient(420px 280px at 8% 8%, rgba(90,130,190,.10), transparent 72%),
+    radial-gradient(420px 300px at 92% 18%, rgba(150,115,190,.08), transparent 72%),
+    radial-gradient(520px 360px at 50% 100%, rgba(70,110,160,.055), transparent 74%),
+    #0e1013;
 }
 
-/* Softer glass: lower opacity, stronger blur, much less rigid border. */
+/* 2) MATERIAL — genuinely translucent, with background blur */
 .card,
 .contract-card,
 .customer-card,
 .hero-card,
 .summary-card,
 .stat-card,
+.panel,
 .sheet,
 .bottom-sheet,
-.modal,
-.panel,
 .search-box,
 .filter-bar{
   position:relative;
+  isolation:isolate;
   overflow:hidden;
   background:
-    linear-gradient(145deg,
-      rgba(255,255,255,.070),
-      rgba(255,255,255,.028) 48%,
-      rgba(255,255,255,.018));
-  border:1px solid var(--soft-glass-edge);
+    linear-gradient(135deg,
+      rgba(255,255,255,.065) 0%,
+      rgba(255,255,255,.025) 48%,
+      rgba(255,255,255,.045) 100%);
+  border:1px solid var(--lg-edge);
   box-shadow:
-    0 18px 46px rgba(0,0,0,.22),
-    0 2px 10px rgba(0,0,0,.10),
-    inset 0 1px 0 rgba(255,255,255,.13);
-  backdrop-filter:blur(30px) saturate(125%);
-  -webkit-backdrop-filter:blur(30px) saturate(125%);
+    var(--lg-shadow),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:
+    blur(26px)
+    saturate(135%);
+  -webkit-backdrop-filter:
+    blur(26px)
+    saturate(135%);
 }
 
-/* Broad, diffused reflection — deliberately not a hard white streak. */
-.card::after,
-.contract-card::after,
-.customer-card::after,
-.hero-card::after,
-.summary-card::after,
-.stat-card::after{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  width:150%;
-  height:120%;
-  left:-28%;
-  top:-74%;
-  background:
-    radial-gradient(
-      ellipse at 50% 80%,
-      rgba(255,255,255,.105) 0%,
-      rgba(255,255,255,.045) 23%,
-      transparent 58%
-    );
-  transform:rotate(-7deg);
-  filter:blur(7px);
-  opacity:.72;
-  mix-blend-mode:screen;
-}
-
-/* Very subtle rim light instead of a visible rectangular outline. */
+/* 3) THICKNESS — a dark translucent underside makes the material feel layered */
 .card::before,
 .contract-card::before,
 .customer-card::before,
 .hero-card::before,
 .summary-card::before,
-.stat-card::before{
+.stat-card::before,
+.panel::before{
   content:"";
   position:absolute;
-  pointer-events:none;
   inset:0;
+  pointer-events:none;
   border-radius:inherit;
   background:
     linear-gradient(
-      135deg,
-      rgba(255,255,255,.17),
-      transparent 18%,
-      transparent 72%,
-      rgba(255,255,255,.055)
+      180deg,
+      rgba(255,255,255,.065),
+      transparent 16%,
+      transparent 78%,
+      rgba(0,0,0,.075)
     );
-  opacity:.55;
+  z-index:0;
 }
 
-/* Hero has a little more translucency and glow. */
-.hero-card,
-.summary-card{
+/* 4) REALISTIC REFLECTION — broad, soft and local rather than a hard stripe */
+.card::after,
+.contract-card::after,
+.customer-card::after,
+.hero-card::after,
+.summary-card::after,
+.stat-card::after,
+.panel::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+  width:80%;
+  height:46%;
+  left:-12%;
+  top:-18%;
   background:
-    radial-gradient(circle at 15% 0%, rgba(255,255,255,.075), transparent 38%),
-    linear-gradient(145deg,
-      rgba(255,255,255,.085),
-      rgba(255,255,255,.030));
-  box-shadow:
-    0 24px 58px rgba(0,0,0,.26),
-    inset 0 1px 0 rgba(255,255,255,.16);
+    radial-gradient(
+      ellipse at center,
+      rgba(255,255,255,.16) 0%,
+      rgba(255,255,255,.065) 24%,
+      rgba(255,255,255,.018) 46%,
+      transparent 72%
+    );
+  filter:blur(12px);
+  transform:rotate(-10deg);
+  opacity:.8;
 }
 
-/* Inputs become frosted glass instead of dark boxes. */
+/* Keep actual content above the glass material layer. */
+.card > *,
+.contract-card > *,
+.customer-card > *,
+.hero-card > *,
+.summary-card > *,
+.stat-card > *,
+.panel > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Hero: slightly thicker glass, not opaque. */
+.hero-card{
+  background:
+    radial-gradient(circle at 16% 8%, rgba(255,255,255,.10), transparent 34%),
+    linear-gradient(135deg,
+      rgba(255,255,255,.075),
+      rgba(255,255,255,.028) 55%,
+      rgba(255,255,255,.045));
+  box-shadow:
+    0 26px 60px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* Inputs: frosted glass instead of black rectangles. */
 input,
 select,
 textarea,
 .form-control{
-  background:
-    rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.095);
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.085);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.065),
-    0 7px 18px rgba(0,0,0,.10);
-  backdrop-filter:blur(22px) saturate(120%);
-  -webkit-backdrop-filter:blur(22px) saturate(120%);
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 8px 18px rgba(0,0,0,.10);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
 }
 
-/* Product display: transparent glass cradle, not a solid dark box. */
+/* Product stage — transparent glass cradle, with a light field behind dark products. */
 .product-image,
 .product-thumb,
 .product-media,
 .product-photo,
 .product-container{
   position:relative;
+  isolation:isolate;
   overflow:hidden;
   background:
-    radial-gradient(circle at 50% 35%, rgba(255,255,255,.14), transparent 40%),
-    linear-gradient(145deg,
-      rgba(255,255,255,.075),
-      rgba(255,255,255,.025));
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:
-    0 14px 34px rgba(0,0,0,.20),
-    inset 0 1px 0 rgba(255,255,255,.13);
-  backdrop-filter:blur(24px) saturate(125%);
-  -webkit-backdrop-filter:blur(24px) saturate(125%);
-}
-
-/* Soft reflection across product glass. */
-.product-image::after,
-.product-thumb::after,
-.product-media::after,
-.product-photo::after,
-.product-container::after{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  width:145%;
-  height:90%;
-  left:-22%;
-  top:-48%;
-  background:
     radial-gradient(
-      ellipse,
-      rgba(255,255,255,.12),
-      transparent 62%
-    );
-  filter:blur(9px);
-  transform:rotate(-8deg);
-  opacity:.62;
-}
-
-/* Avatars: translucent surface, soft rim. */
-.customer-avatar,
-.avatar,
-.profile-avatar{
-  background:
-    radial-gradient(circle at 35% 25%, rgba(255,255,255,.13), transparent 48%),
-    rgba(255,255,255,.045);
-  border:1px solid rgba(255,255,255,.12);
+      ellipse 70% 55% at 50% 35%,
+      rgba(255,255,255,.16),
+      transparent 68%
+    ),
+    rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.095);
   box-shadow:
-    0 10px 26px rgba(0,0,0,.18),
-    inset 0 1px 0 rgba(255,255,255,.13);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+    0 16px 34px rgba(0,0,0,.25),
+    inset 0 1px 0 rgba(255,255,255,.11);
+  backdrop-filter:blur(20px) saturate(125%);
+  -webkit-backdrop-filter:blur(20px) saturate(125%);
 }
 
-/* Floating glass controls */
-.bottom-nav,
-.nav-bar,
-.fab{
-  background:
-    linear-gradient(145deg,
-      rgba(255,255,255,.075),
-      rgba(255,255,255,.025));
-  border:1px solid rgba(255,255,255,.11);
-  box-shadow:
-    0 18px 44px rgba(0,0,0,.24),
-    inset 0 1px 0 rgba(255,255,255,.14);
-  backdrop-filter:blur(30px) saturate(125%);
-  -webkit-backdrop-filter:blur(30px) saturate(125%);
-}
-
-/* Preserve natural product colors. */
 .product-image img,
 .product-thumb img,
 .product-media img,
 .product-photo img,
 .product-container img{
-  opacity:1;
-  filter:none;
+  position:relative;
+  z-index:2;
+  opacity:1 !important;
+  filter:none !important;
+}
+
+/* Product reflection lives behind the product itself. */
+.product-image::before,
+.product-thumb::before,
+.product-media::before,
+.product-photo::before,
+.product-container::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  width:90%;
+  height:65%;
+  left:5%;
+  top:-25%;
+  background:radial-gradient(
+    ellipse,
+    rgba(255,255,255,.13),
+    transparent 68%
+  );
+  filter:blur(13px);
+  pointer-events:none;
+}
+
+/* Customer glass disc */
+.customer-avatar,
+.avatar,
+.profile-avatar{
+  background:
+    radial-gradient(circle at 32% 20%, rgba(255,255,255,.13), transparent 50%),
+    rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* Floating navigation: translucent slab */
+.bottom-nav,
+.nav-bar{
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.060),
+      rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.095);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(28px) saturate(130%);
+  -webkit-backdrop-filter:blur(28px) saturate(130%);
 }
