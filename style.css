@@ -1463,3 +1463,170 @@ textarea:focus,
 }
 
 /* Keep light mode independent from the darker glass treatment */
+
+
+/* PayNest Glass UI Revision v2
+   Slightly brighter premium glass treatment.
+   Visual-only: no data/core logic changes.
+*/
+
+:root{
+  --pn-glass-bg-v2:rgba(255,255,255,.095);
+  --pn-glass-bg-v2-strong:rgba(255,255,255,.135);
+  --pn-glass-border-v2:rgba(255,255,255,.17);
+  --pn-glass-line-v2:rgba(255,255,255,.20);
+}
+
+/* Add a little more ambient light without turning the page gray. */
+body.dark,
+body.dark-mode,
+[data-theme="dark"]{
+  background:
+    radial-gradient(700px 360px at 8% -5%, rgba(255,255,255,.055), transparent 68%),
+    radial-gradient(620px 340px at 100% 8%, rgba(255,255,255,.040), transparent 70%),
+    radial-gradient(520px 300px at 50% 100%, rgba(255,255,255,.025), transparent 72%),
+    var(--pn-bg, #111214);
+}
+
+/* Brighter glass with a stronger but still soft edge. */
+.card,
+.contract-card,
+.customer-card,
+.hero-card,
+.summary-card,
+.stat-card,
+.sheet,
+.bottom-sheet,
+.modal,
+.panel,
+.search-box,
+.filter-bar{
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,.115) 0%,
+      rgba(255,255,255,.070) 52%,
+      rgba(255,255,255,.050) 100%);
+  border-color:var(--pn-glass-border-v2);
+  box-shadow:
+    0 16px 42px rgba(0,0,0,.24),
+    0 2px 8px rgba(0,0,0,.14),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+}
+
+/* A subtle glass highlight that catches the eye at the top edge. */
+.card::before,
+.contract-card::before,
+.customer-card::before,
+.hero-card::before,
+.summary-card::before,
+.stat-card::before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.075),
+    transparent
+  );
+  opacity:.8;
+}
+
+/* Hero gets the most visual depth. */
+.hero-card,
+.summary-card{
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,.145),
+      rgba(255,255,255,.075) 55%,
+      rgba(255,255,255,.055));
+  box-shadow:
+    0 20px 52px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.23);
+}
+
+/* Inner surfaces: visible but still below the main card. */
+.inner-card,
+.card-inner,
+.contract-info,
+.summary-item,
+.detail-item{
+  background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055);
+}
+
+/* Product stage: more light behind dark products. */
+.product-image,
+.product-thumb,
+.product-media,
+.product-photo,
+.product-container{
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,.22), transparent 46%),
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,.075), transparent 42%),
+    linear-gradient(145deg, #343941, #22262c 58%, #1b1f24);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:
+    0 14px 32px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.16);
+}
+
+/* Images should not be dimmed by the UI layer. */
+.product-image img,
+.product-thumb img,
+.product-media img,
+.product-photo img,
+.product-container img{
+  filter:none;
+  opacity:1;
+}
+
+/* Avatars get a soft halo rather than a hard ring. */
+.customer-avatar,
+.avatar,
+.profile-avatar{
+  border-color:rgba(255,255,255,.19);
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.025),
+    0 10px 24px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* Buttons: stronger depth, not stronger color. */
+button,
+.btn,
+.action-btn{
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+button:hover,
+.btn:hover,
+.action-btn:hover{
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* Main content text gets a touch more separation. */
+.muted,
+.sub,
+.secondary-text,
+.text-muted{
+  color:rgba(255,255,255,.68);
+}
+
+/* Dividers become visible through glass. */
+hr,
+.divider,
+.separator{
+  border-color:rgba(255,255,255,.095);
+}
+
+/* Avoid excessive brightness on disabled controls. */
+button:disabled,
+.btn:disabled{
+  opacity:.55;
+  box-shadow:none;
+}
