@@ -875,7 +875,7 @@ html[data-theme="light"] .skip-link{
    Only presentation/storage of optional imageData is added.
 ========================================================= */
 .brand-lockup{display:flex;align-items:center;gap:10px;min-width:0}
-.app-logo{width:24px;height:24px;border-radius:7px;display:block;object-fit:cover;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 1px 0 var(--glass-highlight)}
+.app-logo{width:30px;height:30px;flex:0 0 30px;display:block;overflow:visible;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
 
 .contract-title-wrap{display:flex;align-items:center;gap:11px;min-width:0}
 .contract-title-copy{min-width:0}
@@ -902,7 +902,7 @@ html[data-theme="light"] .product-thumb{background:linear-gradient(145deg,rgba(2
 html[data-theme="light"] .product-image-field{background:rgba(255,255,255,.68)}
 
 @media (max-width:420px){
-  .app-logo{width:24px;height:24px;border-radius:7px}
+  .app-logo{width:30px;height:30px;flex-basis:30px}
   .topbar{padding-left:14px;padding-right:14px}
   .topbar h1{font-size:22px}
   .product-thumb-small{width:42px;height:42px;border-radius:11px}
@@ -1211,7 +1211,7 @@ html[data-theme="light"] .installment-partial .installment-side span{
   padding:calc(12px + env(safe-area-inset-top)) 16px 10px;
 }
 .brand-lockup{gap:8px}
-.app-logo{width:24px;height:24px}
+.app-logo{width:30px;height:30px;flex-basis:30px}
 .topbar h1{font-size:21px;letter-spacing:-.35px}
 .icon-btn{width:38px;height:38px;border-radius:12px;font-size:16px}
 
