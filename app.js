@@ -1292,6 +1292,19 @@ function customerContactValues(customer = {}) {
   };
 }
 
+// Builds a tappable URL for a stored contact value.
+// If the person already saved a full link, use it as-is.
+// LINE is usually just an ID, so build the standard line.me add-friend link.
+// Facebook/TikTok/Instagram without "http" are just usernames we can't safely
+// turn into a working link, so those stay as plain text.
+function contactHref(key, value) {
+  const v = String(value || "").trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  if (key === "line") return `https://line.me/ti/p/~${encodeURIComponent(v)}`;
+  return null;
+}
+
 function customerContactFields(customer = {}) {
   const c = customerContactValues(customer);
   const rows = [
@@ -1531,8 +1544,8 @@ function openCustomer(id) {
     .reduce((sum, c) => sum + remaining(c), 0);
   const contacts = customerContactValues(customer);
   const contactEntries = [
-    ["LINE", contacts.line], ["Facebook", contacts.facebook],
-    ["TikTok", contacts.tiktok], ["Instagram", contacts.instagram]
+    ["LINE", contacts.line, "line"], ["Facebook", contacts.facebook, "facebook"],
+    ["TikTok", contacts.tiktok, "tiktok"], ["Instagram", contacts.instagram, "instagram"]
   ].filter(([,value]) => value);
 
   $("#modalRoot").innerHTML = `<div class="overlay">
@@ -1549,12 +1562,15 @@ function openCustomer(id) {
       </div>
 
       <div class="customer-detail">
-        <div><span>โทร</span><b>${esc(customer.phone || "-")}</b></div>
+        <div><span>โทร</span>${customer.phone ? `<a href="tel:${esc(customer.phone)}">${esc(customer.phone)}</a>` : `<b>-</b>`}</div>
         <div><span>สัญญา</span><b>${contracts.length}</b></div>
         <div><span>ค้างรับ</span><b>${money(outstanding)}</b></div>
       </div>
 
-      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value]) => `<div><span>${label}</span><b>${esc(value)}</b></div>`).join("")}</div>` : ""}
+      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value,key]) => {
+        const href = contactHref(key, value);
+        return `<div><span>${label}</span>${href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(value)}</a>` : `<b>${esc(value)}</b>`}</div>`;
+      }).join("")}</div>` : ""}
       ${customer.address ? `<div class="note-box"><b>ที่อยู่</b><br>${esc(customer.address)}</div>` : ""}
       ${customer.note ? `<div class="note-box"><b>หมายเหตุ</b><br>${esc(customer.note)}</div>` : ""}
 
@@ -1779,7 +1795,7 @@ function openContractDetail(id) {
 
       <div class="detail-grid">
         <div><span>ลูกค้า</span><b>${esc(contract.customerName || customer?.name || "-")}</b></div>
-        <div><span>เบอร์โทร</span><b>${esc(contract.phone || customer?.phone || "-")}</b></div>
+        <div><span>เบอร์โทร</span>${(contract.phone || customer?.phone) ? `<a href="tel:${esc(contract.phone || customer?.phone)}">${esc(contract.phone || customer?.phone)}</a>` : `<b>-</b>`}</div>
         <div><span>รับแล้ว</span><b>${money(contract.received)}</b></div>
         <div><span>คงเหลือ</span><b>${money(remaining(contract))}</b></div>
         <div><span>จำนวนงวด</span><b>${contract.installments} งวด</b></div>
