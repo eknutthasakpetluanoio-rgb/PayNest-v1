@@ -1,1 +1,0 @@
-export async function registerPWA(){if(!("serviceWorker"in navigator))return null;try{return await navigator.serviceWorker.register("./sw.js");}catch(e){console.warn("PWA registration failed",e);return null;}}
