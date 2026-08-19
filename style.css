@@ -1325,3 +1325,141 @@ html[data-theme="light"] .installment-partial .installment-side span{
 .customer-avatar{
   isolation:isolate;
 }
+
+
+
+/* PayNest Glass UI Revision v1
+   Visual-only refinement:
+   brighter graphite surfaces, soft glass reflection,
+   subtle borders and shadows. Core/data logic untouched.
+*/
+
+:root{
+  --pn-glass-bg:rgba(255,255,255,.075);
+  --pn-glass-bg-strong:rgba(255,255,255,.105);
+  --pn-glass-border:rgba(255,255,255,.14);
+  --pn-glass-highlight:rgba(255,255,255,.16);
+  --pn-glass-shadow:0 14px 38px rgba(0,0,0,.28);
+  --pn-glass-shadow-soft:0 8px 24px rgba(0,0,0,.20);
+}
+
+/* Dark graphite base */
+body.dark,
+body.dark-mode,
+[data-theme="dark"]{
+  background:
+    radial-gradient(circle at 15% 0%, rgba(255,255,255,.035), transparent 30%),
+    radial-gradient(circle at 90% 15%, rgba(255,255,255,.025), transparent 28%),
+    var(--pn-bg, #111214);
+}
+
+/* Glass surfaces: target existing cards/panels without changing layout */
+.card,
+.contract-card,
+.customer-card,
+.hero-card,
+.summary-card,
+.stat-card,
+.sheet,
+.bottom-sheet,
+.modal,
+.panel,
+.search-box,
+.filter-bar{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.095),
+      rgba(255,255,255,.045)
+    );
+  border:1px solid var(--pn-glass-border);
+  box-shadow:
+    var(--pn-glass-shadow-soft),
+    inset 0 1px 0 var(--pn-glass-highlight);
+  backdrop-filter:blur(18px) saturate(115%);
+  -webkit-backdrop-filter:blur(18px) saturate(115%);
+}
+
+/* Stronger hero/detail surfaces */
+.hero-card,
+.summary-card{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.125),
+      rgba(255,255,255,.055)
+    );
+  box-shadow:
+    var(--pn-glass-shadow),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* Inputs should be visibly one level below cards */
+input,
+select,
+textarea,
+.form-control{
+  background:rgba(0,0,0,.20);
+  border-color:rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 5px 16px rgba(0,0,0,.12);
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus{
+  border-color:rgba(255,255,255,.22);
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.045),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Product containers: lighter than the page so black products remain visible */
+.product-image,
+.product-thumb,
+.product-media,
+.product-photo,
+.product-container{
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,.16), transparent 48%),
+    linear-gradient(145deg, #2a2e34, #1b1e23);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+/* Customer avatars */
+.customer-avatar,
+.avatar,
+.profile-avatar{
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.055));
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* Status chips */
+.badge,
+.status-badge,
+.status{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 4px 12px rgba(0,0,0,.12);
+}
+
+/* Bottom navigation / floating controls */
+.bottom-nav,
+.nav-bar,
+.fab{
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.13);
+}
+
+/* Keep light mode independent from the darker glass treatment */
