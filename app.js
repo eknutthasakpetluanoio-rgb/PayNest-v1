@@ -1521,24 +1521,6 @@ function openPayment(id) {
   });
 }
 
-function contactHref(key, value) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  if (/^(https?:\/\/|mailto:|tel:)/i.test(raw)) return raw;
-
-  const clean = raw.replace(/^@+/, "").trim();
-  if (!clean) return "";
-
-  const base = {
-    line: "https://line.me/ti/p/~",
-    facebook: "https://www.facebook.com/",
-    tiktok: "https://www.tiktok.com/@",
-    instagram: "https://www.instagram.com/"
-  }[key];
-
-  return base ? base + encodeURIComponent(clean) : "";
-}
-
 function openCustomer(id) {
   const customer = customerById(id);
   if (!customer) return;
@@ -1572,14 +1554,7 @@ function openCustomer(id) {
         <div><span>ค้างรับ</span><b>${money(outstanding)}</b></div>
       </div>
 
-      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value]) => {
-        const key = ({LINE:"line",Facebook:"facebook",TikTok:"tiktok",Instagram:"instagram"})[label];
-        const href = contactHref(key, value);
-        const content = href
-          ? `<a class="customer-contact-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(value)}</a>`
-          : `<b>${esc(value)}</b>`;
-        return `<div><span>${label}</span>${content}</div>`;
-      }).join("")}</div>` : ""}
+      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value]) => `<div><span>${label}</span><b>${esc(value)}</b></div>`).join("")}</div>` : ""}
       ${customer.address ? `<div class="note-box"><b>ที่อยู่</b><br>${esc(customer.address)}</div>` : ""}
       ${customer.note ? `<div class="note-box"><b>หมายเหตุ</b><br>${esc(customer.note)}</div>` : ""}
 

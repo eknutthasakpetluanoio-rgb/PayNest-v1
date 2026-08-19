@@ -1,5 +1,5 @@
 // PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v6-cleanup-20260819";
+const CACHE_NAME = "paynest-pwa-v7-modal-fix-20260819";
 
 const APP_SHELL = [
   "./",
