@@ -2880,3 +2880,62 @@ body::before{
     transition:none;
   }
 }
+
+/* =========================================================
+   PAYNEST — MOBILE HEADER / LOGO FIX
+   Prevents the app logo from using its source-image dimensions.
+========================================================= */
+.brand-lockup{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  flex:1 1 auto;
+}
+
+.app-logo{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:block;
+  object-fit:cover;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.topbar > div:last-child{
+  flex:0 0 auto;
+  min-width:0;
+}
+
+@media(max-width:480px){
+  .topbar{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .brand-lockup{
+    gap:9px;
+  }
+
+  .app-logo{
+    width:42px;
+    height:42px;
+    flex-basis:42px;
+    border-radius:11px;
+  }
+
+  .topbar h1{
+    font-size:24px;
+  }
+
+  .icon-btn{
+    width:44px;
+    height:44px;
+    border-radius:15px;
+    font-size:20px;
+  }
+}
