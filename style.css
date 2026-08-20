@@ -489,3 +489,192 @@ html.light .nav-bar{
     0 18px 40px rgba(70,80,100,.16),
     inset 0 1px 0 rgba(255,255,255,.80);
 }
+
+/* =========================================================
+   PAYPREMINIQ Premium Graphite / iOS Finish v1
+   Visual-only refinement.
+   IMPORTANT: no HTML, JavaScript, storage, customer,
+   product, contract, payment, or image data is changed.
+========================================================= */
+:root{
+  --bg:#070708;
+  --text:#f5f5f7;
+  --muted:#8e8e93;
+  --line:rgba(255,255,255,.09);
+  --glass:rgba(255,255,255,.055);
+  --glass2:rgba(255,255,255,.032);
+}
+
+html,body{
+  background:
+    radial-gradient(520px 300px at 50% -10%,rgba(255,255,255,.055),transparent 68%),
+    linear-gradient(180deg,#0a0a0b 0%,#070708 48%,#050506 100%) !important;
+}
+
+body::before{
+  background:
+    radial-gradient(420px 260px at 12% 34%,rgba(255,255,255,.018),transparent 72%),
+    radial-gradient(460px 300px at 88% 66%,rgba(255,255,255,.014),transparent 72%) !important;
+}
+
+.topbar{
+  min-height:64px;
+  padding:10px 14px;
+  padding-top:max(10px,env(safe-area-inset-top));
+  background:rgba(10,10,11,.78) !important;
+  border-bottom:1px solid rgba(255,255,255,.065) !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.24) !important;
+  backdrop-filter:blur(24px) saturate(120%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(120%) !important;
+}
+
+.brand{
+  color:#747478 !important;
+  letter-spacing:3.8px !important;
+}
+
+.topbar h1{
+  font-size:20px !important;
+  font-weight:800 !important;
+  letter-spacing:-.65px !important;
+}
+
+.app-logo{
+  width:36px !important;
+  height:36px !important;
+  flex-basis:36px !important;
+  border-radius:12px !important;
+  border-color:rgba(255,255,255,.13) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+
+.icon-btn{
+  width:36px !important;
+  height:36px !important;
+  flex-basis:36px !important;
+  border-radius:12px !important;
+  color:#e9e9eb !important;
+  background:rgba(255,255,255,.045) !important;
+  border-color:rgba(255,255,255,.10) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(22px) saturate(120%) !important;
+  -webkit-backdrop-filter:blur(22px) saturate(120%) !important;
+}
+
+.page{
+  max-width:720px;
+  padding:20px 15px calc(116px + env(safe-area-inset-bottom));
+}
+
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.028) 58%,rgba(255,255,255,.018)) !important;
+  border-color:rgba(255,255,255,.075) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 14px 34px rgba(0,0,0,.26) !important;
+  backdrop-filter:blur(24px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(125%) !important;
+}
+
+.hero{
+  min-height:150px;
+  padding:22px !important;
+  border-radius:27px !important;
+}
+
+.hero::after{
+  background:radial-gradient(circle,rgba(255,255,255,.075),transparent 68%) !important;
+  filter:blur(20px) !important;
+}
+
+.hero-number{
+  font-size:39px !important;
+  font-weight:800 !important;
+  letter-spacing:-2px !important;
+}
+
+.stat,.status-summary,.task,.customer,.contract-card,.empty{
+  border-radius:20px !important;
+}
+
+.stat strong{font-size:22px !important}
+
+.tabs{
+  padding:4px !important;
+  background:rgba(255,255,255,.025) !important;
+  border:1px solid rgba(255,255,255,.055) !important;
+  border-radius:16px !important;
+}
+
+.tab{
+  border-radius:12px !important;
+  padding:8px 12px !important;
+}
+
+.tab.active{
+  background:#ededf0 !important;
+  color:#111113 !important;
+  border-color:#fff !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 #fff !important;
+}
+
+.search-wrap{
+  border-radius:18px !important;
+}
+
+.contract-card{
+  padding:14px !important;
+  margin:9px 0 !important;
+}
+
+.contract-card:hover,.customer:hover,.task:hover{
+  border-color:rgba(255,255,255,.115) !important;
+}
+
+.progress i{
+  background:linear-gradient(90deg,#ededf0,#bfc0c5) !important;
+  box-shadow:0 0 12px rgba(255,255,255,.10) !important;
+}
+
+.primary-mini,.primary-btn{
+  background:linear-gradient(180deg,#f4f4f5,#d9d9dc) !important;
+  color:#111113 !important;
+  border-color:rgba(255,255,255,.92) !important;
+  box-shadow:inset 0 1px 0 #fff,0 8px 20px rgba(0,0,0,.24) !important;
+}
+
+.mini-btn,.wide-btn{
+  background:rgba(255,255,255,.045) !important;
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+.fab{
+  background:linear-gradient(145deg,#f4f4f5,#cfd0d4) !important;
+  color:#111113 !important;
+  border-color:rgba(255,255,255,.92) !important;
+  box-shadow:0 18px 36px rgba(0,0,0,.38),inset 0 1px 0 #fff !important;
+}
+
+.bottom-nav,.nav-bar{
+  background:rgba(14,14,16,.76) !important;
+  border-color:rgba(255,255,255,.085) !important;
+  box-shadow:0 18px 45px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter:blur(26px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(26px) saturate(125%) !important;
+}
+
+.bottom-nav .active,.bottom-nav .selected,.nav-bar .active,.nav-bar .selected{
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 7px 18px rgba(0,0,0,.20) !important;
+}
+
+.product-thumb,.product-thumb-small,.product-thumb-large{
+  background:rgba(255,255,255,.028) !important;
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+@media(max-width:600px){
+  .page{padding-left:14px;padding-right:14px}
+  .hero-number{font-size:36px !important}
+  .section{margin-top:22px}
+}
