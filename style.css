@@ -292,3 +292,200 @@ html[data-theme="light"] .skip-link{background:#171923;color:#fff}
     -webkit-backdrop-filter:blur(24px) saturate(150%);
   }
 }
+
+/* =========================================================
+   PayNest Optical Liquid Glass v5
+   Transparent / adaptive / lens-inspired glass layer
+   Visual-only patch; no application logic changes.
+========================================================= */
+:root{
+  --glass-clear: rgba(255,255,255,.035);
+  --glass-regular: rgba(255,255,255,.065);
+  --glass-edge: rgba(255,255,255,.18);
+  --glass-highlight: rgba(255,255,255,.22);
+}
+
+html,body{
+  background:
+    radial-gradient(520px 420px at 8% 0%, rgba(96,128,176,.17), transparent 68%),
+    radial-gradient(480px 420px at 94% 16%, rgba(132,104,176,.14), transparent 70%),
+    radial-gradient(620px 520px at 50% 110%, rgba(255,255,255,.055), transparent 72%),
+    #0a0c10 !important;
+}
+
+/* Keep content cards as standard translucent material; controls get the strongest glass. */
+.hero-card,
+.search-box,
+.bottom-nav,
+.nav-bar,
+.fab,
+.icon-btn,
+.primary-btn,
+.wide-btn{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,.12), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%, rgba(255,255,255,.045));
+  border:1px solid var(--glass-edge);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -1px 0 rgba(255,255,255,.035);
+  backdrop-filter: blur(30px) saturate(175%) contrast(105%);
+  -webkit-backdrop-filter: blur(30px) saturate(175%) contrast(105%);
+}
+
+/* Optical rim: brighter upper edge + soft lateral refraction-like glow. */
+.hero-card::before,
+.search-box::before,
+.bottom-nav::before,
+.nav-bar::before,
+.fab::before,
+.icon-btn::before,
+.primary-btn::before,
+.wide-btn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.20), transparent 16%),
+    radial-gradient(80% 70% at 8% 0%, rgba(255,255,255,.14), transparent 55%),
+    radial-gradient(65% 80% at 100% 100%, rgba(115,155,205,.08), transparent 60%);
+  mix-blend-mode:screen;
+  opacity:.8;
+}
+
+/* Concentrated highlight: creates the visual cue of curved glass. */
+.hero-card::after,
+.search-box::after,
+.bottom-nav::after,
+.nav-bar::after,
+.fab::after,
+.icon-btn::after,
+.primary-btn::after,
+.wide-btn::after{
+  content:"";
+  position:absolute;
+  width:55%;
+  height:38%;
+  left:-14%;
+  top:-28%;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  background:rgba(255,255,255,.20);
+  filter:blur(20px);
+  transform:rotate(-12deg);
+  opacity:.55;
+}
+
+.hero-card > *,
+.search-box > *,
+.bottom-nav > *,
+.nav-bar > *,
+.fab > *,
+.icon-btn > *,
+.primary-btn > *,
+.wide-btn > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Selected navigation gets a lens-like light concentration, not a solid fill. */
+.bottom-nav .active,
+.bottom-nav .selected,
+.nav-bar .active,
+.nav-bar .selected{
+  background:
+    radial-gradient(80% 120% at 50% 0%, rgba(255,255,255,.18), transparent 58%),
+    rgba(255,255,255,.055) !important;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.20),
+    0 8px 20px rgba(0,0,0,.16);
+}
+
+/* Product/media surfaces: transparent cradle so dark products remain visible. */
+.product-image,
+.product-thumb,
+.product-photo,
+.product-media,
+.product-container{
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 54%),
+    rgba(255,255,255,.025) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 14px 30px rgba(0,0,0,.20) !important;
+  backdrop-filter:blur(22px) saturate(160%);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);
+}
+
+/* Mobile: preserve proportions and never let media define card height. */
+@media (max-width:600px){
+  .hero-card{ border-radius:24px; }
+  .product-image,
+  .product-thumb,
+  .product-photo,
+  .product-media,
+  .product-container{
+    width:min(104px, 30vw) !important;
+    height:min(104px, 30vw) !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    flex:0 0 auto !important;
+  }
+  .product-image img,
+  .product-thumb img,
+  .product-photo img,
+  .product-media img,
+  .product-container img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+  }
+}
+
+@media (max-width:380px){
+  .product-image,
+  .product-thumb,
+  .product-photo,
+  .product-media,
+  .product-container{
+    width:88px !important;
+    height:88px !important;
+  }
+}
+
+/* Light mode: same optical material, brighter environment rather than opaque white cards. */
+body.light,
+html.light body,
+body[data-theme="light"]{
+  background:
+    radial-gradient(520px 420px at 8% 0%, rgba(110,150,205,.20), transparent 68%),
+    radial-gradient(480px 420px at 94% 16%, rgba(150,125,205,.16), transparent 70%),
+    #eef2f7 !important;
+}
+
+body.light .hero-card,
+body.light .search-box,
+body.light .bottom-nav,
+body.light .nav-bar,
+html.light .hero-card,
+html.light .search-box,
+html.light .bottom-nav,
+html.light .nav-bar{
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,.65), transparent 44%),
+    rgba(255,255,255,.30) !important;
+  border-color:rgba(255,255,255,.60);
+  box-shadow:
+    0 18px 40px rgba(70,80,100,.16),
+    inset 0 1px 0 rgba(255,255,255,.80);
+}
