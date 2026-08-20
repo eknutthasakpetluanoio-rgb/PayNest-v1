@@ -1469,11 +1469,44 @@ function recalculateContractPayments(contract) {
   return contract;
 }
 
+function ensurePaymentInstallmentNumbers(contract) {
+  const payments = Array.isArray(contract.payments) ? contract.payments : [];
+  const schedule = getInstallmentSchedule(contract);
+  if (!payments.length || !schedule.length) return payments;
+
+  // Backfill legacy payments without changing their amounts/dates.
+  // Payments are allocated chronologically to the first installment that
+  // still has room, while preserving an existing installmentNo when present.
+  let remainingByInstallment = schedule.map(item => Number(item.amount || 0));
+  const ordered = [...payments].sort((a, b) =>
+    String(a.date || '').localeCompare(String(b.date || '')) ||
+    String(a.id || '').localeCompare(String(b.id || ''))
+  );
+
+  for (const payment of ordered) {
+    if (Number.isFinite(Number(payment.installmentNo)) && Number(payment.installmentNo) > 0) continue;
+    let amount = Math.max(0, Number(payment.amount || 0));
+    let index = 0;
+    while (index < remainingByInstallment.length - 1 && remainingByInstallment[index] <= 0.005) index++;
+    payment.installmentNo = index + 1;
+    while (amount > 0.005 && index < remainingByInstallment.length) {
+      const applied = Math.min(amount, Math.max(0, remainingByInstallment[index]));
+      remainingByInstallment[index] -= applied;
+      amount -= applied;
+      if (amount > 0.005 && index < remainingByInstallment.length - 1) index++;
+    }
+  }
+  return payments;
+}
+
 function openPaymentEdit(contractId, paymentId) {
   const contract = data.contracts.find(c => c.id === contractId);
   if (!contract) return;
   const payment = (contract.payments || []).find(p => p.id === paymentId);
   if (!payment) return;
+
+  ensurePaymentInstallmentNumbers(contract);
+  const editSchedule = getInstallmentSchedule(contract);
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <form class="modal small" id="paymentEditForm">
@@ -1487,6 +1520,12 @@ function openPaymentEdit(contractId, paymentId) {
         <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
         <strong>ยอดสัญญา ${money(contract.total)}</strong>
       </div>
+
+      <label>งวดที่
+        <select name="installmentNo">
+          ${editSchedule.map(item => `<option value="${item.number}" ${Number(payment.installmentNo || 1) === item.number ? "selected" : ""}>งวด ${item.number} · ${fmtDate(item.dueDate)}</option>`).join("")}
+        </select>
+      </label>
 
       <label>เงินต้นที่รับ
         <input name="amount" type="number" min="0" step="0.01" value="${Number(payment.amount || 0)}" required>
@@ -1520,6 +1559,7 @@ function openPaymentEdit(contractId, paymentId) {
       return;
     }
 
+    payment.installmentNo = Math.max(1, Number(f.get("installmentNo") || payment.installmentNo || 1));
     payment.amount = Math.round(amount * 100) / 100;
     payment.penalty = Math.round(Math.max(0, Number(f.get("penalty") || 0)) * 100) / 100;
     payment.date = String(f.get("date") || localToday());
@@ -1536,6 +1576,11 @@ function openPayment(id) {
   const contract = data.contracts.find(c => c.id === id);
   if (!contract || getStatus(contract) === "paid") return;
 
+  const schedule = getInstallmentSchedule(contract);
+  const nextInstallment = schedule.find(item => item.status !== "paid");
+  if (!nextInstallment) return;
+  const maxAmount = Math.max(0, nextInstallment.remainingAmount);
+
   $("#modalRoot").innerHTML = `<div class="overlay">
     <form class="modal small" id="payForm">
       <div class="modal-head">
@@ -1546,31 +1591,36 @@ function openPayment(id) {
       <div class="payment-summary">
         <b>${esc(contract.product)}</b>
         <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
-        <strong>คงเหลือ ${money(remaining(contract))}</strong>
+        <strong>งวด ${nextInstallment.number} · คงเหลือ ${money(maxAmount)}</strong>
       </div>
 
+      <label>งวดที่
+        <input type="text" value="งวด ${nextInstallment.number} · ครบกำหนด ${fmtDate(nextInstallment.dueDate)}" readonly>
+      </label>
+
       <label>จำนวนเงิน
-        <input name="amount" type="number" min="0.01" max="${remaining(contract)}" step="0.01" value="${remaining(contract)}" required>
+        <input name="amount" type="number" min="0.01" max="${maxAmount}" step="0.01" value="${maxAmount}" required>
       </label>
 
       <label>วันที่รับเงิน
         <input name="date" type="date" value="${localToday()}">
       </label>
 
-      <button class="primary-btn">บันทึกรับชำระ</button>
+      <button class="primary-btn">บันทึกรับชำระงวด ${nextInstallment.number}</button>
     </form>
   </div>`;
 
   $("#payForm").addEventListener("submit", event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
-    const amount = Math.min(remaining(contract), Number(f.get("amount") || 0));
+    const amount = Math.min(maxAmount, Math.max(0, Number(f.get("amount") || 0)));
     if (amount <= 0) return;
 
-    contract.received += amount;
+    contract.received = Number(contract.received || 0) + amount;
     contract.payments = Array.isArray(contract.payments) ? contract.payments : [];
     contract.payments.push({
       id: uid(),
+      installmentNo: nextInstallment.number,
       amount,
       date: String(f.get("date") || localToday())
     });
@@ -1754,35 +1804,12 @@ function openContractDetail(id) {
   if (!contract) return;
 
   const customer = customerById(contract.customerId);
+  ensurePaymentInstallmentNumbers(contract);
   const payments = [...(contract.payments || [])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
   const schedule = getInstallmentSchedule(contract);
   const nextInstallment = schedule.find(item => item.status !== "paid");
   const paidCount = schedule.filter(item => item.status === "paid").length;
   const partialItem = schedule.find(item => item.status === "partial");
-
-  const scheduleRows = schedule.map(item => {
-    const statusText = installmentStatusLabel(item);
-    const dateText = fmtDate(item.dueDate);
-    const amountText = money(item.amount);
-    const statusClassName = item.status === "paid" ? "installment-paid" :
-      item.status === "partial" ? "installment-partial" : "installment-pending";
-
-    return `<div class="installment-row ${statusClassName}">
-      <div class="installment-main">
-        <b>งวด ${item.number}/${schedule.length}</b>
-        <span>${dateText}</span>
-        ${item.status === "partial" ? `<small>รับแล้ว ${money(item.paidAmount)} · เหลือ ${money(item.remainingAmount)}</small>` : ""}
-      </div>
-      <div class="installment-side">
-        <strong>${amountText}</strong>
-        <span>${statusText}</span>
-      </div>
-    </div>`;
-  }).join("");
-
-  const nextLabel = getStatus(contract) === "paid"
-    ? "ชำระครบ"
-    : `งวด ${nextInstallment?.number || "-"} · ${fmtDate(nextInstallment?.dueDate || contract.dueDate)}`;
 
   const progressPercent = contract.total > 0
     ? Math.min(100, (Number(contract.received || 0) / Number(contract.total || 0)) * 100)
@@ -1792,71 +1819,116 @@ function openContractDetail(id) {
     ? `ชำระครบ ${schedule.length}/${schedule.length} งวด`
     : `${paidCount}/${schedule.length} งวด · ${partialItem ? `งวด ${partialItem.number} ชำระบางส่วน` : `งวดถัดไป ${nextInstallment?.number || "-"}`}`;
 
-  const scheduleBlock = `<section class="installment-section">
-    <div class="modal-section-title">งวดที่ต้องชำระ</div>
-    <div class="installment-summary">
-      <div>
-        <span>ความคืบหน้า</span>
-        <b>${scheduleSummary}</b>
+  const scheduleRows = schedule.map(item => {
+    const statusText = installmentStatusLabel(item);
+    const statusClassName = item.status === "paid" ? "installment-paid" :
+      item.status === "partial" ? "installment-partial" : "installment-pending";
+    return `<div class="installment-row ${statusClassName}">
+      <div class="installment-main">
+        <b>งวด ${item.number}/${schedule.length}</b>
+        <span>ครบกำหนด ${fmtDate(item.dueDate)}</span>
+        ${item.status === "partial" ? `<small>รับแล้ว ${money(item.paidAmount)} · เหลือ ${money(item.remainingAmount)}</small>` : ""}
       </div>
+      <div class="installment-side">
+        <strong>${money(item.amount)}</strong>
+        <span>${statusText}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  const historyRows = payments.map(p => {
+    const installmentNo = Number(p.installmentNo || 0);
+    const installment = installmentNo ? schedule[installmentNo - 1] : null;
+    return `<div class="payment-row">
+      <div class="payment-history-main">
+        <div class="payment-history-top">
+          <b>งวด ${installmentNo || "-"}</b>
+          <strong>+ ${money(p.amount)}</strong>
+        </div>
+        <span>ชำระ ${fmtDate(p.date)}${installment ? ` · ครบกำหนด ${fmtDate(installment.dueDate)}` : ""}</span>
+        ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+        ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+      </div>
+      <div class="payment-row-actions">
+        <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+        <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  const nextLabel = getStatus(contract) === "paid"
+    ? "ชำระครบ"
+    : `งวด ${nextInstallment?.number || "-"} · ${fmtDate(nextInstallment?.dueDate || contract.dueDate)}`;
+
+  const detailBlock = `<section class="detail-section">
+    <div class="modal-section-title">รายละเอียดการผ่อน</div>
+    <div class="detail-grid">
+      <div><span>ลูกค้า</span><b>${esc(contract.customerName || customer?.name || "-")}</b></div>
+      <div><span>เบอร์โทร</span>${(contract.phone || customer?.phone) ? `<a href="tel:${esc(contract.phone || customer?.phone)}">${esc(contract.phone || customer?.phone)}</a>` : `<b>-</b>`}</div>
+      <div><span>ยอดสัญญา</span><b>${money(contract.total)}</b></div>
+      <div><span>คงเหลือ</span><b>${money(remaining(contract))}</b></div>
+      <div><span>ค่างวดโดยประมาณ</span><b>${money(installmentAmount(contract, 0))}</b></div>
+      <div><span>จำนวนงวด</span><b>${contract.installments} งวด</b></div>
+      <div><span>รูปแบบการชำระ</span><b>${paymentTypeLabel(contract.paymentType)}</b></div>
+      <div><span>งวดถัดไป</span><b>${nextLabel}</b></div>
+    </div>
+  </section>`;
+
+  const currentBlock = `<section class="detail-section current-installment-section">
+    <div class="modal-section-title">งวดปัจจุบัน</div>
+    <div class="current-installment-card">
+      ${nextInstallment ? `<div class="current-installment-copy">
+        <div><span>งวด ${nextInstallment.number}/${schedule.length}</span><b>${money(nextInstallment.remainingAmount)}</b></div>
+        <small>ครบกำหนด ${fmtDate(nextInstallment.dueDate)} · ${installmentStatusLabel(nextInstallment)}</small>
+      </div>` : `<div class="current-installment-copy"><div><span>สถานะ</span><b>ชำระครบแล้ว</b></div></div>`}
+      ${nextInstallment ? `<button class="primary-btn current-pay-btn" data-pay="${contract.id}">รับชำระงวดนี้</button>` : ""}
+    </div>
+  </section>`;
+
+  const scheduleBlock = `<section class="detail-section">
+    <div class="modal-section-title">ตารางงวด</div>
+    <div class="installment-summary">
+      <div><span>ความคืบหน้า</span><b>${scheduleSummary}</b></div>
       <strong>${Math.round(progressPercent)}%</strong>
     </div>
     <div class="installment-progress"><i style="width:${progressPercent}%"></i></div>
     <div class="installment-list">${scheduleRows}</div>
   </section>`;
 
-  const historyBlock = `<div class="modal-section-title">ประวัติการรับชำระ</div>
+  const historyBlock = `<section class="detail-section">
+    <div class="modal-section-title">ประวัติการชำระ</div>
     ${Number(contract.penaltyTotal || 0) > 0 ? `<div class="subtle-box">ค่าปรับสะสม ${money(contract.penaltyTotal)}</div>` : ""}
-    ${payments.length
-      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row">
-        <div>
-          <span>${fmtDate(p.date)}</span>
-          <b>+ ${money(p.amount)}</b>
-          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
-          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
-        </div>
-        <div class="payment-row-actions">
-          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
-          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
-        </div>
-      </div>`).join("")}</div>`
-      : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
+    ${payments.length ? `<div class="payment-list">${historyRows}</div>` : `<div class="subtle-box">ยังไม่มีประวัติการชำระ</div>`}
+  </section>`;
+
+  const hero = `<div class="detail-hero card">
+    <div class="detail-hero-top">
+      ${productThumb(contract.product, contract.imageData, "large")}
+      <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2><span>${esc(contract.customerName || customer?.name || "ไม่ระบุลูกค้า")}</span></div>
+    </div>
+    <div class="detail-hero-amount"><span>ยอดคงเหลือ</span><strong>${money(remaining(contract))}</strong></div>
+    <div class="installment-progress"><i style="width:${progressPercent}%"></i></div>
+    <div class="detail-hero-meta"><span>รับแล้ว ${money(contract.received)}</span><span>${Math.round(progressPercent)}% · ${paidCount}/${schedule.length} งวด</span></div>
+  </div>`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <div class="modal small contract-detail-modal">
       <div class="modal-head contract-detail-head">
-        <div class="contract-detail-title">
-          ${productThumb(contract.product, contract.imageData, "large")}
-          <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
-        </div>
+        <div><div class="eyebrow">DETAIL</div><h2>รายละเอียดสัญญา</h2></div>
         <div class="modal-head-actions">
           <button type="button" class="mini-btn ghost-mini" data-edit="${contract.id}">แก้ไข</button>
-          <button class="icon-btn" data-close>×</button>
+          <button class="icon-btn" data-close aria-label="ปิด">×</button>
         </div>
       </div>
-
-      <div class="detail-status">
-        <span class="pill ${getStatus(contract) === "paid" ? "paid" : "active"}">${statusLabel(contract)}</span>
-        <strong>${money(contract.total)}</strong>
-      </div>
-
-      <div class="detail-grid">
-        <div><span>ลูกค้า</span><b>${esc(contract.customerName || customer?.name || "-")}</b></div>
-        <div><span>เบอร์โทร</span>${(contract.phone || customer?.phone) ? `<a href="tel:${esc(contract.phone || customer?.phone)}">${esc(contract.phone || customer?.phone)}</a>` : `<b>-</b>`}</div>
-        <div><span>รับแล้ว</span><b>${money(contract.received)}</b></div>
-        <div><span>คงเหลือ</span><b>${money(remaining(contract))}</b></div>
-        <div><span>จำนวนงวด</span><b>${contract.installments} งวด</b></div>
-        <div><span>รูปแบบ</span><b>${paymentTypeLabel(contract.paymentType)}</b></div>
-        <div><span>งวดถัดไป</span><b>${nextLabel}</b></div>
-      </div>
-
+      ${hero}
+      ${detailBlock}
+      ${currentBlock}
       ${scheduleBlock}
       ${historyBlock}
-
-      ${getStatus(contract) === "active"
-        ? `<button class="primary-btn" data-pay="${contract.id}">รับชำระเงิน</button>`
-        : ""}
-      <button type="button" class="wide-btn danger" data-delete-contract="${contract.id}">ลบสัญญานี้</button>
+      <section class="detail-section detail-actions-section">
+        <div class="modal-section-title">จัดการสัญญา</div>
+        <button type="button" class="wide-btn danger" data-delete-contract="${contract.id}">ลบสัญญานี้</button>
+      </section>
     </div>
   </div>`;
 }

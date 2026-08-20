@@ -127,3 +127,58 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
   .nav-item small{font-size:8px}
   .fab{width:56px;height:56px;min-width:56px;min-height:56px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom))}
 }
+
+/* =========================================================
+   PAYPREMINIQ — CONSISTENT GLASS + DETAIL SYSTEM
+   Final layer: no theme switching, no legacy visual overrides.
+========================================================= */
+.topbar{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
+.brand-lockup,.top-actions{display:flex!important;align-items:center!important}
+.top-actions{gap:7px!important;flex:0 0 auto!important}
+.top-actions .icon-btn{display:grid;place-items:center!important}
+
+/* Bottom navigation uses the same glass material family as the FAB. */
+.bottom-nav{
+  background:radial-gradient(circle at 28% 0%,rgba(255,255,255,.12),rgba(255,255,255,.055) 38%,rgba(255,255,255,.028) 100%);
+  border-color:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 20px 46px rgba(0,0,0,.42);
+  backdrop-filter:blur(24px) saturate(150%);
+  -webkit-backdrop-filter:blur(24px) saturate(150%);
+}
+
+/* Contract Detail: separate contract facts, current installment, schedule and payment history. */
+.contract-detail-modal{overflow-y:auto!important}
+.detail-hero{padding:15px;border-radius:22px;margin-bottom:13px}
+.detail-hero-top{display:flex;align-items:center;gap:11px;min-width:0}
+.detail-hero-top>div:last-child{min-width:0}
+.detail-hero-top h2{margin:3px 0 2px;font-size:20px;color:#f5f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-hero-top span{display:block;color:#92959f;font-size:9px}
+.detail-hero-amount{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:15px}
+.detail-hero-amount span{color:#92959f;font-size:9px}
+.detail-hero-amount strong{font-size:25px;letter-spacing:-.8px;color:#f7f7f9}
+.detail-hero .installment-progress{margin:11px 0 7px}
+.detail-hero-meta{display:flex;justify-content:space-between;gap:8px;color:#8e919a;font-size:8px}
+.detail-section{margin:13px 0}
+.detail-section>.modal-section-title{margin-bottom:8px}
+.current-installment-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border-radius:19px;border:1px solid rgba(255,255,255,.10);background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.10),rgba(255,255,255,.035) 48%,rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 10px 25px rgba(0,0,0,.20);backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%)}
+.current-installment-copy{min-width:0;flex:1}
+.current-installment-copy>div{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.current-installment-copy span{font-size:10px;color:#bfc1c8;font-weight:700}
+.current-installment-copy b{font-size:17px;color:#f5f5f7}
+.current-installment-copy small{display:block;margin-top:4px;color:#858892;font-size:8px}
+.current-pay-btn{width:auto!important;min-width:105px!important;min-height:44px!important;padding:8px 11px!important;font-size:9px!important}
+.detail-actions-section{padding-bottom:4px}
+.payment-history-main{min-width:0;flex:1}
+.payment-history-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.payment-history-top b{font-size:10px;color:#f0f1f4}
+.payment-history-top strong{font-size:12px;color:#f3f4f6}
+.payment-history-main>span{display:block;margin-top:3px;color:#8e919a;font-size:8px}
+.payment-history-main small{display:block;margin-top:3px;color:#777b85;font-size:7px}
+
+@media(max-width:380px){
+  .top-actions{gap:4px!important}
+  .top-actions .icon-btn{width:44px!important;height:44px!important;flex-basis:44px!important}
+  .current-installment-card{align-items:stretch;flex-direction:column}
+  .current-pay-btn{width:100%!important}
+  .detail-hero-top h2{font-size:18px}
+}
