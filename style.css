@@ -129,56 +129,73 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 }
 
 /* =========================================================
-   PAYPREMINIQ — CONSISTENT GLASS + DETAIL SYSTEM
-   Final layer: no theme switching, no legacy visual overrides.
+   PAYPREMINIQ — FINAL LOCKED MATERIAL + STATUS SYSTEM
 ========================================================= */
-.topbar{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
-.brand-lockup,.top-actions{display:flex!important;align-items:center!important}
-.top-actions{gap:7px!important;flex:0 0 auto!important}
-.top-actions .icon-btn{display:grid;place-items:center!important}
 
-/* Bottom navigation uses the same glass material family as the FAB. */
-.bottom-nav{
-  background:radial-gradient(circle at 28% 0%,rgba(255,255,255,.12),rgba(255,255,255,.055) 38%,rgba(255,255,255,.028) 100%);
-  border-color:rgba(255,255,255,.16);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 20px 46px rgba(0,0,0,.42);
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
+:root{
+  --fab-glass:radial-gradient(circle at 30% 20%,rgba(255,255,255,.16),rgba(255,255,255,.07) 45%,rgba(255,255,255,.035) 100%);
+  --glass-edge:rgba(255,255,255,.18);
+  --status-green:rgba(70,210,140,.12);
+  --status-amber:rgba(255,190,70,.12);
+  --status-red:rgba(255,80,90,.12);
+  --status-blue:rgba(120,165,255,.10);
 }
 
-/* Contract Detail: separate contract facts, current installment, schedule and payment history. */
-.contract-detail-modal{overflow-y:auto!important}
-.detail-hero{padding:15px;border-radius:22px;margin-bottom:13px}
-.detail-hero-top{display:flex;align-items:center;gap:11px;min-width:0}
-.detail-hero-top>div:last-child{min-width:0}
-.detail-hero-top h2{margin:3px 0 2px;font-size:20px;color:#f5f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.detail-hero-top span{display:block;color:#92959f;font-size:9px}
-.detail-hero-amount{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:15px}
-.detail-hero-amount span{color:#92959f;font-size:9px}
-.detail-hero-amount strong{font-size:25px;letter-spacing:-.8px;color:#f7f7f9}
-.detail-hero .installment-progress{margin:11px 0 7px}
-.detail-hero-meta{display:flex;justify-content:space-between;gap:8px;color:#8e919a;font-size:8px}
-.detail-section{margin:13px 0}
-.detail-section>.modal-section-title{margin-bottom:8px}
-.current-installment-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border-radius:19px;border:1px solid rgba(255,255,255,.10);background:radial-gradient(circle at 18% 0%,rgba(255,255,255,.10),rgba(255,255,255,.035) 48%,rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 10px 25px rgba(0,0,0,.20);backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%)}
-.current-installment-copy{min-width:0;flex:1}
-.current-installment-copy>div{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.current-installment-copy span{font-size:10px;color:#bfc1c8;font-weight:700}
-.current-installment-copy b{font-size:17px;color:#f5f5f7}
-.current-installment-copy small{display:block;margin-top:4px;color:#858892;font-size:8px}
-.current-pay-btn{width:auto!important;min-width:105px!important;min-height:44px!important;padding:8px 11px!important;font-size:9px!important}
-.detail-actions-section{padding-bottom:4px}
-.payment-history-main{min-width:0;flex:1}
-.payment-history-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.payment-history-top b{font-size:10px;color:#f0f1f4}
-.payment-history-top strong{font-size:12px;color:#f3f4f6}
-.payment-history-main>span{display:block;margin-top:3px;color:#8e919a;font-size:8px}
-.payment-history-main small{display:block;margin-top:3px;color:#777b85;font-size:7px}
+/* Top Bar scrolls naturally with the page; it is not fixed. */
+.topbar{
+  position:relative;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  min-height:68px;
+  padding-left:12px;
+  padding-right:12px;
+  background:var(--fab-glass);
+  border:1px solid rgba(255,255,255,.16);
+  border-top:0;
+  border-radius:0 0 22px 22px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 16px 34px rgba(0,0,0,.34);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+}
+.topbar-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;min-width:0}
+.icon-btn{width:44px;height:44px;min-width:44px;min-height:44px;background:var(--fab-glass);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.34);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+
+/* Bottom navigation uses the same material as FAB. */
+.bottom-nav{background:var(--fab-glass);border-color:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 20px 46px rgba(0,0,0,.46);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+.nav-item.active{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+
+/* Installment schedule = individual glass cards, visually distinct from payment history. */
+.installment-section{margin-top:15px}
+.installment-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;margin-bottom:8px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.installment-summary span,.installment-summary b{display:block}.installment-summary span{font-size:8px;color:#858891}.installment-summary b{font-size:10px;margin-top:3px}.installment-summary>strong{font-size:15px}
+.installment-progress{height:5px;margin:0 0 9px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}
+.installment-progress i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#dfe3ea,#aeb7c8);box-shadow:0 0 12px rgba(210,220,240,.16)}
+.installment-list{display:grid;gap:8px}
+.installment-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:72px;padding:12px 13px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:var(--fab-glass);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 12px 26px rgba(0,0,0,.28);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+.installment-main{min-width:0}.installment-main b,.installment-main span,.installment-main small{display:block}.installment-main b{font-size:11px;color:#f2f3f5}.installment-main span{font-size:8px;color:#a2a5ad;margin-top:3px}.installment-main small{font-size:8px;color:#878a93;margin-top:3px}.installment-side{text-align:right;flex:0 0 auto}.installment-side strong,.installment-side span{display:block}.installment-side strong{font-size:11px}.installment-side span{font-size:8px;font-weight:800;margin-top:4px}
+.installment-paid{background:linear-gradient(145deg,rgba(70,210,140,.12),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(120,235,180,.20)}.installment-paid .installment-side span{color:var(--success)}
+.installment-partial,.installment-overdue-partial{background:linear-gradient(145deg,rgba(255,190,70,.10),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,205,110,.20)}.installment-partial .installment-side span,.installment-overdue-partial .installment-side span{color:var(--warning)}
+.installment-due-soon{background:linear-gradient(145deg,rgba(255,190,70,.12),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,205,110,.22)}.installment-due-soon .installment-side span{color:var(--warning)}
+.installment-overdue{background:linear-gradient(145deg,rgba(255,80,90,.13),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,110,120,.24)}.installment-overdue .installment-side span{color:var(--danger)}
+.installment-pending{background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.035) 62%,rgba(255,255,255,.025));border-color:rgba(255,255,255,.14)}.installment-pending .installment-side span{color:#c3c6cd}
+
+/* Payment history is intentionally quieter than the schedule. */
+.payment-history-section{margin-top:18px}.payment-list{display:grid;gap:7px}.payment-row{min-height:64px;padding:10px 11px;border-radius:16px;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 18px rgba(0,0,0,.20)}
+.payment-installment-badge{display:inline-flex;align-items:center;padding:7px 10px;margin:4px 0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:#d9dbe0;font-size:9px;font-weight:800}
+
+/* Data actions: same glass material, status tint communicates risk. */
+.action-backup{background:linear-gradient(145deg,rgba(70,210,140,.10),rgba(255,255,255,.045));border-color:rgba(120,235,180,.18);color:var(--success)}
+.action-restore{background:linear-gradient(145deg,rgba(120,165,255,.10),rgba(255,255,255,.045));border-color:rgba(150,185,255,.18);color:#bcd0ff}
+.action-delete{background:linear-gradient(145deg,rgba(255,80,90,.11),rgba(255,255,255,.045));border-color:rgba(255,110,120,.22);color:var(--danger)}
+.action-clear{background:linear-gradient(145deg,rgba(255,55,70,.16),rgba(255,255,255,.035));border-color:rgba(255,100,110,.28);color:#ff9a9f}
 
 @media(max-width:380px){
-  .top-actions{gap:4px!important}
-  .top-actions .icon-btn{width:44px!important;height:44px!important;flex-basis:44px!important}
-  .current-installment-card{align-items:stretch;flex-direction:column}
-  .current-pay-btn{width:100%!important}
-  .detail-hero-top h2{font-size:18px}
+  .topbar{padding-left:9px;padding-right:9px}
+  .topbar-actions{gap:3px!important}
+  .icon-btn{width:42px;height:42px;min-width:42px;min-height:42px}
+  .installment-row{padding:11px 10px}
 }

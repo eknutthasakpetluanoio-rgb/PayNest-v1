@@ -1,5 +1,5 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v12-detail-glass-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v12-ios-graphite-detail-20260821";
 
 const APP_SHELL = [
   "./",
