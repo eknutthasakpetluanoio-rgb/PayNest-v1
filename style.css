@@ -662,3 +662,247 @@ html, body {
     margin-bottom: 5px;
   }
 }
+
+
+/* =========================================================
+   PAYNEST — FINAL DOCUMENT-SCROLL LAYOUT
+   Reference: supplied mobile screenshot.
+   Header, content, recent + button and bottom navigation
+   are normal document-flow elements. The viewport itself
+   is the ONLY scroll container.
+   ========================================================= */
+html {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  min-height: 100%;
+  height: auto !important;
+}
+
+body {
+  overflow: visible !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  min-height: 100vh !important;
+  height: auto !important;
+}
+
+#app {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.topbar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 10 !important;
+}
+
+#view {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.page {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+/* The + button belongs to the Recent section, not the viewport. */
+.recent-add-row {
+  position: relative !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 68px !important;
+  padding: 6px 0 8px !important;
+  box-sizing: border-box;
+}
+
+.recent-add-row .fab,
+#fab {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+.recent-add-row .fab {
+  z-index: 2 !important;
+  flex: 0 0 52px !important;
+}
+
+/* Bottom navigation is part of the document and therefore scrolls. */
+.bottom-nav {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 10 !important;
+  width: calc(100% - 20px) !important;
+  max-width: 520px !important;
+  margin: 10px auto max(10px, env(safe-area-inset-bottom)) !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 380px) {
+  .bottom-nav {
+    width: calc(100% - 12px) !important;
+    margin-bottom: 6px !important;
+  }
+  .recent-add-row .fab {
+    flex-basis: 50px !important;
+  }
+}
+
+/* Prevent an accidental inner scroll area from being introduced. */
+#app, #view, .page, .recent-section, .recent-list {
+  overscroll-behavior: auto !important;
+}
+
+
+/* =========================================================
+   PAYNEST — AUTHORITATIVE SINGLE-SCROLL CONTAINER
+   The entire visible app (header + content + + + bottom nav)
+   scrolls as ONE unit inside #app.
+   ========================================================= */
+html, body {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: hidden !important;
+}
+
+#app {
+  position: relative !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  max-height: 100dvh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: auto !important;
+  scrollbar-width: none;
+}
+
+#app::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.topbar,
+#view,
+.page,
+.bottom-nav,
+.recent-add-row,
+.recent-add-row .fab {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+.topbar {
+  z-index: 1 !important;
+}
+
+#view,
+.page {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.page {
+  padding-bottom: 28px !important;
+}
+
+.recent-add-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  min-height: 68px !important;
+  padding: 6px 0 8px !important;
+}
+
+.recent-add-row .fab {
+  display: flex !important;
+  flex: 0 0 52px !important;
+  margin: 0 !important;
+}
+
+.bottom-nav {
+  display: grid !important;
+  width: calc(100% - 20px) !important;
+  max-width: 520px !important;
+  margin: 10px auto max(10px, env(safe-area-inset-bottom)) !important;
+  box-sizing: border-box !important;
+  z-index: 1 !important;
+}
+
+@media (max-width: 380px) {
+  .bottom-nav {
+    width: calc(100% - 12px) !important;
+    margin-bottom: 6px !important;
+  }
+  .recent-add-row .fab {
+    flex-basis: 50px !important;
+  }
+}
+
+/* Page-flow add button: scrolls with the page, never floats over the viewport. */
+.page-add-row{
+  position:relative !important;
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  width:100% !important;
+  margin:12px 0 6px !important;
+  padding:4px 0 8px !important;
+  box-sizing:border-box !important;
+}
+.page-fab{
+  position:relative !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  transform:none !important;
+  z-index:2 !important;
+  display:flex !important;
+  flex:0 0 52px !important;
+  width:52px !important;
+  height:52px !important;
+  margin:0 !important;
+}
+@media(max-width:380px){
+  .page-fab{flex-basis:50px !important;width:50px !important;height:50px !important}
+}

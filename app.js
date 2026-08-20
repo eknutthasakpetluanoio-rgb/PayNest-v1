@@ -938,6 +938,12 @@ function contracts() {
     ${all.length
       ? all.map(contractCard).join("")
       : emptyState("⌕", "ไม่พบสัญญา", contractQuery ? "ลองเปลี่ยนคำค้นหา" : "กดปุ่ม + เพื่อสร้างสัญญา")}
+
+    <div class="page-add-row">
+      <button class="fab page-fab" id="fab" type="button" aria-label="เพิ่มสัญญา" aria-haspopup="dialog">
+        <span aria-hidden="true">+</span>
+      </button>
+    </div>
   </section>`;
 }
 
@@ -966,6 +972,12 @@ function customers() {
       ? list.map(customerCard).join("")
       : emptyState("＋", data.customers.length ? "ไม่พบลูกค้า" : "ยังไม่มีลูกค้า",
           data.customers.length ? "ลองเปลี่ยนคำค้นหา" : "กดปุ่ม + เพื่อเพิ่มลูกค้า")}
+
+    <div class="page-add-row">
+      <button class="fab page-fab" id="fab" type="button" aria-label="เพิ่มลูกค้า" aria-haspopup="dialog">
+        <span aria-hidden="true">+</span>
+      </button>
+    </div>
   </section>`;
 }
 
@@ -1945,7 +1957,7 @@ document.addEventListener("click", event => {
   if (pageBtn) {
     page = pageBtn.dataset.page;
     render();
-    scrollTo({top: 0, behavior: "smooth"});
+    document.getElementById("app")?.scrollTo({top: 0, behavior: "smooth"});
     return;
   }
 
@@ -2115,7 +2127,7 @@ $("#importFile").addEventListener("change", async event => {
 });
 
 $("#topAction").addEventListener("click", () =>
-  scrollTo({top: 0, behavior: "smooth"})
+  document.getElementById("app")?.scrollTo({top: 0, behavior: "smooth"})
 );
 
 $("#themeToggle")?.addEventListener("click", toggleTheme);
