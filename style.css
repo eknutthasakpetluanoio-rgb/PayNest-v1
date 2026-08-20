@@ -1930,3 +1930,37 @@ textarea,
 /* Respect reduced-motion / no-backdrop-filter fallbacks: if backdrop-filter
    is unsupported entirely, everything above degrades to the solid
    var(--surface) backgrounds already defined earlier in this file. */
+
+
+/* PayNest UI Touchup v1 */
+body{
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{
+  letter-spacing:-.015em;
+}
+.card,.contract-card,.customer-card,.panel,.sheet,.modal{
+  box-shadow:0 12px 32px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.product-image,.product-thumb,.product-photo,.product-media{
+  background:
+    radial-gradient(circle at 50% 30%,rgba(255,255,255,.10),transparent 55%),
+    rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.09);
+}
+button,.btn,.action-btn,.fab{
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+button:active,.btn:active,.action-btn:active,.fab:active{
+  transform:scale(.97);
+}
+input,select,textarea{
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+@media (max-width:600px){
+  .card,.contract-card,.customer-card,.panel{
+    box-shadow:0 10px 26px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.07);
+  }
+}
