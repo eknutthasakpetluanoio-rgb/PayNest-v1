@@ -42,41 +42,6 @@ const db = getFirestore(firebaseApp);
 
 const STORAGE_KEY = "paynest_v1_data";
 
-/* ---------- Theme ---------- */
-
-const THEME_KEY = "paynest_theme";
-
-function getStoredTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  return saved === "light" ? "light" : "dark";
-}
-
-function applyTheme(theme = getStoredTheme()) {
-  const safeTheme = theme === "light" ? "light" : "dark";
-  document.documentElement.dataset.theme = safeTheme;
-  document.documentElement.style.colorScheme = safeTheme;
-
-  const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) {
-    metaTheme.setAttribute("content", safeTheme === "light" ? "#f4f5f7" : "#040406");
-  }
-
-  const button = document.getElementById("themeToggle");
-  if (button) {
-    button.textContent = safeTheme === "light" ? "☾" : "☀";
-    button.setAttribute("aria-label", safeTheme === "light" ? "เปลี่ยนเป็นโหมดกลางคืน" : "เปลี่ยนเป็นโหมดกลางวัน");
-    button.title = safeTheme === "light" ? "โหมดกลางคืน" : "โหมดกลางวัน";
-  }
-}
-
-function toggleTheme() {
-  const next = getStoredTheme() === "dark" ? "light" : "dark";
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
-}
-
-applyTheme();
-
 const DEFAULT_DATA = {
   version: 1,
   contracts: [],
@@ -2181,7 +2146,6 @@ $("#topAction").addEventListener("click", () =>
   scrollTo({top: 0, behavior: "smooth"})
 );
 
-$("#themeToggle")?.addEventListener("click", toggleTheme);
 
 $("#cloudAccount")?.addEventListener("click", async () => {
   if (auth.currentUser) {
