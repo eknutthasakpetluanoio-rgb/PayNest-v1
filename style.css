@@ -2939,3 +2939,315 @@ body::before{
     font-size:20px;
   }
 }
+
+
+/* =========================================================
+   PayNest Transparent Liquid Glass + Mobile v2
+   Material: transparent glass that reveals the backdrop.
+   Mobile: compact, safe-area aware, no overflow.
+   Visual-only; application logic untouched.
+========================================================= */
+
+/* ---------- Transparent glass environment ---------- */
+:root{
+  --ptg-bg:#0b0d10;
+  --ptg-edge:rgba(255,255,255,.16);
+  --ptg-surface:rgba(255,255,255,.055);
+  --ptg-surface-strong:rgba(255,255,255,.075);
+}
+
+html{
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  min-width:0;
+  overflow-x:hidden;
+  background:
+    radial-gradient(520px 380px at 8% -5%, rgba(120,150,190,.15), transparent 72%),
+    radial-gradient(460px 340px at 94% 12%, rgba(150,120,190,.11), transparent 72%),
+    radial-gradient(620px 420px at 50% 108%, rgba(100,130,170,.075), transparent 72%),
+    var(--ptg-bg);
+}
+
+/* Real transparent material: background remains visible through the surface. */
+.card,
+.contract-card,
+.customer-card,
+.panel,
+.sheet,
+.bottom-sheet,
+.modal,
+.hero-card,
+.summary-card,
+.stat-card,
+.search-box,
+.filter-bar{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.070),
+      rgba(255,255,255,.035) 48%,
+      rgba(255,255,255,.055));
+  border:1px solid var(--ptg-edge);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter:blur(26px) saturate(165%);
+  -webkit-backdrop-filter:blur(26px) saturate(165%);
+}
+
+/* Broad reflection, not a hard stripe. */
+.card::after,
+.contract-card::after,
+.customer-card::after,
+.panel::after,
+.hero-card::after,
+.summary-card::after,
+.stat-card::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  width:90%;
+  height:52%;
+  left:-14%;
+  top:-25%;
+  background:
+    radial-gradient(ellipse,
+      rgba(255,255,255,.14) 0%,
+      rgba(255,255,255,.055) 30%,
+      transparent 70%);
+  filter:blur(12px);
+  transform:rotate(-8deg);
+}
+
+.card > *,
+.contract-card > *,
+.customer-card > *,
+.panel > *,
+.hero-card > *,
+.summary-card > *,
+.stat-card > *{
+  position:relative;
+  z-index:1;
+}
+
+/* ---------- Product area ---------- */
+.product-image,
+.product-thumb,
+.product-photo,
+.product-media,
+.product-container{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,.13), transparent 62%),
+    rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(20px) saturate(145%);
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
+}
+
+.product-image img,
+.product-thumb img,
+.product-photo img,
+.product-media img,
+.product-container img{
+  max-width:100%;
+  height:auto;
+  object-fit:contain;
+  opacity:1 !important;
+  filter:none !important;
+}
+
+/* ---------- Bottom navigation: one floating glass slab ---------- */
+.bottom-nav,
+.nav-bar{
+  position:fixed;
+  left:50%;
+  bottom:max(12px, env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:min(calc(100% - 24px), 520px);
+  min-height:64px;
+  box-sizing:border-box;
+  padding:7px 8px;
+  border-radius:24px;
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.075),
+      rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter:blur(30px) saturate(165%);
+  -webkit-backdrop-filter:blur(30px) saturate(165%);
+  z-index:1000;
+}
+
+/* Keep nav children comfortably tappable on small screens. */
+.bottom-nav a,
+.bottom-nav button,
+.bottom-nav .nav-item,
+.nav-bar a,
+.nav-bar button,
+.nav-bar .nav-item{
+  min-width:44px;
+  min-height:44px;
+  border-radius:18px;
+}
+
+/* Selected item becomes a subtle glass pill, not a solid button. */
+.bottom-nav .active,
+.bottom-nav .selected,
+.nav-bar .active,
+.nav-bar .selected{
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.13),
+      rgba(255,255,255,.055));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 5px 16px rgba(0,0,0,.14);
+}
+
+/* ---------- FAB ---------- */
+.fab{
+  width:58px;
+  height:58px;
+  min-width:58px;
+  min-height:58px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,.23), transparent 44%),
+    rgba(255,255,255,.095);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.18);
+  backdrop-filter:blur(24px) saturate(165%);
+  -webkit-backdrop-filter:blur(24px) saturate(165%);
+  z-index:1010;
+}
+
+/* ---------- Small-screen corrections ---------- */
+@media (max-width:600px){
+  body{
+    font-size:15px;
+  }
+
+  .card,
+  .contract-card,
+  .customer-card,
+  .panel,
+  .hero-card,
+  .summary-card,
+  .stat-card{
+    border-radius:20px;
+  }
+
+  /* Avoid giant fixed heights from desktop styles. */
+  .hero-card,
+  .summary-card,
+  .panel{
+    max-width:100%;
+  }
+
+  /* Keep content away from the floating nav and device edge. */
+  main,
+  .main,
+  .app-content,
+  .content{
+    padding-bottom:calc(92px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav,
+  .nav-bar{
+    width:calc(100% - 20px);
+    min-height:62px;
+    padding:6px;
+    border-radius:22px;
+  }
+
+  .bottom-nav a,
+  .bottom-nav button,
+  .bottom-nav .nav-item,
+  .nav-bar a,
+  .nav-bar button,
+  .nav-bar .nav-item{
+    min-width:42px;
+    min-height:42px;
+  }
+
+  .fab{
+    width:54px;
+    height:54px;
+    min-width:54px;
+    min-height:54px;
+  }
+
+  /* Prevent long labels from pushing the nav wider. */
+  .bottom-nav span,
+  .nav-bar span{
+    max-width:72px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  /* Product images remain contained and never force horizontal scroll. */
+  .product-image,
+  .product-thumb,
+  .product-photo,
+  .product-media,
+  .product-container{
+    max-width:100%;
+    min-width:0;
+  }
+
+  img{
+    max-width:100%;
+  }
+}
+
+@media (max-width:380px){
+  .bottom-nav,
+  .nav-bar{
+    width:calc(100% - 16px);
+    min-height:58px;
+    padding:5px;
+    border-radius:20px;
+  }
+
+  .bottom-nav a,
+  .bottom-nav button,
+  .bottom-nav .nav-item,
+  .nav-bar a,
+  .nav-bar button,
+  .nav-bar .nav-item{
+    min-width:40px;
+    min-height:40px;
+    border-radius:15px;
+  }
+
+  .bottom-nav span,
+  .nav-bar span{
+    display:none;
+  }
+
+  .fab{
+    width:52px;
+    height:52px;
+    min-width:52px;
+    min-height:52px;
+  }
+}
