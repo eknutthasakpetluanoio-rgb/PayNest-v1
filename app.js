@@ -42,6 +42,41 @@ const db = getFirestore(firebaseApp);
 
 const STORAGE_KEY = "paynest_v1_data";
 
+/* ---------- Theme ---------- */
+
+const THEME_KEY = "paynest_theme";
+
+function getStoredTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  return saved === "light" ? "light" : "dark";
+}
+
+function applyTheme(theme = getStoredTheme()) {
+  const safeTheme = theme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = safeTheme;
+  document.documentElement.style.colorScheme = safeTheme;
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute("content", safeTheme === "light" ? "#f4f5f7" : "#040406");
+  }
+
+  const button = document.getElementById("themeToggle");
+  if (button) {
+    button.textContent = safeTheme === "light" ? "☾" : "☀";
+    button.setAttribute("aria-label", safeTheme === "light" ? "เปลี่ยนเป็นโหมดกลางคืน" : "เปลี่ยนเป็นโหมดกลางวัน");
+    button.title = safeTheme === "light" ? "โหมดกลางคืน" : "โหมดกลางวัน";
+  }
+}
+
+function toggleTheme() {
+  const next = getStoredTheme() === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+applyTheme();
+
 const DEFAULT_DATA = {
   version: 1,
   contracts: [],
@@ -65,32 +100,18 @@ function normalize(data) {
     : [];
 
   const customers = Array.isArray(data.customers)
-    ? data.customers.filter(item => item && typeof item === "object")
+    ? data.customers.filter(item => item && typeof item === "object").map(customer => ({
+        ...customer,
+        contacts: customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {},
+        address: String(customer.address || ""),
+        note: String(customer.note || ""),
+        photo: String(customer.photo || "")
+      }))
     : [];
-
-  const safeContracts = contracts.map(contract => {
-    const payments = Array.isArray(contract.payments)
-      ? contract.payments.filter(p => p && typeof p === "object").map((p, index) => ({
-          id: p.id || uid(),
-          amount: Math.max(0, Number(p.amount || 0)),
-          date: String(p.date || localToday()),
-          installmentNo: Math.max(1, Number(p.installmentNo || index + 1))
-        }))
-      : [];
-    const received = payments.length
-      ? Math.min(Number(contract.total || 0), payments.reduce((sum, p) => sum + Number(p.amount || 0), 0))
-      : Math.max(0, Number(contract.received || 0));
-    return {
-      ...contract,
-      installments: Math.max(1, Number(contract.installments || 1)),
-      received,
-      payments
-    };
-  });
 
   return {
     version: 1,
-    contracts: safeContracts,
+    contracts,
     customers,
     settings: {
       ...DEFAULT_DATA.settings,
@@ -134,9 +155,30 @@ function loadData() {
   }
 }
 
+const RECOVERY_KEY = "paynest_v1_recovery";
+
 function saveLocalData(value) {
   const safe = normalize(value);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
+  const serialized = JSON.stringify(safe);
+
+  try {
+    // Keep the previous non-empty database as an emergency local recovery copy.
+    const previous = localStorage.getItem(STORAGE_KEY);
+    if (previous) {
+      try {
+        const previousData = normalize(JSON.parse(previous));
+        if (hasMeaningfulData(previousData)) {
+          localStorage.setItem(RECOVERY_KEY, JSON.stringify(previousData));
+        }
+      } catch (_) {}
+    }
+
+    localStorage.setItem(STORAGE_KEY, serialized);
+  } catch (error) {
+    console.error("PayNest local save error:", error);
+    throw error;
+  }
+
   return safe;
 }
 
@@ -158,6 +200,10 @@ function importData(text) {
 }
 
 function resetData() {
+  const current = loadData();
+  if (hasMeaningfulData(current)) {
+    localStorage.setItem(RECOVERY_KEY, JSON.stringify(current));
+  }
   localStorage.removeItem(STORAGE_KEY);
   return clone(DEFAULT_DATA);
 }
@@ -198,34 +244,63 @@ async function setCloudData(value) {
   return true;
 }
 
-function saveData(value) {
-  const safe = saveLocalData(value);
-  setCloudData(safe).catch(error =>
-    console.warn("PayNest cloud save skipped:", error)
-  );
-  return safe;
+function hasMeaningfulData(value) {
+  const safe = normalize(value);
+  return safe.contracts.length > 0 || safe.customers.length > 0;
+}
+
+function mergeDataWithoutLoss(localValue, cloudValue) {
+  const localSafe = normalize(localValue);
+  const cloudSafe = normalize(cloudValue);
+
+  // IMPORTANT: an empty cloud document must never erase non-empty local data.
+  // This is the protection that prevents a fresh/empty Firebase account from
+  // replacing an existing PayNest database on the device.
+  if (hasMeaningfulData(localSafe) && !hasMeaningfulData(cloudSafe)) {
+    return localSafe;
+  }
+
+  // If the device is empty but Cloud has data, restore Cloud to the device.
+  if (!hasMeaningfulData(localSafe) && hasMeaningfulData(cloudSafe)) {
+    return cloudSafe;
+  }
+
+  // If both have data, keep the device copy for this safety-first build.
+  // Without per-record revision timestamps, choosing Cloud blindly can erase
+  // newer local records. The next safe sync writes this preserved copy back.
+  return localSafe;
 }
 
 async function syncInitialData(localData) {
   const ref = userDocumentRef();
-  if (!ref) return localData;
+  const safeLocal = clone(normalize(localData));
+  if (!ref) return safeLocal;
 
   const snapshot = await getDoc(ref);
 
-  if (snapshot.exists()) {
-    const cloudData = snapshot.data()?.data;
-    if (cloudData && typeof cloudData === "object") {
-      return clone(cloudData);
-    }
+  if (!snapshot.exists()) {
+    await setDoc(ref, {
+      data: safeLocal,
+      updatedAt: serverTimestamp()
+    }, {merge: true});
+    return safeLocal;
   }
 
-  const safeLocal = clone(normalize(localData));
-  await setDoc(ref, {
-    data: safeLocal,
-    updatedAt: serverTimestamp()
-  }, {merge: true});
+  const cloudData = snapshot.data()?.data;
+  const chosen = mergeDataWithoutLoss(safeLocal, cloudData);
 
-  return safeLocal;
+  // If local contains real data and Cloud is empty/invalid, repair Cloud from
+  // the local copy instead of destroying the local copy.
+  if (hasMeaningfulData(safeLocal) && !hasMeaningfulData(cloudData)) {
+    await setDoc(ref, {
+      data: clone(chosen),
+      updatedAt: serverTimestamp()
+    }, {merge: true});
+  } else if (!hasMeaningfulData(safeLocal) && hasMeaningfulData(cloudData)) {
+    saveLocalData(chosen);
+  }
+
+  return clone(chosen);
 }
 
 function startRealtimeSync(onData) {
@@ -242,8 +317,18 @@ function startRealtimeSync(onData) {
       const cloudData = snapshot.data()?.data;
       if (!cloudData || typeof cloudData !== "object") return;
 
+      if (cloudWriteInProgress) return;
+
+      // Safety-first realtime rule: a Cloud snapshot may restore an empty
+      // device, but it must not replace an already populated local database.
+      const incoming = normalize(cloudData);
+      if (hasMeaningfulData(data)) {
+        console.warn("PayNest: ignored Cloud snapshot because local data is populated");
+        return;
+      }
+
       try {
-        onData(clone(cloudData));
+        onData(clone(incoming));
       } catch (error) {
         console.error("PayNest realtime data handler error:", error);
       }
@@ -401,6 +486,57 @@ const money = value =>
     maximumFractionDigits: 2
   })}`;
 
+/* ---------- Product image helpers (UI-only, existing data remains intact) ---------- */
+function productInitials(product) {
+  const text = String(product || "สินค้า").trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return text.slice(0, 2).toUpperCase();
+}
+
+function defaultProductImage(product) {
+  const text = String(product || "").toLowerCase();
+  if (text.includes("vivo") && text.includes("v70")) return "./products/vivo-v70.svg";
+  if (text.includes("soundcore") && text.includes("r60i")) return "./products/soundcore-r60i-nc.svg";
+  if (text.includes("redmi") && text.includes("watch") && text.includes("5")) return "./products/redmi-watch-5-lite.svg";
+  return "";
+}
+
+function productThumb(product, imageData = "", size = "small") {
+  const safeImage = String(imageData || "");
+  const fallback = defaultProductImage(product);
+  const src = safeImage.startsWith("data:image/") ? safeImage : fallback;
+  return `<div class="product-thumb product-thumb-${size}" aria-hidden="true">${
+    src ? `<img src="${esc(src)}" alt="">` : `<span>${esc(productInitials(product))}</span>`
+  }</div>`;
+}
+
+function compressProductImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve("");
+    if (!file.type.startsWith("image/")) return reject(new Error("กรุณาเลือกไฟล์รูปภาพ"));
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("อ่านรูปภาพไม่สำเร็จ"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("รูปภาพไม่ถูกต้อง"));
+      img.onload = () => {
+        const max = 320;
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function localToday() {
   const d = new Date();
   const y = d.getFullYear();
@@ -419,9 +555,25 @@ function fmtDate(value) {
       });
 }
 
+let cloudWriteInProgress = false;
+
 function persist() {
-  data = saveData(data);
+  data = saveLocalData(data);
   render();
+
+  if (currentUser()) {
+    cloudWriteInProgress = true;
+    setCloudData(data)
+      .catch(error => {
+        console.error("PayNest cloud save error:", error);
+        console.warn("ข้อมูลถูกเก็บไว้ในเครื่อง แต่การบันทึก Firebase ไม่สำเร็จ");
+      })
+      .finally(() => {
+        cloudWriteInProgress = false;
+      });
+  }
+
+  return data;
 }
 
 function authErrorMessage(error) {
@@ -510,11 +662,23 @@ function renderAuthButton() {
 
 async function bootstrapCloud() {
   try {
-    // Existing Cloud data is authoritative. Only a brand-new Cloud account
-    // is bootstrapped from this device's LocalStorage.
+    // Safety-first sync: populated local data is preserved. Cloud is used to
+    // restore an empty device, or initialized from the device when empty.
     const cloudData = await syncInitialData(data);
     data = saveLocalData(cloudData);
     render();
+
+    // After the safety decision, publish the preserved device copy to Cloud.
+    // This repairs an empty/stale Cloud document instead of allowing it to
+    // erase the device database.
+    cloudWriteInProgress = true;
+    try {
+      await setCloudData(data);
+    } catch (error) {
+      console.warn("PayNest cloud repair skipped:", error);
+    } finally {
+      cloudWriteInProgress = false;
+    }
 
     startRealtimeSync(cloudData => {
       // Never call saveData() here: that would write the incoming Cloud
@@ -536,84 +700,94 @@ function remaining(contract) {
   return Math.max(0, Number(contract.total) - Number(contract.received));
 }
 
-function installmentAmount(contract) {
-  const count = Math.max(1, Number(contract.installments || 1));
-  return Number(contract.total || 0) / count;
+function getStatus(contract) {
+  return remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active";
 }
 
-function installmentDueAmount(contract, installmentNo) {
+function installmentAmount(contract, index) {
+  const total = Math.max(0, Number(contract.total || 0));
   const count = Math.max(1, Number(contract.installments || 1));
-  const base = installmentAmount(contract);
-  if (installmentNo >= count) return Math.max(0, Number(contract.total || 0) - base * (count - 1));
+  const base = Math.round((total / count) * 100) / 100;
+  if (index === count - 1) {
+    const previous = base * (count - 1);
+    return Math.round((total - previous) * 100) / 100;
+  }
   return base;
 }
 
-function currentInstallmentNo(contract) {
-  const count = Math.max(1, Number(contract.installments || 1));
-  const payments = Array.isArray(contract.payments) ? contract.payments : [];
-  const paid = new Set();
-  for (const payment of payments) {
-    if (Number(payment.amount || 0) > 0) paid.add(Math.max(1, Number(payment.installmentNo || 1)));
-  }
-  for (let no = 1; no <= count; no++) {
-    const paidAmount = payments.filter(p => Number(p.installmentNo || 1) === no).reduce((sum, p) => sum + Number(p.amount || 0), 0);
-    if (paidAmount + 0.005 < installmentDueAmount(contract, no)) return no;
-  }
-  return count;
-}
+function addPeriod(dateValue, index, type) {
+  const source = new Date(`${dateValue || localToday()}T00:00:00`);
+  if (Number.isNaN(source.getTime())) return localToday();
 
-function addPeriod(dateValue, paymentType, periods) {
-  const d = new Date(`${dateValue}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return dateValue;
-  if (paymentType === "daily") d.setDate(d.getDate() + periods);
-  else if (paymentType === "weekly") d.setDate(d.getDate() + periods * 7);
-  else d.setMonth(d.getMonth() + periods);
+  const d = new Date(source);
+  if (type === "daily") {
+    d.setDate(d.getDate() + index);
+  } else if (type === "weekly") {
+    d.setDate(d.getDate() + (index * 7));
+  } else {
+    // Monthly dates are clamped to the last valid day of the target month.
+    const originalDay = d.getDate();
+    const targetMonth = d.getMonth() + index;
+    d.setDate(1);
+    d.setMonth(targetMonth);
+    const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    d.setDate(Math.min(originalDay, lastDay));
+  }
+
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
-function nextDueDate(contract) {
-  const no = currentInstallmentNo(contract);
-  return addPeriod(contract.dueDate || localToday(), contract.paymentType || "monthly", no - 1);
-}
-
-function dueAmount(contract) {
-  const no = currentInstallmentNo(contract);
-  const scheduled = installmentDueAmount(contract, no);
-  const paidThisInstallment = (contract.payments || [])
-    .filter(p => Number(p.installmentNo || 1) === no)
-    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
-  return Math.max(0, Math.min(remaining(contract), scheduled - paidThisInstallment));
-}
-
-function nextInstallmentNo(contract) {
+function getInstallmentSchedule(contract) {
   const count = Math.max(1, Number(contract.installments || 1));
-  return Math.min(count, currentInstallmentNo(contract));
+  const received = Math.max(0, Number(contract.received || 0));
+  const type = contract.paymentType || "monthly";
+  let cumulativeDue = 0;
+
+  return Array.from({length: count}, (_, index) => {
+    const amount = installmentAmount(contract, index);
+    const previousDue = cumulativeDue;
+    cumulativeDue += amount;
+
+    let status = "pending";
+    let paidAmount = 0;
+    if (received >= cumulativeDue - 0.005) {
+      status = "paid";
+      paidAmount = amount;
+    } else if (received > previousDue + 0.005) {
+      status = "partial";
+      paidAmount = Math.min(amount, received - previousDue);
+    }
+
+    return {
+      number: index + 1,
+      amount,
+      paidAmount: Math.round(paidAmount * 100) / 100,
+      remainingAmount: Math.max(0, Math.round((amount - paidAmount) * 100) / 100),
+      dueDate: addPeriod(contract.dueDate || contract.startDate || localToday(), index, type),
+      status
+    };
+  });
 }
 
-function recalculateContractReceived(contract) {
-  contract.payments = Array.isArray(contract.payments) ? contract.payments : [];
-  contract.payments = contract.payments.map((payment, index) => ({
-    id: payment.id || uid(),
-    amount: Math.max(0, Number(payment.amount || 0)),
-    date: String(payment.date || localToday()),
-    installmentNo: Math.max(1, Math.min(Number(contract.installments || 1), Number(payment.installmentNo || index + 1)))
-  })).filter(payment => payment.amount > 0);
-  contract.received = Math.min(Number(contract.total || 0), contract.payments.reduce((sum, p) => sum + p.amount, 0));
-  contract.status = getStatus(contract);
+function getNextInstallment(contract) {
+  return getInstallmentSchedule(contract).find(item => item.status !== "paid") || null;
 }
 
-function getStatus(contract) {
-  return remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active";
+function installmentStatusLabel(item) {
+  return ({
+    paid: "ชำระแล้ว",
+    partial: "ชำระบางส่วน",
+    pending: "รอชำระ"
+  }[item.status] || "รอชำระ");
 }
 
 function paymentStatus(contract) {
   if (getStatus(contract) === "paid") return "paid";
   const received = Number(contract.received || 0);
-  const dueDateValue = nextDueDate(contract);
-  const dueDate = dueDateValue ? new Date(`${dueDateValue}T23:59:59`) : null;
+  const dueDate = contract.dueDate ? new Date(`${contract.dueDate}T23:59:59`) : null;
   const today = new Date(`${localToday()}T00:00:00`);
   if (dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < today) {
     return received > 0 ? "overdue-partial" : "overdue";
@@ -643,8 +817,7 @@ function stats() {
     due: active.reduce((sum, c) => sum + remaining(c), 0),
     active: active.length,
     overdue: active.filter(c => ["overdue", "overdue-partial"].includes(paymentStatus(c))).length,
-    dueToday: active.filter(c => nextDueDate(c) === localToday()).length,
-    dueTodayAmount: active.filter(c => nextDueDate(c) === localToday()).reduce((sum, c) => sum + dueAmount(c), 0),
+    dueToday: active.filter(c => c.dueDate === localToday()).length,
     customers: data.customers.length
   };
 }
@@ -704,11 +877,6 @@ function dashboard() {
         <small>${s.active ? "มีรายการที่ยังไม่ครบ" : "ไม่มีรายการค้าง"}</small>
       </div>
       <div class="card stat">
-        <span>ต้องเก็บวันนี้</span>
-        <strong>${money(s.dueTodayAmount)}</strong>
-        <small>${s.dueToday} รายการครบกำหนดวันนี้</small>
-      </div>
-      <div class="card stat">
         <span>ลูกค้า</span>
         <strong>${s.customers}</strong>
         <small>${data.contracts.length} สัญญา</small>
@@ -742,7 +910,6 @@ function dashboard() {
 function actionList() {
   const active = data.contracts
     .filter(c => getStatus(c) === "active")
-    .filter(c => nextDueDate(c) === localToday() || ["overdue", "overdue-partial"].includes(paymentStatus(c)))
     .sort((a, b) => String(a.dueDate).localeCompare(String(b.dueDate)));
 
   if (!active.length) {
@@ -754,10 +921,10 @@ function actionList() {
       <div class="task-main">
         <b>${esc(c.product)}</b>
         <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
-        <small>งวดที่ ${currentInstallmentNo(c)} · ครบกำหนด ${fmtDate(nextDueDate(c))}</small>
+        <small>${getNextInstallment(c) ? `งวดถัดไป ${fmtDate(getNextInstallment(c).dueDate)}` : "ชำระครบแล้ว"}</small>
       </div>
       <div class="task-right">
-        <strong>${money(dueAmount(c))}</strong>
+        <strong>${money(remaining(c))}</strong>
         <span class="status-text ${statusClass(c)}">${statusLabel(c)}</span>
         <button class="mini-btn primary-mini" data-pay="${c.id}">รับชำระ</button>
       </div>
@@ -772,9 +939,12 @@ function contractCard(c) {
 
   return `<article class="contract-card card" data-contract-card="${c.id}">
     <div class="contract-top">
-      <div>
-        <h3>${esc(c.product)}</h3>
-        <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
+      <div class="contract-title-wrap">
+        ${productThumb(c.product, c.imageData, "small")}
+        <div class="contract-title-copy">
+          <h3>${esc(c.product)}</h3>
+          <span>${esc(c.customerName || "ไม่ระบุลูกค้า")}</span>
+        </div>
       </div>
       <span class="pill ${statusClass(c)}">${statusLabel(c)}</span>
     </div>
@@ -794,8 +964,8 @@ function contractCard(c) {
     <div class="contract-bottom">
       <span>${paid ? "✓ ชำระครบแล้ว" :
         (["overdue","overdue-partial"].includes(paymentStatus(c))
-          ? "⚠ เกินกำหนด " + fmtDate(nextDueDate(c))
-          : "งวดถัดไป " + fmtDate(nextDueDate(c)))}</span>
+          ? "⚠ เกินกำหนด " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate)
+          : "งวดถัดไป " + fmtDate(getNextInstallment(c)?.dueDate || c.dueDate))}</span>
       <div class="button-row">
         <button class="mini-btn ghost-mini" data-detail="${c.id}">รายละเอียด</button>
         ${paid
@@ -890,8 +1060,12 @@ function customerCard(c) {
     .filter(x => getStatus(x) === "active")
     .reduce((sum, x) => sum + remaining(x), 0);
 
+  const photo = c.photo
+    ? `<img src="${esc(c.photo)}" alt="${esc(c.name || "ลูกค้า")}">`
+    : `<span>${esc((c.name || "?").charAt(0))}</span>`;
+
   return `<article class="customer card">
-    <div class="avatar">${esc((c.name || "?").charAt(0))}</div>
+    <div class="avatar customer-avatar">${photo}</div>
     <div class="customer-main">
       <b>${esc(c.name)}</b>
       <span>${esc(c.phone || "ไม่มีเบอร์โทร")}</span>
@@ -963,8 +1137,21 @@ function openContractModal(prefill = {}, editId = null) {
       </div>
 
       <label>สินค้า / รายการ
-        <input name="product" required placeholder="เช่น iPhone 16 Pro" value="${esc(source.product || "")}">
+        <input name="product" required placeholder="เช่น Vivo V70" value="${esc(source.product || "")}">
       </label>
+
+      <div class="product-image-field">
+        <div class="product-image-preview" id="productImagePreview">
+          ${productThumb(source.product || "สินค้า", source.imageData, "small")}
+        </div>
+        <div class="product-image-copy">
+          <b>รูปสินค้า</b>
+          <span>ระบบใส่รูปสินค้าให้ตามรุ่นอัตโนมัติ · เปลี่ยนรูปเองได้</span>
+        </div>
+        <label class="file-btn" for="productImageInput">เปลี่ยนรูป</label>
+        <input id="productImageInput" name="productImage" type="file" accept="image/*" hidden>
+        <button type="button" class="mini-btn ghost-mini" id="removeProductImage" aria-label="ใช้รูปอัตโนมัติ">รีเซ็ต</button>
+      </div>
 
       ${data.customers.length ? `
       <label>เลือกลูกค้าที่มีอยู่
@@ -1019,6 +1206,33 @@ function openContractModal(prefill = {}, editId = null) {
   const totalInput = form.querySelector('[name="total"]');
   const installmentInput = form.querySelector('[name="installments"]');
   const preview = $("#installmentPreview");
+  const productImageInput = $("#productImageInput");
+  const productImagePreview = $("#productImagePreview");
+  let productImageData = String(source.imageData || "");
+
+  function updateProductImagePreview() {
+    productImagePreview.innerHTML = productThumb(form.product?.value || "สินค้า", productImageData, "small");
+  }
+
+  productImageInput?.addEventListener("change", async () => {
+    const file = productImageInput.files?.[0];
+    if (!file) return;
+    try {
+      productImageData = await compressProductImage(file);
+      updateProductImagePreview();
+    } catch (error) {
+      alert(error.message || "เพิ่มรูปสินค้าไม่สำเร็จ");
+      productImageInput.value = "";
+    }
+  });
+
+  $("#removeProductImage")?.addEventListener("click", () => {
+    productImageData = "";
+    if (productImageInput) productImageInput.value = "";
+    updateProductImagePreview();
+  });
+
+  form.product?.addEventListener("input", updateProductImagePreview);
 
   function updatePreview() {
     const total = Number(totalInput?.value || 0);
@@ -1038,7 +1252,7 @@ function openContractModal(prefill = {}, editId = null) {
   installmentInput?.addEventListener("input", updatePreview);
   updatePreview();
 
-  form.addEventListener("submit", event => {
+  form.addEventListener("submit", async event => {
     event.preventDefault();
     const f = new FormData(form);
 
@@ -1083,6 +1297,7 @@ function openContractModal(prefill = {}, editId = null) {
 
     const updated = {
       product: String(f.get("product") || "ไม่ระบุ").trim(),
+      imageData: productImageData,
       customerId,
       customerName: name,
       phone,
@@ -1104,7 +1319,7 @@ function openContractModal(prefill = {}, editId = null) {
         startDate: localToday(),
         status: received >= total ? "paid" : "active",
         payments: received
-          ? [{id: uid(), amount: received, date: localToday(), installmentNo: 1}]
+          ? [{id: uid(), amount: received, date: localToday()}]
           : [],
         createdAt: new Date().toISOString()
       });
@@ -1124,12 +1339,96 @@ function openContractModal(prefill = {}, editId = null) {
   });
 }
 
+
+function readImageAsDataURL(file, maxSize = 160) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve("");
+    if (!file.type.startsWith("image/")) return reject(new Error("กรุณาเลือกไฟล์รูปภาพ"));
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => reject(new Error("อ่านรูปภาพไม่สำเร็จ"));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error("อ่านไฟล์ไม่สำเร็จ"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function customerContactValues(customer = {}) {
+  const contacts = customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {};
+  return {
+    line: String(contacts.line || ""),
+    facebook: String(contacts.facebook || ""),
+    tiktok: String(contacts.tiktok || ""),
+    instagram: String(contacts.instagram || "")
+  };
+}
+
+// Builds a tappable URL for a stored contact value.
+// If the person already saved a full link, use it as-is.
+// LINE is usually just an ID, so build the standard line.me add-friend link.
+// Facebook/TikTok/Instagram without "http" are just usernames we can't safely
+// turn into a working link, so those stay as plain text.
+function contactHref(key, value) {
+  const v = String(value || "").trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  if (key === "line") return `https://line.me/ti/p/~${encodeURIComponent(v)}`;
+  return null;
+}
+
+function customerContactFields(customer = {}) {
+  const c = customerContactValues(customer);
+  const rows = [
+    ["line", "LINE", "ID / ชื่อบัญชี", "💚"],
+    ["facebook", "Facebook", "ชื่อโปรไฟล์ / ลิงก์", "🔵"],
+    ["tiktok", "TikTok", "ชื่อบัญชี / ลิงก์", "⚫"],
+    ["instagram", "Instagram", "ชื่อบัญชี / ลิงก์", "🟣"]
+  ];
+  return `<div class="contact-options">
+    ${rows.map(([key,label,placeholder,icon]) => `
+      <label class="contact-option">
+        <span class="contact-option-head"><input type="checkbox" name="contact_${key}" value="1" ${c[key] ? "checked" : ""}> ${icon} ${label}</span>
+        <input name="contact_${key}_value" placeholder="${placeholder}" value="${esc(c[key])}">
+      </label>`).join("")}
+  </div>`;
+}
+
+function collectCustomerContacts(form) {
+  const out = {};
+  ["line","facebook","tiktok","instagram"].forEach(key => {
+    const enabled = form.querySelector(`[name="contact_${key}"]`)?.checked;
+    const value = String(form.querySelector(`[name="contact_${key}_value"]`)?.value || "").trim();
+    if (enabled && value) out[key] = value;
+  });
+  return out;
+}
+
 function openCustomerForm(prefill = {}) {
   $("#modalRoot").innerHTML = `<div class="overlay">
     <form class="modal small" id="customerForm">
       <div class="modal-head">
         <div><div class="eyebrow">NEW CUSTOMER</div><h2>เพิ่มลูกค้า</h2></div>
         <button type="button" class="icon-btn" data-close>×</button>
+      </div>
+
+      <div class="customer-photo-editor">
+        <div class="customer-photo-preview" id="newCustomerPhotoPreview">
+          ${prefill.photo ? `<img src="${esc(prefill.photo)}" alt="">` : `<span>${esc((prefill.name || "?").charAt(0))}</span>`}
+        </div>
+        <label class="mini-upload">เพิ่มรูปลูกค้า
+          <input id="newCustomerPhoto" name="photoFile" type="file" accept="image/*">
+        </label>
       </div>
 
       <label>ชื่อลูกค้า
@@ -1140,6 +1439,13 @@ function openCustomerForm(prefill = {}) {
         <input name="phone" inputmode="tel" placeholder="08xxxxxxxx" value="${esc(prefill.phone || "")}">
       </label>
 
+      <div class="form-group-label">ช่องทางติดต่อ <small>เลือกได้มากกว่า 1 ช่องทาง</small></div>
+      ${customerContactFields(prefill)}
+
+      <label>ที่อยู่
+        <textarea name="address" rows="3" placeholder="ที่อยู่สำหรับติดต่อ">${esc(prefill.address || "")}</textarea>
+      </label>
+
       <label>หมายเหตุ
         <textarea name="note" rows="3" placeholder="ข้อมูลเพิ่มเติม">${esc(prefill.note || "")}</textarea>
       </label>
@@ -1148,7 +1454,21 @@ function openCustomerForm(prefill = {}) {
     </form>
   </div>`;
 
-  $("#customerForm").addEventListener("submit", event => {
+  const form = $("#customerForm");
+  let photo = String(prefill.photo || "");
+  form.querySelector("#newCustomerPhoto")?.addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      photo = await readImageAsDataURL(file);
+      $("#newCustomerPhotoPreview").innerHTML = `<img src="${esc(photo)}" alt="รูปลูกค้า">`;
+    } catch (error) {
+      alert(error.message || "ไม่สามารถใช้รูปนี้ได้");
+      event.target.value = "";
+    }
+  });
+
+  form.addEventListener("submit", async event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
     const name = String(f.get("name") || "").trim();
@@ -1158,12 +1478,92 @@ function openCustomerForm(prefill = {}) {
       id: uid(),
       name,
       phone: String(f.get("phone") || "").trim(),
+      contacts: collectCustomerContacts(form),
+      address: String(f.get("address") || "").trim(),
       note: String(f.get("note") || "").trim(),
+      photo,
       createdAt: new Date().toISOString()
     });
 
     $("#modalRoot").innerHTML = "";
     persist();
+  });
+}
+
+function recalculateContractPayments(contract) {
+  const payments = Array.isArray(contract.payments) ? contract.payments : [];
+  const principal = payments.reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+  contract.received = Math.min(
+    Math.max(0, Number(contract.total || 0)),
+    Math.round(principal * 100) / 100
+  );
+  contract.penaltyTotal = Math.round(
+    payments.reduce((sum, p) => sum + Math.max(0, Number(p.penalty || 0)), 0) * 100
+  ) / 100;
+  contract.status = getStatus(contract);
+  return contract;
+}
+
+function openPaymentEdit(contractId, paymentId) {
+  const contract = data.contracts.find(c => c.id === contractId);
+  if (!contract) return;
+  const payment = (contract.payments || []).find(p => p.id === paymentId);
+  if (!payment) return;
+
+  $("#modalRoot").innerHTML = `<div class="overlay">
+    <form class="modal small" id="paymentEditForm">
+      <div class="modal-head">
+        <div><div class="eyebrow">EDIT PAYMENT</div><h2>แก้ไขประวัติการรับเงิน</h2></div>
+        <button type="button" class="icon-btn" data-close>×</button>
+      </div>
+
+      <div class="payment-summary">
+        <b>${esc(contract.product)}</b>
+        <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
+        <strong>ยอดสัญญา ${money(contract.total)}</strong>
+      </div>
+
+      <label>เงินต้นที่รับ
+        <input name="amount" type="number" min="0" step="0.01" value="${Number(payment.amount || 0)}" required>
+      </label>
+
+      <label>ค่าปรับ
+        <input name="penalty" type="number" min="0" step="0.01" value="${Number(payment.penalty || 0)}">
+      </label>
+
+      <label>วันที่รับเงิน
+        <input name="date" type="date" value="${esc(payment.date || localToday())}" required>
+      </label>
+
+      <label>หมายเหตุ
+        <input name="note" type="text" maxlength="200" value="${esc(payment.note || "")}">
+      </label>
+
+      <button class="primary-btn" type="submit">บันทึกการแก้ไข</button>
+    </form>
+  </div>`;
+
+  $("#paymentEditForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const f = new FormData(event.currentTarget);
+    const otherPrincipal = (contract.payments || [])
+      .filter(p => p.id !== payment.id)
+      .reduce((sum, p) => sum + Math.max(0, Number(p.amount || 0)), 0);
+    const amount = Math.max(0, Number(f.get("amount") || 0));
+    if (otherPrincipal + amount > Number(contract.total || 0) + 0.005) {
+      alert(`เงินต้นรวมจะเกินยอดสัญญา ${money(contract.total)}`);
+      return;
+    }
+
+    payment.amount = Math.round(amount * 100) / 100;
+    payment.penalty = Math.round(Math.max(0, Number(f.get("penalty") || 0)) * 100) / 100;
+    payment.date = String(f.get("date") || localToday());
+    payment.note = String(f.get("note") || "").trim();
+
+    recalculateContractPayments(contract);
+    $("#modalRoot").innerHTML = "";
+    persist();
+    openContractDetail(contract.id);
   });
 }
 
@@ -1207,10 +1607,9 @@ function openPayment(id) {
     contract.payments.push({
       id: uid(),
       amount,
-      date: String(f.get("date") || localToday()),
-      installmentNo: Math.max(1, Math.min(Number(contract.installments || 1), nextInstallmentNo(contract)))
+      date: String(f.get("date") || localToday())
     });
-    recalculateContractReceived(contract);
+    contract.status = getStatus(contract);
 
     $("#modalRoot").innerHTML = "";
     persist();
@@ -1225,30 +1624,67 @@ function openCustomer(id) {
   const outstanding = contracts
     .filter(c => getStatus(c) === "active")
     .reduce((sum, c) => sum + remaining(c), 0);
+  const contacts = customerContactValues(customer);
+  const contactEntries = [
+    ["LINE", contacts.line, "line"], ["Facebook", contacts.facebook, "facebook"],
+    ["TikTok", contacts.tiktok, "tiktok"], ["Instagram", contacts.instagram, "instagram"]
+  ].filter(([,value]) => value);
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <div class="modal small">
       <div class="modal-head">
-        <div><div class="eyebrow">CUSTOMER</div><h2>${esc(customer.name)}</h2></div>
+        <div class="customer-detail-heading">
+          <div class="avatar customer-avatar large">${customer.photo ? `<img src="${esc(customer.photo)}" alt="">` : `<span>${esc((customer.name || "?").charAt(0))}</span>`}</div>
+          <div><div class="eyebrow">CUSTOMER</div><h2>${esc(customer.name)}</h2></div>
+        </div>
         <div class="modal-head-actions">
           <button type="button" class="mini-btn ghost-mini" data-edit-customer="${customer.id}">แก้ไข</button>
-          <button type="button" class="mini-btn danger-mini" data-delete-customer="${customer.id}">ลบ</button>
           <button class="icon-btn" data-close>×</button>
         </div>
       </div>
 
       <div class="customer-detail">
-        <div><span>โทร</span><b>${esc(customer.phone || "-")}</b></div>
+        <div><span>โทร</span>${customer.phone ? `<a href="tel:${esc(customer.phone)}">${esc(customer.phone)}</a>` : `<b>-</b>`}</div>
         <div><span>สัญญา</span><b>${contracts.length}</b></div>
         <div><span>ค้างรับ</span><b>${money(outstanding)}</b></div>
       </div>
 
-      ${customer.note ? `<div class="note-box">${esc(customer.note)}</div>` : ""}
+      ${contactEntries.length ? `<div class="customer-contacts"><b>ช่องทางติดต่อ</b>${contactEntries.map(([label,value,key]) => {
+        const href = contactHref(key, value);
+        return `<div><span>${label}</span>${href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(value)}</a>` : `<b>${esc(value)}</b>`}</div>`;
+      }).join("")}</div>` : ""}
+      ${customer.address ? `<div class="note-box"><b>ที่อยู่</b><br>${esc(customer.address)}</div>` : ""}
+      ${customer.note ? `<div class="note-box"><b>หมายเหตุ</b><br>${esc(customer.note)}</div>` : ""}
+
+      <div class="modal-actions">
+        <button type="button" class="wide-btn danger" data-delete-customer="${customer.id}">ลบลูกค้านี้</button>
+      </div>
 
       <div class="modal-section-title">สัญญาของลูกค้า</div>
       ${contracts.length ? contracts.map(contractCard).join("") : emptyState("＋", "ยังไม่มีสัญญา", "สร้างสัญญาใหม่ได้จากปุ่ม +")}
     </div>
   </div>`;
+}
+
+function deleteCustomer(id) {
+  const customer = customerById(id);
+  if (!customer) return;
+
+  const linkedContracts = data.contracts.filter(c => c.customerId === id);
+
+  const confirmed = confirm(
+    `ลบลูกค้า "${customer.name}" ใช่หรือไม่?\\n\\n` +
+    `สัญญาที่ผูกอยู่ ${linkedContracts.length} รายการจะไม่ถูกลบ ` +
+    `และจะยังคงเก็บประวัติสัญญาไว้`
+  );
+
+  if (!confirmed) return;
+
+  // Keep contracts/history safe; only remove the customer record.
+  data.customers = data.customers.filter(c => c.id !== id);
+
+  $("#modalRoot").innerHTML = "";
+  persist();
 }
 
 function openCustomerEdit(id) {
@@ -1267,12 +1703,29 @@ function openCustomerEdit(id) {
         <span>การแก้ไขชื่อหรือเบอร์โทรจะอัปเดตไปยังสัญญาที่ผูกกับลูกค้าคนนี้ด้วย</span>
       </div>
 
+      <div class="customer-photo-editor">
+        <div class="customer-photo-preview" id="editCustomerPhotoPreview">
+          ${customer.photo ? `<img src="${esc(customer.photo)}" alt="">` : `<span>${esc((customer.name || "?").charAt(0))}</span>`}
+        </div>
+        <label class="mini-upload">เปลี่ยนรูปลูกค้า
+          <input id="editCustomerPhoto" type="file" accept="image/*">
+        </label>
+        ${customer.photo ? `<button type="button" class="mini-btn ghost-mini" id="removeCustomerPhoto">ลบรูป</button>` : ""}
+      </div>
+
       <label>ชื่อลูกค้า
         <input name="name" required placeholder="ชื่อ-นามสกุล" value="${esc(customer.name || "")}">
       </label>
 
       <label>เบอร์โทร
         <input name="phone" inputmode="tel" placeholder="08xxxxxxxx" value="${esc(customer.phone || "")}">
+      </label>
+
+      <div class="form-group-label">ช่องทางติดต่อ <small>เลือกได้มากกว่า 1 ช่องทาง</small></div>
+      ${customerContactFields(customer)}
+
+      <label>ที่อยู่
+        <textarea name="address" rows="3" placeholder="ที่อยู่สำหรับติดต่อ">${esc(customer.address || "")}</textarea>
       </label>
 
       <label>หมายเหตุ
@@ -1283,19 +1736,42 @@ function openCustomerEdit(id) {
     </form>
   </div>`;
 
-  $("#customerEditForm").addEventListener("submit", event => {
+  const form = $("#customerEditForm");
+  let photo = String(customer.photo || "");
+  form.querySelector("#editCustomerPhoto")?.addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      photo = await readImageAsDataURL(file);
+      $("#editCustomerPhotoPreview").innerHTML = `<img src="${esc(photo)}" alt="รูปลูกค้า">`;
+    } catch (error) {
+      alert(error.message || "ไม่สามารถใช้รูปนี้ได้");
+      event.target.value = "";
+    }
+  });
+
+  form.querySelector("#removeCustomerPhoto")?.addEventListener("click", () => {
+    photo = "";
+    $("#editCustomerPhotoPreview").innerHTML = `<span>${esc((customer.name || "?").charAt(0))}</span>`;
+    form.querySelector("#removeCustomerPhoto")?.remove();
+  });
+
+  form.addEventListener("submit", event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
     const name = String(f.get("name") || "").trim();
     const phone = String(f.get("phone") || "").trim();
+    const address = String(f.get("address") || "").trim();
     const note = String(f.get("note") || "").trim();
     if (!name) return;
 
     customer.name = name;
     customer.phone = phone;
+    customer.contacts = collectCustomerContacts(form);
+    customer.address = address;
     customer.note = note;
+    customer.photo = photo;
 
-    // Keep linked contract snapshots aligned with the customer record.
     data.contracts
       .filter(contract => contract.customerId === customer.id)
       .forEach(contract => {
@@ -1314,11 +1790,80 @@ function openContractDetail(id) {
 
   const customer = customerById(contract.customerId);
   const payments = [...(contract.payments || [])].sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  const schedule = getInstallmentSchedule(contract);
+  const nextInstallment = schedule.find(item => item.status !== "paid");
+  const paidCount = schedule.filter(item => item.status === "paid").length;
+  const partialItem = schedule.find(item => item.status === "partial");
+
+  const scheduleRows = schedule.map(item => {
+    const statusText = installmentStatusLabel(item);
+    const dateText = fmtDate(item.dueDate);
+    const amountText = money(item.amount);
+    const statusClassName = item.status === "paid" ? "installment-paid" :
+      item.status === "partial" ? "installment-partial" : "installment-pending";
+
+    return `<div class="installment-row ${statusClassName}">
+      <div class="installment-main">
+        <b>งวด ${item.number}/${schedule.length}</b>
+        <span>${dateText}</span>
+        ${item.status === "partial" ? `<small>รับแล้ว ${money(item.paidAmount)} · เหลือ ${money(item.remainingAmount)}</small>` : ""}
+      </div>
+      <div class="installment-side">
+        <strong>${amountText}</strong>
+        <span>${statusText}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  const nextLabel = getStatus(contract) === "paid"
+    ? "ชำระครบ"
+    : `งวด ${nextInstallment?.number || "-"} · ${fmtDate(nextInstallment?.dueDate || contract.dueDate)}`;
+
+  const progressPercent = contract.total > 0
+    ? Math.min(100, (Number(contract.received || 0) / Number(contract.total || 0)) * 100)
+    : 0;
+
+  const scheduleSummary = getStatus(contract) === "paid"
+    ? `ชำระครบ ${schedule.length}/${schedule.length} งวด`
+    : `${paidCount}/${schedule.length} งวด · ${partialItem ? `งวด ${partialItem.number} ชำระบางส่วน` : `งวดถัดไป ${nextInstallment?.number || "-"}`}`;
+
+  const scheduleBlock = `<section class="installment-section">
+    <div class="modal-section-title">งวดที่ต้องชำระ</div>
+    <div class="installment-summary">
+      <div>
+        <span>ความคืบหน้า</span>
+        <b>${scheduleSummary}</b>
+      </div>
+      <strong>${Math.round(progressPercent)}%</strong>
+    </div>
+    <div class="installment-progress"><i style="width:${progressPercent}%"></i></div>
+    <div class="installment-list">${scheduleRows}</div>
+  </section>`;
+
+  const historyBlock = `<div class="modal-section-title">ประวัติการรับชำระ</div>
+    ${Number(contract.penaltyTotal || 0) > 0 ? `<div class="subtle-box">ค่าปรับสะสม ${money(contract.penaltyTotal)}</div>` : ""}
+    ${payments.length
+      ? `<div class="payment-list">${payments.map(p => `<div class="payment-row">
+        <div>
+          <span>${fmtDate(p.date)}</span>
+          <b>+ ${money(p.amount)}</b>
+          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+        </div>
+        <div class="payment-row-actions">
+          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+        </div>
+      </div>`).join("")}</div>`
+      : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
-    <div class="modal small">
-      <div class="modal-head">
-        <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
+    <div class="modal small contract-detail-modal">
+      <div class="modal-head contract-detail-head">
+        <div class="contract-detail-title">
+          ${productThumb(contract.product, contract.imageData, "large")}
+          <div><div class="eyebrow">CONTRACT</div><h2>${esc(contract.product)}</h2></div>
+        </div>
         <div class="modal-head-actions">
           <button type="button" class="mini-btn ghost-mini" data-edit="${contract.id}">แก้ไข</button>
           <button class="icon-btn" data-close>×</button>
@@ -1332,19 +1877,16 @@ function openContractDetail(id) {
 
       <div class="detail-grid">
         <div><span>ลูกค้า</span><b>${esc(contract.customerName || customer?.name || "-")}</b></div>
-        <div><span>เบอร์โทร</span><b>${esc(contract.phone || customer?.phone || "-")}</b></div>
+        <div><span>เบอร์โทร</span>${(contract.phone || customer?.phone) ? `<a href="tel:${esc(contract.phone || customer?.phone)}">${esc(contract.phone || customer?.phone)}</a>` : `<b>-</b>`}</div>
         <div><span>รับแล้ว</span><b>${money(contract.received)}</b></div>
         <div><span>คงเหลือ</span><b>${money(remaining(contract))}</b></div>
         <div><span>จำนวนงวด</span><b>${contract.installments} งวด</b></div>
         <div><span>รูปแบบ</span><b>${paymentTypeLabel(contract.paymentType)}</b></div>
-        <div><span>งวดปัจจุบัน</span><b>${getStatus(contract) === "paid" ? "ชำระครบ" : `งวดที่ ${currentInstallmentNo(contract)}`}</b></div>
-        <div><span>กำหนดชำระ</span><b>${getStatus(contract) === "paid" ? "ชำระครบ" : fmtDate(nextDueDate(contract))}</b></div>
+        <div><span>งวดถัดไป</span><b>${nextLabel}</b></div>
       </div>
 
-      <div class="modal-section-title">ประวัติการรับชำระ</div>
-      ${payments.length
-        ? `<div class="payment-list">${payments.map(p => `<div class="payment-row"><div><span>งวดที่ ${esc(p.installmentNo || "-")} · ${fmtDate(p.date)}</span><b>+ ${money(p.amount)}</b></div><div class="button-row"><button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button><button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button></div></div>`).join("")}</div>`
-        : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}
+      ${scheduleBlock}
+      ${historyBlock}
 
       ${getStatus(contract) === "active"
         ? `<button class="primary-btn" data-pay="${contract.id}">รับชำระเงิน</button>`
@@ -1352,74 +1894,6 @@ function openContractDetail(id) {
       <button type="button" class="wide-btn danger" data-delete-contract="${contract.id}">ลบสัญญานี้</button>
     </div>
   </div>`;
-}
-
-function openPaymentEdit(contractId, paymentId) {
-  const contract = data.contracts.find(c => c.id === contractId);
-  const payment = contract?.payments?.find(p => p.id === paymentId);
-  if (!contract || !payment) return;
-
-  const maxInstallment = Math.max(1, Number(contract.installments || 1));
-  $("#modalRoot").innerHTML = `<div class="overlay">
-    <form class="modal small" id="paymentEditForm">
-      <div class="modal-head">
-        <div><div class="eyebrow">EDIT PAYMENT</div><h2>แก้ไขประวัติการชำระ</h2></div>
-        <button type="button" class="icon-btn" data-close>×</button>
-      </div>
-      <label>งวดที่
-        <input name="installmentNo" type="number" min="1" max="${maxInstallment}" step="1" value="${Number(payment.installmentNo || 1)}" required>
-      </label>
-      <label>จำนวนเงิน
-        <input name="amount" type="number" min="0.01" step="0.01" value="${Number(payment.amount || 0)}" required>
-      </label>
-      <label>วันที่รับเงิน
-        <input name="date" type="date" value="${esc(payment.date || localToday())}" required>
-      </label>
-      <button class="primary-btn" type="submit">บันทึกการแก้ไข</button>
-      <button class="wide-btn danger" type="button" id="deletePayment">ลบรายการชำระนี้</button>
-    </form>
-  </div>`;
-
-  $("#paymentEditForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const f = new FormData(event.currentTarget);
-    const amount = Number(f.get("amount") || 0);
-    if (amount <= 0) return;
-    const otherPayments = contract.payments.filter(p => p.id !== payment.id);
-    const maxTotal = Number(contract.total || 0) - otherPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
-    if (amount > maxTotal) {
-      alert(`ยอดชำระรวมต้องไม่เกินยอดสัญญา เหลือให้รายการนี้ได้สูงสุด ${money(Math.max(0, maxTotal))}`);
-      return;
-    }
-    payment.amount = amount;
-    payment.date = String(f.get("date") || localToday());
-    payment.installmentNo = Math.max(1, Math.min(maxInstallment, Number(f.get("installmentNo") || 1)));
-    recalculateContractReceived(contract);
-    $("#modalRoot").innerHTML = "";
-    persist();
-  });
-
-  $("#deletePayment").addEventListener("click", () => {
-    if (!confirm("ลบประวัติการชำระรายการนี้ใช่หรือไม่?")) return;
-    contract.payments = contract.payments.filter(p => p.id !== payment.id);
-    recalculateContractReceived(contract);
-    $("#modalRoot").innerHTML = "";
-    persist();
-  });
-}
-
-function deleteCustomer(id) {
-  const customer = customerById(id);
-  if (!customer) return;
-  const linked = data.contracts.filter(c => c.customerId === id);
-  const message = linked.length
-    ? `ลูกค้า "${customer.name}" มี ${linked.length} สัญญาที่ผูกอยู่\n\nลบลูกค้าพร้อมสัญญาและประวัติการชำระทั้งหมดหรือไม่?`
-    : `ลบลูกค้า "${customer.name}" ใช่หรือไม่?`;
-  if (!confirm(message)) return;
-  data.contracts = data.contracts.filter(c => c.customerId !== id);
-  data.customers = data.customers.filter(c => c.id !== id);
-  $("#modalRoot").innerHTML = "";
-  persist();
 }
 
 function deleteContract(id) {
@@ -1545,6 +2019,12 @@ document.addEventListener("click", event => {
     return;
   }
 
+  const editPayment = event.target.closest("[data-edit-payment]");
+  if (editPayment) {
+    openPaymentEdit(editPayment.dataset.editPayment, editPayment.dataset.payment);
+    return;
+  }
+
   const receipt = event.target.closest("[data-receipt]");
   if (receipt) {
     openReceipt(receipt.dataset.receipt, receipt.dataset.payment);
@@ -1574,12 +2054,6 @@ document.addEventListener("click", event => {
   const deleteContractButton = event.target.closest("[data-delete-contract]");
   if (deleteContractButton) {
     deleteContract(deleteContractButton.dataset.deleteContract);
-    return;
-  }
-
-  const editPayment = event.target.closest("[data-edit-payment]");
-  if (editPayment) {
-    openPaymentEdit(editPayment.dataset.editPayment, editPayment.dataset.payment);
     return;
   }
 
@@ -1639,7 +2113,11 @@ document.addEventListener("click", event => {
       exportJson("before-reset");
       data = resetData();
       // Keep Firestore consistent with the explicit local reset.
-      data = saveData(data);
+      if (currentUser()) {
+        setCloudData(data).catch(error =>
+          console.warn("PayNest cloud reset sync skipped:", error)
+        );
+      }
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
@@ -1703,6 +2181,8 @@ $("#topAction").addEventListener("click", () =>
   scrollTo({top: 0, behavior: "smooth"})
 );
 
+$("#themeToggle")?.addEventListener("click", toggleTheme);
+
 $("#cloudAccount")?.addEventListener("click", async () => {
   if (auth.currentUser) {
     if (confirm(`ออกจากระบบ ${auth.currentUser.email} ใช่หรือไม่?`)) {
@@ -1726,3 +2206,182 @@ onAuthStateChanged(auth, async user => {
 });
 
 render();
+
+
+
+/* ===================================
+   PayNest Core Revision
+   Single source of truth for:
+   Customer / Contract / Installment / Payment
+=================================== */
+
+const PayNestCore = (() => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const num = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    const dateOnly = (value) => {
+        const d = value instanceof Date ? new Date(value) : new Date(value);
+        if (Number.isNaN(d.getTime())) return null;
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
+
+    const isoDate = (value) => {
+        const d = dateOnly(value);
+        if (!d) return "";
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+    };
+
+    const addDays = (value, days) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        d.setDate(d.getDate() + num(days));
+        return d;
+    };
+
+    const addMonths = (value, months) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        const originalDay = d.getDate();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + num(months));
+        const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(originalDay, last));
+        return d;
+    };
+
+    const frequencyDays = (frequency) => {
+        const f = String(frequency || "").toLowerCase();
+        if (f.includes("day") || f.includes("วัน")) return 1;
+        if (f.includes("week") || f.includes("สัปดาห์")) return 7;
+        if (f.includes("2") && (f.includes("week") || f.includes("สัปดาห์"))) return 14;
+        return null;
+    };
+
+    const installmentDate = (start, index, frequency) => {
+        const i = Math.max(0, num(index));
+        const days = frequencyDays(frequency);
+        if (days) return addDays(start, i * days);
+        return addMonths(start, i);
+    };
+
+    const buildInstallments = (contract) => {
+        const total = Math.max(0, Math.round(num(contract.months)));
+        const monthly = num(contract.monthly);
+        const start = contract.startDate || contract.start || contract.due;
+        const frequency = contract.frequency || contract.type || "monthly";
+        const items = [];
+
+        for (let i = 0; i < total; i++) {
+            const due = installmentDate(start, i, frequency);
+            items.push({
+                no: i + 1,
+                dueDate: isoDate(due),
+                amount: monthly,
+                paid: 0,
+                penalty: 0,
+                remaining: monthly,
+                status: "pending"
+            });
+        }
+        return items;
+    };
+
+    const classify = (installment, today = new Date()) => {
+        const due = dateOnly(installment.dueDate);
+        const now = dateOnly(today);
+        const paid = num(installment.paid);
+        const amount = num(installment.amount);
+        const remaining = Math.max(0, amount - paid);
+
+        if (remaining <= 0) return "paid";
+        if (!due) return paid > 0 ? "partial" : "pending";
+
+        const diff = Math.round((due - now) / DAY);
+        if (diff < 0) return paid > 0 ? "overdue_partial" : "overdue";
+        if (paid > 0) return "partial";
+        if (diff <= 3) return "due_soon";
+        return "pending";
+    };
+
+    const summarizePayments = (payments = []) => {
+        const map = new Map();
+        for (const payment of payments) {
+            const no = num(payment.installmentNo || payment.installment || payment.no);
+            if (!no) continue;
+            const current = map.get(no) || { paid: 0, penalty: 0 };
+            current.paid += num(payment.amount || payment.paid);
+            current.penalty += num(payment.penalty);
+            map.set(no, current);
+        }
+        return map;
+    };
+
+    const calculate = (contract, payments = [], today = new Date()) => {
+        const installments = buildInstallments(contract);
+        const paymentMap = summarizePayments(payments);
+
+        // Apply payment history to its exact installment.
+        for (const item of installments) {
+            const p = paymentMap.get(item.no) || { paid: 0, penalty: 0 };
+            item.paid = Math.min(item.amount, p.paid);
+            item.penalty = p.penalty;
+            item.remaining = Math.max(0, item.amount - item.paid);
+            item.status = classify(item, today);
+        }
+
+        const paidPrincipal = installments.reduce((s, x) => s + x.paid, 0);
+        const penalties = installments.reduce((s, x) => s + x.penalty, 0);
+        const total = installments.reduce((s, x) => s + x.amount, 0);
+        const outstanding = Math.max(0, total - paidPrincipal);
+
+        const next = installments.find(x => x.remaining > 0) || null;
+        const overdue = installments.filter(x => x.status === "overdue" || x.status === "overdue_partial");
+        const dueSoon = installments.filter(x => x.status === "due_soon");
+
+        const todayKey = isoDate(today);
+        const dueToday = installments.filter(x => x.dueDate === todayKey && x.remaining > 0);
+
+        return {
+            installments,
+            total,
+            paidPrincipal,
+            penalties,
+            outstanding,
+            nextInstallment: next,
+            overdue,
+            dueSoon,
+            dueToday,
+            isComplete: outstanding <= 0
+        };
+    };
+
+    const validatePayment = (installment, amount) => {
+        const value = num(amount);
+        const remaining = Math.max(0, num(installment.amount) - num(installment.paid));
+        return {
+            valid: value > 0 && remaining > 0,
+            amount: value,
+            remaining,
+            exceeds: value > remaining
+        };
+    };
+
+    return Object.freeze({
+        buildInstallments,
+        calculate,
+        classify,
+        validatePayment,
+        isoDate
+    });
+})();
+
+/* Backward-compatible global access for existing UI code. */
+window.PayNestCore = PayNestCore;
