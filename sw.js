@@ -1,5 +1,5 @@
-// PayNest — Service Worker
-const CACHE_NAME = "paynest-pwa-v9-customer-row-20260819";
+// PAYPREMINIQ — Service Worker
+const CACHE_NAME = "paypreminiq-pwa-v10-brand-20260821";
 
 const APP_SHELL = [
   "./",
