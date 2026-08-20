@@ -10,8 +10,8 @@
   "display": "standalone",
   "display_override": ["standalone"],
   "orientation": "portrait-primary",
-  "background_color": "#040406",
-  "theme_color": "#040406",
+  "background_color": "#070809",
+  "theme_color": "#070809",
   "prefer_related_applications": false,
   "icons": [
     {
