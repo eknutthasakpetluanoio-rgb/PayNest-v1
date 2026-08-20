@@ -1,7 +1,7 @@
 /* =========================================================
-   PayNest – Smart Installment Manager
+   PAYPREMINIQ – Smart Payment Intelligence
    Single-file application controller.
-   The original PayNest business/UI logic is preserved here;
+   The original PAYPREMINIQ business/UI logic is preserved here;
    storage, Firebase sync, and PWA controller are consolidated
    so the project remains exactly six files.
 ========================================================= */
@@ -91,35 +91,42 @@ function clone(value) {
 }
 
 function normalize(data) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) return clone(DEFAULT_DATA);
-  const contracts = Array.isArray(data.contracts) ? data.contracts.filter(item => item && typeof item === "object").map(contract => {
-    const safe = {...contract};
-    safe.payments = Array.isArray(safe.payments) ? safe.payments.map(payment => ({...payment})) : [];
-    let running = 0;
-    const count = Math.max(1, Number(safe.installments || 1));
-    const per = Math.max(0.01, Number(safe.total || 0) / count);
-    safe.payments = safe.payments.map(payment => {
-      if (Number(payment.installmentNo || payment.installment || payment.no) > 0) return payment;
-      running += Math.max(0, Number(payment.amount || 0));
-      const guessed = Math.min(count, Math.max(1, Math.ceil((running - 0.000001) / per)));
-      return {...payment, installmentNo: guessed};
-    });
-    return safe;
-  }) : [];
-  const customers = Array.isArray(data.customers) ? data.customers.filter(item => item && typeof item === "object").map(customer => ({
-    ...customer, contacts: customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {},
-    address: String(customer.address || ""), note: String(customer.note || ""), photo: String(customer.photo || "")
-  })) : [];
-  return {version: 1, contracts, customers, settings: {...DEFAULT_DATA.settings, ...(data.settings || {})}};
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return clone(DEFAULT_DATA);
+  }
+
+  const contracts = Array.isArray(data.contracts)
+    ? data.contracts.filter(item => item && typeof item === "object")
+    : [];
+
+  const customers = Array.isArray(data.customers)
+    ? data.customers.filter(item => item && typeof item === "object").map(customer => ({
+        ...customer,
+        contacts: customer.contacts && typeof customer.contacts === "object" ? customer.contacts : {},
+        address: String(customer.address || ""),
+        note: String(customer.note || ""),
+        photo: String(customer.photo || "")
+      }))
+    : [];
+
+  return {
+    version: 1,
+    contracts,
+    customers,
+    settings: {
+      ...DEFAULT_DATA.settings,
+      ...(data.settings || {})
+    }
+  };
 }
 
 function validateImportData(imported) {
   if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
-    return {ok: false, message: "ไฟล์ต้องเป็นข้อมูล PayNest JSON"};
+    return {ok: false, message: "ไฟล์ต้องเป็นข้อมูล PAYPREMINIQ JSON"};
   }
 
   if (!Array.isArray(imported.contracts) || !Array.isArray(imported.customers)) {
-    return {ok: false, message: "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ PayNest"};
+    return {ok: false, message: "ไฟล์นี้ไม่ใช่ข้อมูลสำรองของ PAYPREMINIQ"};
   }
 
   for (const contract of imported.contracts) {
@@ -143,7 +150,7 @@ function loadData() {
     if (!raw) return clone(DEFAULT_DATA);
     return normalize(JSON.parse(raw));
   } catch (error) {
-    console.error("PayNest storage load error:", error);
+    console.error("PAYPREMINIQ storage load error:", error);
     return clone(DEFAULT_DATA);
   }
 }
@@ -168,7 +175,7 @@ function saveLocalData(value) {
 
     localStorage.setItem(STORAGE_KEY, serialized);
   } catch (error) {
-    console.error("PayNest local save error:", error);
+    console.error("PAYPREMINIQ local save error:", error);
     throw error;
   }
 
@@ -187,7 +194,7 @@ function importData(text) {
   const safe = normalize(parsed);
   saveLocalData(safe);
   setCloudData(safe).catch(error =>
-    console.warn("PayNest cloud sync skipped:", error)
+    console.warn("PAYPREMINIQ cloud sync skipped:", error)
   );
   return safe;
 }
@@ -248,7 +255,7 @@ function mergeDataWithoutLoss(localValue, cloudValue) {
 
   // IMPORTANT: an empty cloud document must never erase non-empty local data.
   // This is the protection that prevents a fresh/empty Firebase account from
-  // replacing an existing PayNest database on the device.
+  // replacing an existing PAYPREMINIQ database on the device.
   if (hasMeaningfulData(localSafe) && !hasMeaningfulData(cloudSafe)) {
     return localSafe;
   }
@@ -316,17 +323,17 @@ function startRealtimeSync(onData) {
       // device, but it must not replace an already populated local database.
       const incoming = normalize(cloudData);
       if (hasMeaningfulData(data)) {
-        console.warn("PayNest: ignored Cloud snapshot because local data is populated");
+        console.warn("PAYPREMINIQ: ignored Cloud snapshot because local data is populated");
         return;
       }
 
       try {
         onData(clone(incoming));
       } catch (error) {
-        console.error("PayNest realtime data handler error:", error);
+        console.error("PAYPREMINIQ realtime data handler error:", error);
       }
     },
-    error => console.warn("PayNest realtime sync error:", error)
+    error => console.warn("PAYPREMINIQ realtime sync error:", error)
   );
 
   return unsubscribeRealtime;
@@ -363,7 +370,7 @@ function stopRealtimeSync() {
       try { await registration.update(); } catch (_) {}
       return registration;
     } catch (error) {
-      console.error("[PayNest PWA] Service Worker registration failed:", error);
+      console.error("[PAYPREMINIQ PWA] Service Worker registration failed:", error);
       return null;
     }
   }
@@ -390,18 +397,18 @@ function stopRealtimeSync() {
     }
 
     root.innerHTML = `
-      <div class="overlay" role="dialog" aria-modal="true" aria-label="ติดตั้ง PayNest">
+      <div class="overlay" role="dialog" aria-modal="true" aria-label="ติดตั้ง PAYPREMINIQ">
         <div class="modal small">
           <div class="modal-head">
             <div>
-              <div class="eyebrow">PAYNEST PWA</div>
-              <h2>ติดตั้ง PayNest</h2>
+              <div class="eyebrow">PAYPREMINIQ PWA</div>
+              <h2>ติดตั้ง PAYPREMINIQ</h2>
             </div>
             <button class="icon-btn" type="button" data-pwa-close aria-label="ปิด">×</button>
           </div>
 
           <div class="form-note">
-            <b>เพิ่ม PayNest ลงหน้าจอหลัก</b>
+            <b>เพิ่ม PAYPREMINIQ ลงหน้าจอหลัก</b>
             <span>
               หาก Chrome ยังไม่แสดงหน้าต่างติดตั้งอัตโนมัติ
               ให้เปิดเมนู <b>⋮</b> ของ Chrome แล้วเลือก
@@ -433,7 +440,7 @@ function stopRealtimeSync() {
       await promptEvent.prompt();
       await promptEvent.userChoice;
     } catch (error) {
-      console.warn("[PayNest PWA] Install prompt failed:", error);
+      console.warn("[PAYPREMINIQ PWA] Install prompt failed:", error);
     }
 
     showInstallButton();
@@ -558,7 +565,7 @@ function persist() {
     cloudWriteInProgress = true;
     setCloudData(data)
       .catch(error => {
-        console.error("PayNest cloud save error:", error);
+        console.error("PAYPREMINIQ cloud save error:", error);
         console.warn("ข้อมูลถูกเก็บไว้ในเครื่อง แต่การบันทึก Firebase ไม่สำเร็จ");
       })
       .finally(() => {
@@ -584,10 +591,10 @@ function authErrorMessage(error) {
 function openAuthModal() {
   $("#modalRoot").innerHTML = `
     <div class="overlay">
-      <div class="modal small auth-modal" role="dialog" aria-modal="true" aria-label="บัญชี PayNest">
+      <div class="modal small auth-modal" role="dialog" aria-modal="true" aria-label="บัญชี PAYPREMINIQ">
         <div class="modal-head">
           <div>
-            <div class="eyebrow">PAYNEST CLOUD</div>
+            <div class="eyebrow">PAYPREMINIQ CLOUD</div>
             <h2>บัญชีของคุณ</h2>
           </div>
           <button class="icon-btn" data-close type="button" aria-label="ปิด">×</button>
@@ -595,7 +602,7 @@ function openAuthModal() {
 
         <div class="form-note">
           <b>ซิงก์ข้อมูลกับ Firebase Cloud</b>
-          <span>เข้าสู่ระบบเพื่อเก็บข้อมูล PayNest ไว้บนบัญชีของคุณ และใช้งานข้อมูลเดิมจากเครื่องอื่นได้</span>
+          <span>เข้าสู่ระบบเพื่อเก็บข้อมูล PAYPREMINIQ ไว้บนบัญชีของคุณ และใช้งานข้อมูลเดิมจากเครื่องอื่นได้</span>
         </div>
 
         <label>อีเมล
@@ -649,7 +656,7 @@ function renderAuthButton() {
   if (!button) return;
   const user = auth.currentUser;
   button.textContent = user ? "☁" : "☁";
-  button.title = user ? `Cloud: ${user.email} — กดเพื่อออกจากระบบ` : "เข้าสู่ระบบ PayNest Cloud";
+  button.title = user ? `Cloud: ${user.email} — กดเพื่อออกจากระบบ` : "เข้าสู่ระบบ PAYPREMINIQ Cloud";
   button.setAttribute("aria-label", button.title);
 }
 
@@ -668,7 +675,7 @@ async function bootstrapCloud() {
     try {
       await setCloudData(data);
     } catch (error) {
-      console.warn("PayNest cloud repair skipped:", error);
+      console.warn("PAYPREMINIQ cloud repair skipped:", error);
     } finally {
       cloudWriteInProgress = false;
     }
@@ -681,7 +688,7 @@ async function bootstrapCloud() {
     });
   } catch (error) {
     stopRealtimeSync();
-    console.warn("PayNest initial cloud sync skipped:", error);
+    console.warn("PAYPREMINIQ initial cloud sync skipped:", error);
   }
 }
 
@@ -690,51 +697,128 @@ function customerById(id) {
 }
 
 function remaining(contract) {
-  const core = contractCore(contract);
-  return core ? core.outstanding : Math.max(0, Number(contract.total) - Number(contract.received));
+  return Math.max(0, Number(contract.total) - Number(contract.received));
 }
 
 function getStatus(contract) {
-  const core = contractCore(contract);
-  return core ? (core.isComplete && Number(contract.total) > 0 ? "paid" : "active") : (remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active");
+  return remaining(contract) <= 0 && Number(contract.total) > 0 ? "paid" : "active";
 }
 
 function installmentAmount(contract, index) {
   const total = Math.max(0, Number(contract.total || 0));
   const count = Math.max(1, Number(contract.installments || 1));
   const base = Math.round((total / count) * 100) / 100;
-  return index === count - 1 ? Math.round((total - base * (count - 1)) * 100) / 100 : base;
+  if (index === count - 1) {
+    const previous = base * (count - 1);
+    return Math.round((total - previous) * 100) / 100;
+  }
+  return base;
 }
-function contractCore(contract) {
-  return window.PayNestCore ? window.PayNestCore.calculate(contract, Array.isArray(contract.payments) ? contract.payments : []) : null;
+
+function addPeriod(dateValue, index, type) {
+  const source = new Date(`${dateValue || localToday()}T00:00:00`);
+  if (Number.isNaN(source.getTime())) return localToday();
+
+  const d = new Date(source);
+  if (type === "daily") {
+    d.setDate(d.getDate() + index);
+  } else if (type === "weekly") {
+    d.setDate(d.getDate() + (index * 7));
+  } else {
+    // Monthly dates are clamped to the last valid day of the target month.
+    const originalDay = d.getDate();
+    const targetMonth = d.getMonth() + index;
+    d.setDate(1);
+    d.setMonth(targetMonth);
+    const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    d.setDate(Math.min(originalDay, lastDay));
+  }
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
+
 function getInstallmentSchedule(contract) {
-  const core = contractCore(contract);
-  return core ? core.installments.map(x => ({number:x.no, amount:x.amount, paidAmount:x.paid, remainingAmount:x.remaining, dueDate:x.dueDate, status:(x.status === "overdue_partial" ? "overdue" : x.status)})) : [];
+  const count = Math.max(1, Number(contract.installments || 1));
+  const received = Math.max(0, Number(contract.received || 0));
+  const type = contract.paymentType || "monthly";
+  let cumulativeDue = 0;
+
+  return Array.from({length: count}, (_, index) => {
+    const amount = installmentAmount(contract, index);
+    const previousDue = cumulativeDue;
+    cumulativeDue += amount;
+
+    let status = "pending";
+    let paidAmount = 0;
+    if (received >= cumulativeDue - 0.005) {
+      status = "paid";
+      paidAmount = amount;
+    } else if (received > previousDue + 0.005) {
+      status = "partial";
+      paidAmount = Math.min(amount, received - previousDue);
+    }
+
+    return {
+      number: index + 1,
+      amount,
+      paidAmount: Math.round(paidAmount * 100) / 100,
+      remainingAmount: Math.max(0, Math.round((amount - paidAmount) * 100) / 100),
+      dueDate: addPeriod(contract.dueDate || contract.startDate || localToday(), index, type),
+      status
+    };
+  });
 }
-function getNextInstallment(contract) { return getInstallmentSchedule(contract).find(x => x.status !== "paid") || null; }
-function installmentStatusLabel(item) { return ({paid:"ชำระแล้ว",partial:"ชำระบางส่วน",pending:"รอชำระ",due_soon:"ใกล้ถึงกำหนด",overdue:"ค้างชำระ"}[item.status] || "รอชำระ"); }
+
+function getNextInstallment(contract) {
+  return getInstallmentSchedule(contract).find(item => item.status !== "paid") || null;
+}
+
+function installmentStatusLabel(item) {
+  return ({
+    paid: "ชำระแล้ว",
+    partial: "ชำระบางส่วน",
+    pending: "รอชำระ"
+  }[item.status] || "รอชำระ");
+}
+
 function paymentStatus(contract) {
-  const core=contractCore(contract); if(core?.isComplete) return "paid";
-  const next=core?.nextInstallment;
-  if(next?.status === "overdue" || next?.status === "overdue_partial") return next.status === "overdue_partial" ? "overdue-partial" : "overdue";
-  if(next?.status === "partial") return "partial"; return "due";
+  if (getStatus(contract) === "paid") return "paid";
+  const received = Number(contract.received || 0);
+  const dueDate = contract.dueDate ? new Date(`${contract.dueDate}T23:59:59`) : null;
+  const today = new Date(`${localToday()}T00:00:00`);
+  if (dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < today) {
+    return received > 0 ? "overdue-partial" : "overdue";
+  }
+  return received > 0 ? "partial" : "due";
 }
-function statusLabel(contract) { return ({paid:"ชำระครบ",overdue:"ค้างชำระ","overdue-partial":"ค้างชำระบางส่วน",partial:"ชำระบางส่วน",due:"ถึงกำหนด"}[paymentStatus(contract)] || "กำลังผ่อน"); }
-function statusClass(contract) { return paymentStatus(contract); }
+
+function statusLabel(contract) {
+  return ({
+    paid: "ชำระครบ",
+    overdue: "ค้างชำระ",
+    "overdue-partial": "ค้างชำระบางส่วน",
+    partial: "ชำระบางส่วน",
+    due: "ถึงกำหนด"
+  }[paymentStatus(contract)] || "กำลังผ่อน");
+}
+
+function statusClass(contract) {
+  return paymentStatus(contract);
+}
 
 function stats() {
-  const results=data.contracts.map(c=>contractCore(c));
-  const dueTodayItems=results.flatMap((r,i)=>(r?.dueToday||[]).map(item=>({contract:data.contracts[i],item})));
-  const overdueItems=results.flatMap(r=>r?.overdue||[]);
-  const active=results.filter(r=>r&&!r.isComplete).length;
+  const active = data.contracts.filter(c => getStatus(c) === "active");
   return {
-    portfolio:data.contracts.reduce((s,c)=>s+Number(c.total||0),0),
-    received:data.contracts.reduce((s,c)=>s+Number(c.received||0),0),
-    due:results.reduce((s,r)=>s+Number(r?.outstanding||0),0),
-    active, overdue:overdueItems.length, dueToday:dueTodayItems.length,
-    dueTodayAmount:dueTodayItems.reduce((s,x)=>s+Number(x.item.remaining||0),0),
-    customers:data.customers.length
+    portfolio: data.contracts.reduce((sum, c) => sum + Number(c.total || 0), 0),
+    received: data.contracts.reduce((sum, c) => sum + Number(c.received || 0), 0),
+    due: active.reduce((sum, c) => sum + remaining(c), 0),
+    active: active.length,
+    overdue: active.filter(c => ["overdue", "overdue-partial"].includes(paymentStatus(c))).length,
+    dueToday: active.filter(c => c.dueDate === localToday()).length,
+    customers: data.customers.length
   };
 }
 
@@ -751,6 +835,9 @@ function render() {
     button.classList.toggle("active", button.dataset.page === page)
   );
 
+  const showFab = page !== "settings";
+  $("#fab").style.display = showFab ? "flex" : "none";
+  $("#fabLabel").textContent = page === "customers" ? "ลูกค้า" : "สัญญา";
 
   $("#view").innerHTML =
     page === "dashboard" ? dashboard() :
@@ -784,15 +871,19 @@ function dashboard() {
     </div>
 
     <div class="stat-grid">
-      <div class="card stat"><span>ยอดค้างรับ</span><strong>${money(s.due)}</strong><small>${s.active ? "มีรายการที่ยังไม่ครบ" : "ไม่มีรายการค้าง"}</small></div>
-      <div class="card stat"><span>ต้องเก็บวันนี้</span><strong>${money(s.dueTodayAmount)}</strong><small>${s.dueToday} รายการถึงกำหนดวันนี้</small></div>
-    </div>
-    <div class="stat-grid">
-      <div class="card stat"><span>ลูกค้า</span><strong>${s.customers}</strong><small>${data.contracts.length} สัญญา</small></div>
-      <div class="card stat"><span>ค้างชำระ</span><strong>${s.overdue}</strong><small>${s.overdue ? "ต้องติดตาม" : "ไม่มีรายการค้างกำหนด"}</small></div>
+      <div class="card stat">
+        <span>ยอดค้างรับ</span>
+        <strong>${money(s.due)}</strong>
+        <small>${s.active ? "มีรายการที่ยังไม่ครบ" : "ไม่มีรายการค้าง"}</small>
+      </div>
+      <div class="card stat">
+        <span>ลูกค้า</span>
+        <strong>${s.customers}</strong>
+        <small>${data.contracts.length} สัญญา</small>
+      </div>
     </div> 
     <div class="status-summary card">
-      <div><b>สถานะการชำระ</b><span>ค้างกำหนด ${s.overdue} · วันนี้ต้องเก็บ ${money(s.dueTodayAmount)}</span></div>
+      <div><b>สถานะการชำระ</b><span>ค้างกำหนด ${s.overdue} · ครบกำหนดวันนี้ ${s.dueToday}</span></div>
       <span class="summary-dot ${s.overdue ? "has-overdue" : ""}">${s.overdue ? "ต้องติดตาม" : "ปกติ"}</span>
     </div>
 
@@ -803,21 +894,15 @@ function dashboard() {
       </div>
       ${actionList()}
     </section>
-    <section class="section recent-section">
+
+    <section class="section">
       <div class="section-head">
         <div><div class="eyebrow">RECENT</div><h2>สัญญาล่าสุด</h2></div>
         <button class="text-btn" data-page="contracts">ทั้งหมด</button>
       </div>
-      <div class="recent-list">
-        ${recent.length
-          ? recent.map(contractCard).join("")
-          : emptyState("＋", "ยังไม่มีสัญญา", "กดปุ่ม + เพื่อเริ่มสร้างสัญญา")}
-      </div>
-      <div class="recent-add-row">
-        <button class="fab" id="fab" type="button" aria-label="เพิ่มสัญญา" aria-haspopup="dialog">
-          <span aria-hidden="true">+</span>
-        </button>
-      </div>
+      ${recent.length
+        ? recent.map(contractCard).join("")
+        : emptyState("＋", "ยังไม่มีสัญญา", "กดปุ่ม + เพื่อเริ่มสร้างสัญญา")}
     </section>
   </section>`;
 }
@@ -938,12 +1023,6 @@ function contracts() {
     ${all.length
       ? all.map(contractCard).join("")
       : emptyState("⌕", "ไม่พบสัญญา", contractQuery ? "ลองเปลี่ยนคำค้นหา" : "กดปุ่ม + เพื่อสร้างสัญญา")}
-
-    <div class="page-add-row">
-      <button class="fab page-fab" id="fab" type="button" aria-label="เพิ่มสัญญา" aria-haspopup="dialog">
-        <span aria-hidden="true">+</span>
-      </button>
-    </div>
   </section>`;
 }
 
@@ -972,12 +1051,6 @@ function customers() {
       ? list.map(customerCard).join("")
       : emptyState("＋", data.customers.length ? "ไม่พบลูกค้า" : "ยังไม่มีลูกค้า",
           data.customers.length ? "ลองเปลี่ยนคำค้นหา" : "กดปุ่ม + เพื่อเพิ่มลูกค้า")}
-
-    <div class="page-add-row">
-      <button class="fab page-fab" id="fab" type="button" aria-label="เพิ่มลูกค้า" aria-haspopup="dialog">
-        <span aria-hidden="true">+</span>
-      </button>
-    </div>
   </section>`;
 }
 
@@ -1007,14 +1080,14 @@ function settings() {
     <div class="card settings-card">
       <div class="eyebrow">DATA</div>
       <h2>ข้อมูลของคุณ</h2>
-      <p>PayNest เก็บข้อมูลไว้ในเครื่องนี้ด้วย LocalStorage และใช้ฐานข้อมูลชุดเดียวกันทุกหน้า</p>
+      <p>PAYPREMINIQ เก็บข้อมูลไว้ในเครื่องนี้ด้วย LocalStorage และใช้ฐานข้อมูลชุดเดียวกันทุกหน้า</p>
       <div class="data-summary">
         <div><b>${data.contracts.length}</b><span>สัญญา</span></div>
         <div><b>${data.customers.length}</b><span>ลูกค้า</span></div>
       </div>
       <div class="backup-note">
         <b>สำรองข้อมูลก่อนแก้ไขหรือเปลี่ยนเครื่อง</b>
-        <span>ไฟล์ JSON นี้เก็บสัญญา ลูกค้า และประวัติการรับชำระของ PayNest</span>
+        <span>ไฟล์ JSON นี้เก็บสัญญา ลูกค้า และประวัติการรับชำระของ PAYPREMINIQ</span>
       </div>
       <button class="wide-btn" id="export">⬇ สำรองข้อมูลลงเครื่อง</button>
       <button class="wide-btn" id="import">↥ กู้คืนข้อมูลจากไฟล์</button>
@@ -1023,7 +1096,7 @@ function settings() {
 
     <div class="card settings-card">
       <div class="eyebrow">APP</div>
-      <h2>PayNest v1</h2>
+      <h2>PAYPREMINIQ v1</h2>
       <p>สร้างสัญญาได้ทันที · ลูกค้าเป็นข้อมูลเสริม · รับชำระหลายครั้ง · ค้นหา/กรองรายการ · สำรองและกู้คืน JSON</p>
       <div class="version-line"><span>เวอร์ชัน</span><b>v1 Final</b></div>
     </div>
@@ -1036,21 +1109,6 @@ function emptyState(icon, title, text) {
     <b>${esc(title)}</b>
     <span>${esc(text)}</span>
   </div>`;
-}
-
-function allocateInitialPaymentHistory(contract, amount, date = localToday()) {
-  let remainingAmount = Math.max(0, Number(amount || 0));
-  const schedule = contractCore(contract)?.installments || [];
-  const payments = [];
-  for (const installment of schedule) {
-    if (remainingAmount <= 0.005) break;
-    const part = Math.min(remainingAmount, Number(installment.amount || 0));
-    if (part > 0) {
-      payments.push({id: uid(), amount: Math.round(part * 100) / 100, date, installmentNo: installment.no});
-      remainingAmount = Math.max(0, remainingAmount - part);
-    }
-  }
-  return payments;
 }
 
 function openContractModal(prefill = {}, editId = null) {
@@ -1254,19 +1312,17 @@ function openContractModal(prefill = {}, editId = null) {
       contract.status = getStatus(contract);
     } else {
       const received = Math.min(total, Math.max(0, Number(f.get("received") || 0)));
-      const newContract = {
+      data.contracts.unshift({
         id: uid(),
         ...updated,
-        received: 0,
+        received,
         startDate: localToday(),
-        status: "active",
-        payments: [],
+        status: received >= total ? "paid" : "active",
+        payments: received
+          ? [{id: uid(), amount: received, date: localToday()}]
+          : [],
         createdAt: new Date().toISOString()
-      };
-      newContract.payments = allocateInitialPaymentHistory(newContract, received);
-      newContract.received = received;
-      newContract.status = received >= total ? "paid" : "active";
-      data.contracts.unshift(newContract);
+      });
     }
 
     // Keep the linked customer record aligned with edits.
@@ -1467,10 +1523,6 @@ function openPaymentEdit(contractId, paymentId) {
         <strong>ยอดสัญญา ${money(contract.total)}</strong>
       </div>
 
-      <label>งวดที่รับเงิน
-        <input name="installmentNo" type="number" min="1" max="${Math.max(1, Number(contract.installments || 1))}" step="1" value="${Number(payment.installmentNo || 1)}" required>
-      </label>
-
       <label>เงินต้นที่รับ
         <input name="amount" type="number" min="0" step="0.01" value="${Number(payment.amount || 0)}" required>
       </label>
@@ -1503,7 +1555,6 @@ function openPaymentEdit(contractId, paymentId) {
       return;
     }
 
-    payment.installmentNo = Math.min(Math.max(1, Number(f.get("installmentNo") || 1)), Math.max(1, Number(contract.installments || 1)));
     payment.amount = Math.round(amount * 100) / 100;
     payment.penalty = Math.round(Math.max(0, Number(f.get("penalty") || 0)) * 100) / 100;
     payment.date = String(f.get("date") || localToday());
@@ -1519,8 +1570,6 @@ function openPaymentEdit(contractId, paymentId) {
 function openPayment(id) {
   const contract = data.contracts.find(c => c.id === id);
   if (!contract || getStatus(contract) === "paid") return;
-  const nextInstallment = contractCore(contract)?.nextInstallment;
-  const paymentLimit = Math.min(remaining(contract), Number(nextInstallment?.remaining || remaining(contract)));
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <form class="modal small" id="payForm">
@@ -1532,11 +1581,11 @@ function openPayment(id) {
       <div class="payment-summary">
         <b>${esc(contract.product)}</b>
         <span>${esc(contract.customerName || "ไม่ระบุลูกค้า")}</span>
-        <strong>งวด ${nextInstallment?.no || "-"} · เหลือ ${money(paymentLimit)}</strong>
+        <strong>คงเหลือ ${money(remaining(contract))}</strong>
       </div>
 
       <label>จำนวนเงิน
-        <input name="amount" type="number" min="0.01" max="${paymentLimit}" step="0.01" value="${paymentLimit}" required>
+        <input name="amount" type="number" min="0.01" max="${remaining(contract)}" step="0.01" value="${remaining(contract)}" required>
       </label>
 
       <label>วันที่รับเงิน
@@ -1550,15 +1599,17 @@ function openPayment(id) {
   $("#payForm").addEventListener("submit", event => {
     event.preventDefault();
     const f = new FormData(event.currentTarget);
-    const amount = Math.min(paymentLimit, Number(f.get("amount") || 0));
+    const amount = Math.min(remaining(contract), Number(f.get("amount") || 0));
     if (amount <= 0) return;
 
+    contract.received += amount;
     contract.payments = Array.isArray(contract.payments) ? contract.payments : [];
-    const next = contractCore(contract)?.nextInstallment;
     contract.payments.push({
-      id: uid(), amount, date: String(f.get("date") || localToday()), installmentNo: next?.no || 1
+      id: uid(),
+      amount,
+      date: String(f.get("date") || localToday())
     });
-    recalculateContractPayments(contract);
+    contract.status = getStatus(contract);
 
     $("#modalRoot").innerHTML = "";
     persist();
@@ -1794,7 +1845,7 @@ function openContractDetail(id) {
     ${payments.length
       ? `<div class="payment-list">${payments.map(p => `<div class="payment-row">
         <div>
-          <span>${fmtDate(p.date)} · งวด ${Number(p.installmentNo || 1)}</span>
+          <span>${fmtDate(p.date)}</span>
           <b>+ ${money(p.amount)}</b>
           ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
           ${p.note ? `<small>${esc(p.note)}</small>` : ""}
@@ -1885,12 +1936,12 @@ function openReceipt(contractId, paymentId) {
   $("#modalRoot").innerHTML = `<div class="overlay receipt-overlay">
     <div class="modal small receipt-modal">
       <div class="modal-head">
-        <div><div class="eyebrow">PAYNEST RECEIPT</div><h2>ใบเสร็จรับเงิน</h2></div>
+        <div><div class="eyebrow">PAYPREMINIQ RECEIPT</div><h2>ใบเสร็จรับเงิน</h2></div>
         <button type="button" class="icon-btn" data-close>×</button>
       </div>
 
       <div class="receipt-paper" id="receiptPaper">
-        <div class="receipt-brand">PAYNEST</div>
+        <div class="receipt-brand">PAYPREMINIQ</div>
         <div class="receipt-title">ใบเสร็จรับเงิน</div>
         <div class="receipt-meta"><span>เลขที่</span><b>${esc(receiptNo)}</b></div>
         <div class="receipt-meta"><span>วันที่รับเงิน</span><b>${esc(fmtDate(payment.date))}</b></div>
@@ -1906,7 +1957,7 @@ function openReceipt(contractId, paymentId) {
         <div class="receipt-row"><span>รับแล้วสะสม</span><b>${money(receivedAfter)}</b></div>
         <div class="receipt-row"><span>คงเหลือหลังรับเงิน</span><b>${money(balanceAfter)}</b></div>
 
-        <div class="receipt-thanks">ขอบคุณที่ใช้บริการ PAYNEST</div>
+        <div class="receipt-thanks">ขอบคุณที่ใช้บริการ PAYPREMINIQ</div>
       </div>
 
       <button type="button" class="primary-btn" id="printReceipt">พิมพ์ / บันทึกเป็น PDF</button>
@@ -1932,7 +1983,7 @@ function openReceipt(contractId, paymentId) {
 
 function exportJson(reason = "manual") {
   const payload = {
-    app: "PayNest",
+    app: "PAYPREMINIQ",
     backupVersion: 1,
     createdAt: new Date().toISOString(),
     reason,
@@ -1945,7 +1996,7 @@ function exportJson(reason = "manual") {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `paynest-backup-${localToday()}.json`;
+  link.download = `paypreminiq-backup-${localToday()}.json`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -1957,7 +2008,7 @@ document.addEventListener("click", event => {
   if (pageBtn) {
     page = pageBtn.dataset.page;
     render();
-    document.getElementById("app")?.scrollTo({top: 0, behavior: "smooth"});
+    scrollTo({top: 0, behavior: "smooth"});
     return;
   }
 
@@ -2058,13 +2109,13 @@ document.addEventListener("click", event => {
   }
 
   if (event.target.id === "reset") {
-    if (confirm("ล้างข้อมูล PayNest ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
+    if (confirm("ล้างข้อมูล PAYPREMINIQ ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
       data = resetData();
       // Keep Firestore consistent with the explicit local reset.
       if (currentUser()) {
         setCloudData(data).catch(error =>
-          console.warn("PayNest cloud reset sync skipped:", error)
+          console.warn("PAYPREMINIQ cloud reset sync skipped:", error)
         );
       }
       contractFilter = "active";
@@ -2105,9 +2156,9 @@ $("#importFile").addEventListener("change", async event => {
     const text = await file.text();
     const parsed = JSON.parse(text);
 
-    // New backup envelope stores the actual PayNest data under .data.
-    // Older PayNest backups stored the data directly, so keep both formats compatible.
-    const payload = parsed?.app === "PayNest" && parsed?.data ? parsed.data : parsed;
+    // New backup envelope stores the actual PAYPREMINIQ data under .data.
+    // Older PAYPREMINIQ backups stored the data directly, so keep both formats compatible.
+    const payload = (parsed?.app === "PAYPREMINIQ" || parsed?.app === "PayNest") && parsed?.data ? parsed.data : parsed;
 
     // Safety: save the current data before replacing it.
     exportJson("before-restore");
@@ -2127,7 +2178,7 @@ $("#importFile").addEventListener("change", async event => {
 });
 
 $("#topAction").addEventListener("click", () =>
-  document.getElementById("app")?.scrollTo({top: 0, behavior: "smooth"})
+  scrollTo({top: 0, behavior: "smooth"})
 );
 
 $("#themeToggle")?.addEventListener("click", toggleTheme);
@@ -2159,24 +2210,178 @@ render();
 
 
 /* ===================================
-   PayNest Core — SINGLE SOURCE OF TRUTH
+   PAYPREMINIQ Core Revision
+   Single source of truth for:
+   Customer / Contract / Installment / Payment
 =================================== */
-const PayNestCore = (() => {
-  const DAY=86400000, num=v=>{const n=Number(v);return Number.isFinite(n)?n:0;};
-  const dateOnly=v=>{if(!v)return null;const d=v instanceof Date?new Date(v):new Date(`${String(v).slice(0,10)}T00:00:00`);if(Number.isNaN(d.getTime()))return null;d.setHours(0,0,0,0);return d;};
-  const isoDate=v=>{const d=dateOnly(v);if(!d)return "";return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;};
-  const addDays=(v,n)=>{const d=dateOnly(v);if(!d)return null;d.setDate(d.getDate()+num(n));return d;};
-  const addMonths=(v,n)=>{const d=dateOnly(v);if(!d)return null;const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+num(n));d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));return d;};
-  const freq=t=>{const f=String(t||"monthly").toLowerCase();if(f==="daily"||f.includes("day")||f.includes("วัน"))return"daily";if(f==="weekly"||f.includes("week")||f.includes("สัปดาห์"))return"weekly";return"monthly";};
-  const installmentDate=(start,i,type)=>freq(type)==="daily"?addDays(start,i):freq(type)==="weekly"?addDays(start,i*7):addMonths(start,i);
-  const buildInstallments=c=>{const count=Math.max(1,Math.floor(num(c.installments||1))),total=Math.max(0,num(c.total)),base=Math.round(total/count*100)/100,start=c.dueDate||c.startDate||localToday();return Array.from({length:count},(_,i)=>({no:i+1,dueDate:isoDate(installmentDate(start,i,c.paymentType)),amount:i===count-1?Math.round((total-base*(count-1))*100)/100:base,paid:0,penalty:0,remaining:0,status:"pending"}));};
-  const classify=(x,today=new Date())=>{if(x.remaining<=.005)return"paid";const due=dateOnly(x.dueDate),now=dateOnly(today);if(!due||!now)return x.paid>0?"partial":"pending";const diff=Math.round((due-now)/DAY);if(diff<0)return x.paid>0?"overdue_partial":"overdue";if(x.paid>0)return"partial";if(diff<=3)return"due_soon";return"pending";};
-  const calculate=(contract,payments=[],today=new Date())=>{const items=buildInstallments(contract), map=new Map();for(const p of(Array.isArray(payments)?payments:[])){const no=Math.min(items.length,Math.max(1,Math.floor(num(p.installmentNo||p.installment||p.no||1))));const x=map.get(no)||{paid:0,penalty:0};x.paid+=Math.max(0,num(p.amount||p.paid));x.penalty+=Math.max(0,num(p.penalty));map.set(no,x);}let legacy=Math.max(0,num(contract.received));const hasPayments=Array.isArray(payments)&&payments.length>0;for(const x of items){const p=map.get(x.no);if(p){x.paid=Math.min(x.amount,p.paid);x.penalty=p.penalty;}else if(!hasPayments&&legacy>0){x.paid=Math.min(x.amount,legacy);legacy-=x.paid;}x.remaining=Math.max(0,Math.round((x.amount-x.paid)*100)/100);x.status=classify(x,today);}const paid=items.reduce((s,x)=>s+x.paid,0),penalty=items.reduce((s,x)=>s+x.penalty,0),total=items.reduce((s,x)=>s+x.amount,0),outstanding=Math.max(0,Math.round((total-paid)*100)/100);return{installments:items,total,paidPrincipal:paid,penalties:penalty,outstanding,nextInstallment:items.find(x=>x.remaining>.005)||null,overdue:items.filter(x=>x.status==="overdue"||x.status==="overdue_partial"),dueSoon:items.filter(x=>x.status==="due_soon"),dueToday:items.filter(x=>x.dueDate===isoDate(today)&&x.remaining>.005),isComplete:outstanding<=.005};};
-  const validatePayment=(i,a)=>{const amount=num(a),remaining=Math.max(0,num(i?.remaining));return{valid:amount>0&&remaining>0,amount,remaining,exceeds:amount>remaining+.005};};
-  return Object.freeze({buildInstallments,calculate,classify,validatePayment,isoDate});
-})();
-window.PayNestCore=PayNestCore;
 
-// Core is declared after the legacy event wiring so existing handlers remain intact.
-// Re-render once after initialization so the first visible frame uses the Core.
-render();
+const PayNestCore = (() => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const num = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    const dateOnly = (value) => {
+        const d = value instanceof Date ? new Date(value) : new Date(value);
+        if (Number.isNaN(d.getTime())) return null;
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
+
+    const isoDate = (value) => {
+        const d = dateOnly(value);
+        if (!d) return "";
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+    };
+
+    const addDays = (value, days) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        d.setDate(d.getDate() + num(days));
+        return d;
+    };
+
+    const addMonths = (value, months) => {
+        const d = dateOnly(value);
+        if (!d) return null;
+        const originalDay = d.getDate();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + num(months));
+        const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(originalDay, last));
+        return d;
+    };
+
+    const frequencyDays = (frequency) => {
+        const f = String(frequency || "").toLowerCase();
+        if (f.includes("day") || f.includes("วัน")) return 1;
+        if (f.includes("week") || f.includes("สัปดาห์")) return 7;
+        if (f.includes("2") && (f.includes("week") || f.includes("สัปดาห์"))) return 14;
+        return null;
+    };
+
+    const installmentDate = (start, index, frequency) => {
+        const i = Math.max(0, num(index));
+        const days = frequencyDays(frequency);
+        if (days) return addDays(start, i * days);
+        return addMonths(start, i);
+    };
+
+    const buildInstallments = (contract) => {
+        const total = Math.max(0, Math.round(num(contract.months)));
+        const monthly = num(contract.monthly);
+        const start = contract.startDate || contract.start || contract.due;
+        const frequency = contract.frequency || contract.type || "monthly";
+        const items = [];
+
+        for (let i = 0; i < total; i++) {
+            const due = installmentDate(start, i, frequency);
+            items.push({
+                no: i + 1,
+                dueDate: isoDate(due),
+                amount: monthly,
+                paid: 0,
+                penalty: 0,
+                remaining: monthly,
+                status: "pending"
+            });
+        }
+        return items;
+    };
+
+    const classify = (installment, today = new Date()) => {
+        const due = dateOnly(installment.dueDate);
+        const now = dateOnly(today);
+        const paid = num(installment.paid);
+        const amount = num(installment.amount);
+        const remaining = Math.max(0, amount - paid);
+
+        if (remaining <= 0) return "paid";
+        if (!due) return paid > 0 ? "partial" : "pending";
+
+        const diff = Math.round((due - now) / DAY);
+        if (diff < 0) return paid > 0 ? "overdue_partial" : "overdue";
+        if (paid > 0) return "partial";
+        if (diff <= 3) return "due_soon";
+        return "pending";
+    };
+
+    const summarizePayments = (payments = []) => {
+        const map = new Map();
+        for (const payment of payments) {
+            const no = num(payment.installmentNo || payment.installment || payment.no);
+            if (!no) continue;
+            const current = map.get(no) || { paid: 0, penalty: 0 };
+            current.paid += num(payment.amount || payment.paid);
+            current.penalty += num(payment.penalty);
+            map.set(no, current);
+        }
+        return map;
+    };
+
+    const calculate = (contract, payments = [], today = new Date()) => {
+        const installments = buildInstallments(contract);
+        const paymentMap = summarizePayments(payments);
+
+        // Apply payment history to its exact installment.
+        for (const item of installments) {
+            const p = paymentMap.get(item.no) || { paid: 0, penalty: 0 };
+            item.paid = Math.min(item.amount, p.paid);
+            item.penalty = p.penalty;
+            item.remaining = Math.max(0, item.amount - item.paid);
+            item.status = classify(item, today);
+        }
+
+        const paidPrincipal = installments.reduce((s, x) => s + x.paid, 0);
+        const penalties = installments.reduce((s, x) => s + x.penalty, 0);
+        const total = installments.reduce((s, x) => s + x.amount, 0);
+        const outstanding = Math.max(0, total - paidPrincipal);
+
+        const next = installments.find(x => x.remaining > 0) || null;
+        const overdue = installments.filter(x => x.status === "overdue" || x.status === "overdue_partial");
+        const dueSoon = installments.filter(x => x.status === "due_soon");
+
+        const todayKey = isoDate(today);
+        const dueToday = installments.filter(x => x.dueDate === todayKey && x.remaining > 0);
+
+        return {
+            installments,
+            total,
+            paidPrincipal,
+            penalties,
+            outstanding,
+            nextInstallment: next,
+            overdue,
+            dueSoon,
+            dueToday,
+            isComplete: outstanding <= 0
+        };
+    };
+
+    const validatePayment = (installment, amount) => {
+        const value = num(amount);
+        const remaining = Math.max(0, num(installment.amount) - num(installment.paid));
+        return {
+            valid: value > 0 && remaining > 0,
+            amount: value,
+            remaining,
+            exceeds: value > remaining
+        };
+    };
+
+    return Object.freeze({
+        buildInstallments,
+        calculate,
+        classify,
+        validatePayment,
+        isoDate
+    });
+})();
+
+/* Backward-compatible global access for existing UI code. */
+window.PayNestCore = PayNestCore;

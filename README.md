@@ -1,11 +1,11 @@
-# PayNest – Smart Installment Manager
+# PAYPREMINIQ – Smart Payment Intelligence
 
-โครงสร้างนี้เป็นชุดไฟล์ที่ใช้งานจริงของ PayNest โดยตัดไฟล์ซ้ำ ไฟล์เก่า และไฟล์ที่ไม่ได้ถูกเรียกใช้ออกจาก ZIP แล้ว
+โครงสร้างนี้เป็นชุดไฟล์ที่ใช้งานจริงของ PAYPREMINIQ โดยตัดไฟล์ซ้ำ ไฟล์เก่า และไฟล์ที่ไม่ได้ถูกเรียกใช้ออกจาก ZIP แล้ว
 
 ## โครงสร้าง
 
 ```text
-PayNest/
+PAYPREMINIQ/
 ├── index.html
 ├── style.css
 ├── app.js
@@ -49,7 +49,7 @@ Firebase, LocalStorage และ PWA ที่ใช้งานจริงถ�
 - ไม่ได้เปลี่ยนข้อมูลธุรกิจหรือโครงสร้างข้อมูลของผู้ใช้ในรอบการตัดไฟล์นี้
 
 
-## PayNest Core Revision
+## PAYPREMINIQ Core Revision
 
 This revision introduces a single `PayNestCore` calculation layer in `app.js` for installment dates, installment status, payment-to-installment mapping, outstanding balances, due-soon/overdue classification, and payment validation.
 

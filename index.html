@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#040406">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="PayNest – Smart Installment Manager ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
-<meta name="application-name" content="PayNest">
+<meta name="description" content="PAYPREMINIQ – Smart Payment Intelligence ระบบจัดการสัญญาผ่อนชำระและติดตามการชำระเงิน">
+<meta name="application-name" content="PAYPREMINIQ">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<title>PayNest – Smart Installment Manager</title>
+<title>PAYPREMINIQ – Smart Payment Intelligence</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,16 +32,16 @@
   =============================== -->
   <header class="topbar" role="banner">
     <div class="brand-lockup">
-      <img class="app-logo" src="./icon-192.png" alt="PayNest">
+      <img class="app-logo" src="./icon-192.png" alt="PAYPREMINIQ">
       <div>
-        <div class="brand">PAYNEST</div>
+        <div class="brand">PAYPREMINIQ</div>
         <h1 id="pageTitle">ภาพรวม</h1>
       </div>
     </div>
 
-    <div class="top-actions">
-      <button class="icon-btn" id="cloudAccount" type="button" aria-label="เข้าสู่ระบบ PayNest Cloud" title="เข้าสู่ระบบ PayNest Cloud">☁</button>
-      <button class="icon-btn" id="installApp" type="button" aria-label="ติดตั้ง PayNest" title="ติดตั้ง PayNest" hidden>⇩</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="icon-btn" id="cloudAccount" type="button" aria-label="เข้าสู่ระบบ PAYPREMINIQ Cloud" title="เข้าสู่ระบบ PAYPREMINIQ Cloud">☁</button>
+      <button class="icon-btn" id="installApp" type="button" aria-label="ติดตั้ง PAYPREMINIQ" title="ติดตั้ง PAYPREMINIQ" hidden>⇩</button>
       <button class="icon-btn" id="themeToggle" type="button" aria-label="เปลี่ยนโหมดสี" title="เปลี่ยนโหมดสี">☀</button>
       <button
         class="icon-btn"
@@ -57,6 +57,20 @@
        MAIN VIEW
   =============================== -->
   <main id="view" role="main" tabindex="-1"></main>
+
+  <!-- ==============================
+       FLOATING ACTION BUTTON
+  =============================== -->
+  <button
+    class="fab"
+    id="fab"
+    type="button"
+    aria-label="เพิ่มรายการ"
+    aria-haspopup="dialog"
+  >
+    <span aria-hidden="true">+</span>
+    <small id="fabLabel">สัญญา</small>
+  </button>
 
   <!-- ==============================
        BOTTOM NAVIGATION
@@ -102,7 +116,7 @@
 
 <noscript>
   <div style="padding:24px;font-family:sans-serif;background:#09090a;color:#fff;min-height:100vh">
-    PayNest ต้องเปิดใช้งาน JavaScript เพื่อให้ระบบทำงานได้ครบถ้วน
+    PAYPREMINIQ ต้องเปิดใช้งาน JavaScript เพื่อให้ระบบทำงานได้ครบถ้วน
   </div>
 </noscript>
 
