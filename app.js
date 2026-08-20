@@ -1937,12 +1937,34 @@ function exportJson(reason = "manual") {
   setTimeout(() => URL.revokeObjectURL(url), 500);
 }
 
+function navigateTo(nextPage) {
+  const allowed = ["dashboard", "contracts", "customers", "settings"];
+  if (!allowed.includes(nextPage)) return;
+
+  page = nextPage;
+  render();
+
+  // Navigation is global; always scroll the actual document, not #view.
+  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+  const active = document.querySelector(`.nav-item[data-page="${nextPage}"]`);
+  active?.focus({ preventScroll: true });
+}
+
+// Explicit navigation listeners keep the four main buttons reliable even
+// when #view is re-rendered. This is intentionally independent from data.
+document.querySelectorAll(".bottom-nav .nav-item[data-page]").forEach(button => {
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    navigateTo(button.dataset.page);
+  });
+});
+
 document.addEventListener("click", event => {
   const pageBtn = event.target.closest("[data-page]");
-  if (pageBtn) {
-    page = pageBtn.dataset.page;
-    render();
-    scrollTo({top: 0, behavior: "smooth"});
+  if (pageBtn && !pageBtn.closest(".bottom-nav")) {
+    navigateTo(pageBtn.dataset.page);
     return;
   }
 
@@ -2022,8 +2044,9 @@ document.addEventListener("click", event => {
   }
 
   if (event.target.closest("#fab")) {
+    event.preventDefault();
     if (page === "customers") openCustomerForm();
-    else openContractModal();
+    else if (page === "contracts" || page === "dashboard") openContractModal();
     return;
   }
 
