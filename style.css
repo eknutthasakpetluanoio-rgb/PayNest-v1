@@ -489,3 +489,176 @@ html.light .nav-bar{
     0 18px 40px rgba(70,80,100,.16),
     inset 0 1px 0 rgba(255,255,255,.80);
 }
+
+/* =========================================================
+   PAYNEST MOBILE SCROLL LAYOUT — REFERENCE UI
+   Header, content, add button and bottom navigation all
+   belong to the document flow. Nothing is viewport-fixed.
+   ========================================================= */
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100%;
+}
+
+.topbar {
+  position: relative !important;
+  top: auto !important;
+  z-index: 10;
+}
+
+.top-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+#view {
+  overflow: visible;
+}
+
+.page {
+  padding-bottom: 28px;
+}
+
+/* The + button sits at the end of the Recent contracts list,
+   on the right side, exactly as in the supplied reference. */
+.recent-add-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 60px;
+  padding: 4px 0 4px;
+}
+
+.recent-add-row .fab {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+
+.bottom-nav {
+  position: relative !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 10;
+  width: calc(100% - 20px);
+  margin: 10px auto max(8px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* Give the whole page the breathing room seen in the reference. */
+#app {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .bottom-nav {
+    width: min(520px, calc(100% - 40px));
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .recent-add-row .fab {
+    width: 50px;
+    height: 50px;
+    flex-basis: 50px;
+  }
+  .bottom-nav {
+    width: calc(100% - 12px);
+    margin-bottom: 5px;
+  }
+}
+
+/* =========================================================
+   PAYNEST MOBILE SCROLL LAYOUT — REFERENCE UI
+   Header, content, add button and bottom navigation all
+   belong to the document flow. Nothing is viewport-fixed.
+   ========================================================= */
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100%;
+}
+
+.topbar {
+  position: relative !important;
+  top: auto !important;
+  z-index: 10;
+}
+
+.top-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+#view {
+  overflow: visible;
+}
+
+.page {
+  padding-bottom: 28px;
+}
+
+.recent-add-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 60px;
+  padding: 4px 0 4px;
+}
+
+.recent-add-row .fab {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+
+.bottom-nav {
+  position: relative !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 10;
+  width: calc(100% - 20px);
+  margin: 10px auto max(8px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+#app {
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .bottom-nav {
+    width: min(520px, calc(100% - 40px));
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .recent-add-row .fab {
+    width: 50px;
+    height: 50px;
+    flex-basis: 50px;
+  }
+  .bottom-nav {
+    width: calc(100% - 12px);
+    margin-bottom: 5px;
+  }
+}

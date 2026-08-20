@@ -751,9 +751,6 @@ function render() {
     button.classList.toggle("active", button.dataset.page === page)
   );
 
-  const showFab = page !== "settings";
-  $("#fab").style.display = showFab ? "flex" : "none";
-  $("#fabLabel").textContent = page === "customers" ? "ลูกค้า" : "สัญญา";
 
   $("#view").innerHTML =
     page === "dashboard" ? dashboard() :
@@ -806,15 +803,21 @@ function dashboard() {
       </div>
       ${actionList()}
     </section>
-
-    <section class="section">
+    <section class="section recent-section">
       <div class="section-head">
         <div><div class="eyebrow">RECENT</div><h2>สัญญาล่าสุด</h2></div>
         <button class="text-btn" data-page="contracts">ทั้งหมด</button>
       </div>
-      ${recent.length
-        ? recent.map(contractCard).join("")
-        : emptyState("＋", "ยังไม่มีสัญญา", "กดปุ่ม + เพื่อเริ่มสร้างสัญญา")}
+      <div class="recent-list">
+        ${recent.length
+          ? recent.map(contractCard).join("")
+          : emptyState("＋", "ยังไม่มีสัญญา", "กดปุ่ม + เพื่อเริ่มสร้างสัญญา")}
+      </div>
+      <div class="recent-add-row">
+        <button class="fab" id="fab" type="button" aria-label="เพิ่มสัญญา" aria-haspopup="dialog">
+          <span aria-hidden="true">+</span>
+        </button>
+      </div>
     </section>
   </section>`;
 }
@@ -1937,34 +1940,12 @@ function exportJson(reason = "manual") {
   setTimeout(() => URL.revokeObjectURL(url), 500);
 }
 
-function navigateTo(nextPage) {
-  const allowed = ["dashboard", "contracts", "customers", "settings"];
-  if (!allowed.includes(nextPage)) return;
-
-  page = nextPage;
-  render();
-
-  // Navigation is global; always scroll the actual document, not #view.
-  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-
-  const active = document.querySelector(`.nav-item[data-page="${nextPage}"]`);
-  active?.focus({ preventScroll: true });
-}
-
-// Explicit navigation listeners keep the four main buttons reliable even
-// when #view is re-rendered. This is intentionally independent from data.
-document.querySelectorAll(".bottom-nav .nav-item[data-page]").forEach(button => {
-  button.addEventListener("click", event => {
-    event.preventDefault();
-    event.stopPropagation();
-    navigateTo(button.dataset.page);
-  });
-});
-
 document.addEventListener("click", event => {
   const pageBtn = event.target.closest("[data-page]");
-  if (pageBtn && !pageBtn.closest(".bottom-nav")) {
-    navigateTo(pageBtn.dataset.page);
+  if (pageBtn) {
+    page = pageBtn.dataset.page;
+    render();
+    scrollTo({top: 0, behavior: "smooth"});
     return;
   }
 
@@ -2044,9 +2025,8 @@ document.addEventListener("click", event => {
   }
 
   if (event.target.closest("#fab")) {
-    event.preventDefault();
     if (page === "customers") openCustomerForm();
-    else if (page === "contracts" || page === "dashboard") openContractModal();
+    else openContractModal();
     return;
   }
 
