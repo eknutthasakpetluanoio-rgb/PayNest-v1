@@ -372,3 +372,129 @@ body{
   .nav-item small{font-size:10px}
   .modal input,.modal select,.modal textarea{font-size:14px}
 }
+
+/* =========================================================
+   PAYPREMINIQ — iOS LIGHT / LIQUID GLASS PREVIEW
+   UI + Style only. No business/auth/data logic changed.
+========================================================= */
+:root{
+  --bg:#F2F2F7;
+  --text:#1C1C1E;
+  --muted:#6E6E73;
+  --line:rgba(60,60,67,.16);
+  --glass:rgba(255,255,255,.58);
+  --glass2:rgba(255,255,255,.42);
+  --ios-blue:#007AFF;
+  --ios-secondary:#6E6E73;
+  --ios-tertiary:#8E8E93;
+  --ios-edge:rgba(60,60,67,.14);
+  --fab-glass:rgba(255,255,255,.62);
+}
+html{background:#F2F2F7;color-scheme:light}
+body{
+  color:var(--text);
+  background:
+    radial-gradient(520px 360px at 8% -5%,rgba(0,122,255,.10),transparent 68%),
+    radial-gradient(520px 360px at 94% 8%,rgba(175,82,222,.08),transparent 68%),
+    linear-gradient(180deg,#F7F7FA 0%,#F2F2F7 52%,#ECECF1 100%);
+}
+body::before{
+  background:
+    radial-gradient(360px 260px at 20% 35%,rgba(255,255,255,.72),transparent 72%),
+    radial-gradient(420px 280px at 80% 68%,rgba(255,255,255,.48),transparent 72%);
+}
+.topbar{
+  background:rgba(242,242,247,.62)!important;
+  border-bottom-color:rgba(60,60,67,.10)!important;
+  box-shadow:0 8px 28px rgba(60,60,67,.08)!important;
+  backdrop-filter:blur(28px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+}
+.brand,.eyebrow{color:#8E8E93!important}
+.topbar h1{color:#1C1C1E!important}
+.icon-btn{
+  color:#1C1C1E!important;
+  background:rgba(255,255,255,.56)!important;
+  border-color:rgba(60,60,67,.13)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 8px 22px rgba(60,60,67,.12)!important;
+}
+.subtle,.hero-meta,.stat span,.stat small,.task-main span,.task-main small,
+.contract-title-copy span,.contract-top span:not(.pill),.progress-meta,
+.contract-info,.contract-bottom{color:#6E6E73!important}
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,
+.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,
+.payment-row{
+  border-color:rgba(60,60,67,.12)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,255,255,.42))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 14px 34px rgba(60,60,67,.10)!important;
+  backdrop-filter:blur(28px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(175%)!important;
+}
+.hero-number{color:#1C1C1E!important}
+.section-head h2,.page-heading h2{color:#1C1C1E!important}
+.text-btn{color:#007AFF!important}
+.today-chip,.count,.pill{
+  color:#3A3A3C!important;
+  background:rgba(255,255,255,.55)!important;
+  border-color:rgba(60,60,67,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.tabs{background:rgba(118,118,128,.12)!important}
+.tab{color:#6E6E73!important}
+.tab.active{background:rgba(255,255,255,.88)!important;color:#1C1C1E!important;border-color:rgba(60,60,67,.08)!important;box-shadow:0 4px 12px rgba(60,60,67,.12)!important}
+.search-wrap input{color:#1C1C1E!important}
+.search-wrap input::placeholder{color:#8E8E93!important}
+.contract-card{border-color:rgba(60,60,67,.12)!important}
+.contract-title-copy h3,.contract-top h3,.task-main b,.customer-main b{color:#1C1C1E!important}
+.progress{background:rgba(118,118,128,.14)!important}
+.progress i{background:linear-gradient(90deg,#007AFF,#5AC8FA)!important;box-shadow:0 0 12px rgba(0,122,255,.18)!important}
+.contract-bottom{border-top-color:rgba(60,60,67,.10)!important}
+.mini-btn,.wide-btn{
+  color:#1C1C1E!important;
+  border-color:rgba(60,60,67,.12)!important;
+  background:rgba(255,255,255,.58)!important;
+}
+.primary-mini,.primary-btn{background:#007AFF!important;color:#fff!important;border-color:#007AFF!important}
+.product-thumb,.avatar{background:rgba(255,255,255,.48)!important;border-color:rgba(60,60,67,.10)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 7px 16px rgba(60,60,67,.10)!important}
+.empty{color:#6E6E73!important}
+.empty b{color:#1C1C1E!important}
+.empty span{color:#8E8E93!important}
+.settings-card h2{color:#1C1C1E!important}
+.settings-card p{color:#6E6E73!important}
+.data-summary div{background:rgba(255,255,255,.48)!important;border-color:rgba(60,60,67,.10)!important}
+.data-summary span{color:#8E8E93!important}
+.bottom-nav{
+  background:rgba(255,255,255,.64)!important;
+  border-color:rgba(60,60,67,.13)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 20px 46px rgba(60,60,67,.16)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+}
+.nav-item{color:#8E8E93!important}
+.nav-item.active{color:#007AFF!important;background:rgba(0,122,255,.09)!important;border-color:rgba(0,122,255,.10)!important;box-shadow:none!important}
+.fab{
+  color:#1C1C1E!important;
+  background:rgba(255,255,255,.70)!important;
+  border-color:rgba(60,60,67,.14)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 16px 34px rgba(60,60,67,.18)!important;
+  backdrop-filter:blur(24px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+}
+.fab::after{background:rgba(255,255,255,.55)!important}
+.modal{
+  color:#1C1C1E!important;
+  border-color:rgba(60,60,67,.14)!important;
+  background:rgba(250,250,252,.82)!important;
+  box-shadow:0 24px 60px rgba(60,60,67,.20)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+}
+.modal h2{color:#1C1C1E!important}
+.modal label,.form-group-label{color:#3A3A3C!important}
+.modal input,.modal select,.modal textarea{color:#1C1C1E!important;background:rgba(255,255,255,.62)!important;border-color:rgba(60,60,67,.14)!important}
+.modal input::placeholder,.modal textarea::placeholder{color:#8E8E93!important}
+.auth-reset-btn{color:#007AFF!important}
+.installment-summary,.installment-row,.payment-row{background:rgba(255,255,255,.52)!important;color:#1C1C1E!important;border-color:rgba(60,60,67,.12)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 10px 24px rgba(60,60,67,.09)!important}
+.installment-main b,.installment-side strong{color:#1C1C1E!important}
+.installment-main span,.installment-main small,.installment-side span{color:#6E6E73}
+.payment-installment-badge{background:rgba(118,118,128,.10)!important;border-color:rgba(60,60,67,.10)!important;color:#3A3A3C!important}
