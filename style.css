@@ -201,3 +201,174 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 }
 
 .auth-reset-btn{display:block;width:100%;margin:10px 0 0;border:0;background:transparent;color:#d9dbe2;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}.auth-reset-btn:active{opacity:.7}.auth-status{min-height:20px}
+
+/* =========================================================
+   PAYPREMINIQ — iOS TYPOGRAPHY + LIQUID GLASS UI PASS
+   UI/STYLE ONLY — no application logic changes
+========================================================= */
+:root{
+  --ios-text:#f5f5f7;
+  --ios-secondary:rgba(235,235,245,.70);
+  --ios-tertiary:rgba(235,235,245,.48);
+  --ios-glass:rgba(255,255,255,.055);
+  --ios-glass-strong:rgba(255,255,255,.075);
+  --ios-edge:rgba(255,255,255,.115);
+  --ios-highlight:rgba(255,255,255,.14);
+}
+
+body{
+  font-size:15px;
+  line-height:1.45;
+  letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* iOS-like type hierarchy: readable first, compact metadata second. */
+.brand{font-size:9px;line-height:1;letter-spacing:2.6px;font-weight:700}
+.eyebrow{font-size:10px;line-height:1.2;letter-spacing:1.8px;font-weight:600;color:var(--ios-tertiary)}
+.topbar h1{font-size:19px;line-height:1.2;font-weight:600;letter-spacing:-.45px}
+.subtle{font-size:13px;line-height:1.45;color:var(--ios-secondary)}
+
+.page-heading h2,.section-head h2{font-size:20px;line-height:1.25;font-weight:600;letter-spacing:-.35px}
+.text-btn{font-size:13px;line-height:1.3;font-weight:600}
+
+.hero-number{font-size:36px;line-height:1.02;font-weight:700;letter-spacing:-1.35px}
+.hero-meta{font-size:12px;line-height:1.35;color:var(--ios-tertiary)}
+.stat span{font-size:12px;line-height:1.35;color:var(--ios-secondary)}
+.stat strong{font-size:20px;line-height:1.15;font-weight:600;letter-spacing:-.35px}
+.stat small{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
+.status-summary{font-size:13px;line-height:1.35}
+.status-summary>div span{font-size:11px;line-height:1.35}
+.summary-dot{font-size:11px;font-weight:600}
+
+.task-main b{font-size:14px;line-height:1.3;font-weight:600}
+.task-main span,.task-main small{font-size:12px;line-height:1.4}
+.task-right strong{font-size:14px;line-height:1.25;font-weight:600}
+.status-text{font-size:11px;line-height:1.3}
+
+/* Cards use a lighter, layered glass instead of opaque dark blocks. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row{
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.038) 55%,rgba(255,255,255,.022));
+  border-color:var(--ios-edge);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 12px 30px rgba(0,0,0,.24);
+  backdrop-filter:blur(30px) saturate(170%);
+  -webkit-backdrop-filter:blur(30px) saturate(170%);
+}
+
+.today-chip,.count,.pill{
+  font-size:11px;
+  line-height:1.25;
+  font-weight:500;
+  padding:7px 10px;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.105);
+  color:var(--ios-secondary);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+}
+
+.tabs{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
+.tab{font-size:13px;line-height:1.2;font-weight:500;padding:9px 12px;color:var(--ios-tertiary)}
+.tab.active{background:rgba(255,255,255,.88);color:#111216;border-color:rgba(255,255,255,.72);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+
+.search-wrap{background:rgba(255,255,255,.048);border-color:rgba(255,255,255,.10)}
+.search-wrap>span{font-size:17px;color:var(--ios-tertiary)}
+.search-wrap input{font-size:14px;line-height:1.4;padding:12px 0}
+.search-wrap input::placeholder{color:rgba(235,235,245,.38)}
+
+.contract-card{background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.032) 60%,rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 12px 28px rgba(0,0,0,.23);backdrop-filter:blur(28px) saturate(165%);-webkit-backdrop-filter:blur(28px) saturate(165%)}
+.contract-title-copy h3,.contract-top h3{font-size:15px;line-height:1.3;font-weight:600;letter-spacing:-.2px}
+.contract-title-copy span,.contract-top span:not(.pill){font-size:12px;line-height:1.35;color:var(--ios-tertiary)}
+.progress-meta{font-size:11px;line-height:1.3}
+.contract-info{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
+.contract-bottom{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
+
+.mini-btn,.wide-btn{font-size:13px;line-height:1.25;font-weight:600}
+.paid-label{font-size:12px}
+
+.customer-main b{font-size:15px;line-height:1.3;font-weight:600}
+.customer-main span{font-size:12px;line-height:1.35;color:var(--ios-secondary)}
+.customer-main small{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
+
+.empty b{font-size:15px;line-height:1.35;font-weight:600}
+.empty span{font-size:12px;line-height:1.45}
+
+.settings-card h2{font-size:20px;line-height:1.25;font-weight:600}
+.settings-card p{font-size:13px;line-height:1.55}
+.data-summary b{font-size:17px;font-weight:600}
+.data-summary span{font-size:11px;line-height:1.35}
+.version-line{font-size:11px;line-height:1.35}
+
+/* Modal typography follows iOS sheets: clear title, comfortable labels, compact helper text. */
+.overlay{background:rgba(0,0,0,.56);backdrop-filter:blur(18px) saturate(120%);-webkit-backdrop-filter:blur(18px) saturate(120%)}
+.modal{background:linear-gradient(145deg,rgba(30,32,38,.84),rgba(17,19,24,.76));border-color:rgba(255,255,255,.12);box-shadow:0 -24px 60px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(34px) saturate(170%);-webkit-backdrop-filter:blur(34px) saturate(170%)}
+.modal h2{font-size:21px;line-height:1.25;font-weight:600;letter-spacing:-.35px}
+.modal label,.form-group-label{font-size:13px;line-height:1.35;font-weight:500;color:var(--ios-secondary)}
+.modal input,.modal select,.modal textarea{font-size:15px;line-height:1.4;background:rgba(255,255,255,.052);border-color:rgba(255,255,255,.105);padding:12px 13px}
+.modal input::placeholder,.modal textarea::placeholder{color:rgba(235,235,245,.36)}
+.form-note b{font-size:13px;line-height:1.35;font-weight:600}
+.form-note span{font-size:12px;line-height:1.5;color:var(--ios-tertiary)}
+.form-total{font-size:13px;line-height:1.35}
+.primary-btn{font-size:15px;line-height:1.3;font-weight:600;padding:13px}
+
+.payment-summary span{font-size:11px;line-height:1.35}
+.payment-summary strong{font-size:20px;line-height:1.2;font-weight:600}
+.customer-detail span,.detail-grid span{font-size:11px;line-height:1.35}
+.customer-detail b,.detail-grid b{font-size:13px;line-height:1.35;font-weight:600}
+.note-box,.subtle-box{font-size:12px;line-height:1.55}
+.modal-section-title{font-size:13px;line-height:1.35;font-weight:600}
+.detail-status strong{font-size:20px;line-height:1.2;font-weight:600}
+
+.installment-summary span{font-size:11px;line-height:1.35}
+.installment-summary b{font-size:13px;line-height:1.3;font-weight:600}
+.installment-summary>strong{font-size:17px;line-height:1.2;font-weight:600}
+.installment-main b{font-size:14px;line-height:1.3;font-weight:600}
+.installment-main span{font-size:11px;line-height:1.35}
+.installment-main small{font-size:10px;line-height:1.35}
+.installment-side strong{font-size:14px;line-height:1.25;font-weight:600}
+.installment-side span{font-size:11px;line-height:1.3}
+.payment-installment-badge{font-size:11px;line-height:1.25;font-weight:600}
+.payment-row>div:first-child span{font-size:11px}
+.payment-row>div:first-child b{font-size:13px;font-weight:600}
+.payment-row>div:first-child small{font-size:10px}
+
+.product-image-copy b{font-size:12px;line-height:1.35}
+.product-image-copy span{font-size:10px;line-height:1.35}
+.file-btn{font-size:12px!important;line-height:1.25!important}
+.auth-reset-btn{font-size:13px;line-height:1.35;font-weight:500;color:var(--ios-secondary)}
+
+/* Shared glass material for fixed controls. */
+.topbar,.bottom-nav,.fab,.icon-btn{
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.035) 58%,rgba(255,255,255,.022));
+  border-color:rgba(255,255,255,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 38px rgba(0,0,0,.30);
+  backdrop-filter:blur(28px) saturate(175%);
+  -webkit-backdrop-filter:blur(28px) saturate(175%);
+}
+.nav-item span{font-size:20px;line-height:1}
+.nav-item small{font-size:11px;line-height:1.15;font-weight:500}
+.fab span{font-size:28px;font-weight:300}
+.fab small{font-size:10px;line-height:1;font-weight:600}
+
+/* Keep touch targets comfortable while text itself stays visually restrained. */
+.text-btn,.mini-btn,.wide-btn,.tab{min-height:42px}
+.icon-btn{font-size:17px}
+
+@media(max-width:600px){
+  body{font-size:15px}
+  .page{padding-top:16px}
+  .hero-number{font-size:34px}
+  .page-heading h2,.section-head h2{font-size:19px}
+}
+
+@media(max-width:380px){
+  .brand{font-size:8px;letter-spacing:2.2px}
+  .topbar h1{font-size:18px}
+  .hero-number{font-size:32px}
+  .section-head h2,.page-heading h2{font-size:18px}
+  .contract-title-copy h3,.contract-top h3{font-size:14px}
+  .customer-main b{font-size:14px}
+  .nav-item small{font-size:10px}
+  .modal input,.modal select,.modal textarea{font-size:14px}
+}
