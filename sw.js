@@ -1,5 +1,5 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v13-recovery-safe-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v13-js-safe-20260821";
 
 const APP_SHELL = [
   "./",

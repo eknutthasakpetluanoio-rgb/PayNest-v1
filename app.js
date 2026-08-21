@@ -6,25 +6,14 @@
    so the project remains exactly six files.
 ========================================================= */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+(async function bootPaypreminiq(){
 
-/* ---------- Firebase ---------- */
-
+/* ---------- Firebase (safe lazy bootstrap) ----------
+   Firebase must never be allowed to prevent the UI from booting.
+   GitHub Pages can temporarily fail to load a remote module; in that case
+   PAYPREMINIQ remains usable from its local data and cloud features are
+   simply disabled until the page is reloaded.
+--------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCGc0iB3dZe_CZe8vLfEuPwgnn5XCgI5gs",
   authDomain: "paynest-cloud.firebaseapp.com",
@@ -34,9 +23,38 @@ const firebaseConfig = {
   appId: "1:469151372030:web:625320d22038fe42484baf"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
+let firebaseReady = false;
+let firebaseError = null;
+let auth = { currentUser: null };
+let db = null;
+let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword;
+let createUserWithEmailAndPassword, signOut, getFirestore, doc, getDoc;
+let setDoc, onSnapshot, serverTimestamp;
+
+try {
+  const [appMod, authMod, firestoreMod] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+  ]);
+
+  ({ initializeApp } = appMod);
+  ({ getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+     createUserWithEmailAndPassword, signOut } = authMod);
+  ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  auth = getAuth(firebaseApp);
+  db = getFirestore(firebaseApp);
+  firebaseReady = true;
+} catch (error) {
+  firebaseError = error;
+  console.warn("PAYPREMINIQ: Firebase unavailable; local mode enabled.", error);
+  onAuthStateChanged = callback => { callback(null); return () => {}; };
+  signInWithEmailAndPassword = async () => { throw new Error("Firebase ยังไม่พร้อมใช้งาน"); };
+  createUserWithEmailAndPassword = async () => { throw new Error("Firebase ยังไม่พร้อมใช้งาน"); };
+  signOut = async () => {};
+}
 
 /* ---------- Local Storage ---------- */
 
@@ -183,7 +201,7 @@ function currentUser() {
 
 function userDocumentRef() {
   const user = currentUser();
-  return user ? doc(db, "users", user.uid) : null;
+  return firebaseReady && db && user ? doc(db, "users", user.uid) : null;
 }
 
 async function getCloudData() {
@@ -1829,18 +1847,18 @@ function openContractDetail(id) {
       ? `<div class="payment-list">${payments.map((p, index) => {
           const installmentNo = Number(p.installmentNo || p.installment || p.no || 0) || (payments.length - index);
           return `<div class="payment-row">
-        <div>
-          <span>งวด ${installmentNo} · ${fmtDate(p.date)}</span>
-          <b>+ ${money(p.amount)}</b>
-          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
-          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
-        </div>
-        <div class="payment-row-actions">`
+            <div>
+              <span>งวด ${installmentNo} · ${fmtDate(p.date)}</span>
+              <b>+ ${money(p.amount)}</b>
+              ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+              ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+            </div>
+            <div class="payment-row-actions">
+              <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+              <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+            </div>
+          </div>`;
         }).join("")}</div>`
-          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
-          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
-        </div>
-      </div>`).join("")}</div>`
       : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
@@ -2098,11 +2116,12 @@ document.addEventListener("click", event => {
     if (confirm("ล้างข้อมูล PAYPREMINIQ ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
       data = resetData();
-      // IMPORTANT: a local reset must NEVER write the empty/default database
-      // to Firestore. Firebase is the recovery source for a cleared device.
-      // Keep the cloud copy untouched so a fresh reload can restore it.
-      stopRealtimeSync();
-      cloudWriteInProgress = false;
+      // Keep Firestore consistent with the explicit local reset.
+      if (currentUser()) {
+        setCloudData(data).catch(error =>
+          console.warn("PAYPREMINIQ cloud reset sync skipped:", error)
+        );
+      }
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
@@ -2369,3 +2388,5 @@ const PayNestCore = (() => {
 
 /* Backward-compatible global access for existing UI code. */
 window.PayNestCore = PayNestCore;
+
+})();
