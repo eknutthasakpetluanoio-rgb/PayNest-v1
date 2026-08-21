@@ -25,6 +25,7 @@ const firebaseConfig = {
 
 let firebaseReady = false;
 let firebaseError = null;
+let firebaseAuthPromise = null;
 let auth = { currentUser: null };
 let db = null;
 let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail;
@@ -47,6 +48,7 @@ async function initializeFirebaseInBackground() {
     const firebaseApp = initializeApp(firebaseConfig);
     auth = getAuth(firebaseApp);
     firebaseReady = true;
+    firebaseError = null;
 
     // Auth is ready now, independently of Firestore.
     firebaseOnAuthStateChanged(auth, async user => {
@@ -71,7 +73,19 @@ async function initializeFirebaseInBackground() {
   } catch (error) {
     firebaseError = error;
     console.warn("PAYPREMINIQ: Firebase unavailable; local mode enabled.", error);
+    throw error;
   }
+}
+
+function waitForFirebaseAuth(timeoutMs = 12000) {
+  if (firebaseReady && auth && typeof signInWithEmailAndPassword === "function") return Promise.resolve(true);
+  if (!firebaseAuthPromise) {
+    firebaseAuthPromise = initializeFirebaseInBackground().catch(() => false);
+  }
+  return Promise.race([
+    firebaseAuthPromise.then(() => firebaseReady),
+    new Promise(resolve => setTimeout(() => resolve(false), timeoutMs))
+  ]);
 }
 
 
@@ -636,8 +650,11 @@ function openAuthModal() {
       email.focus();
       return;
     }
-    if (!firebaseReady || !auth || typeof sendPasswordResetEmail !== "function") {
-      status.textContent = "Firebase Authentication ยังไม่พร้อม กรุณาลองใหม่อีกครั้ง";
+    status.textContent = "กำลังเชื่อมต่อ Firebase Authentication...";
+    const ready = await waitForFirebaseAuth();
+    if (!ready || !auth || typeof sendPasswordResetEmail !== "function") {
+      const code = firebaseError?.code || "";
+      status.textContent = code ? `Firebase Authentication เชื่อมต่อไม่ได้ (${code})` : "เชื่อมต่อ Firebase Authentication ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วลองใหม่";
       return;
     }
 
@@ -669,7 +686,13 @@ function openAuthModal() {
       status.textContent = "กรุณากรอกอีเมลและรหัสผ่าน";
       return;
     }
-    status.textContent = "กำลังเชื่อมต่อ...";
+    status.textContent = "กำลังเชื่อมต่อ Firebase Authentication...";
+    const ready = await waitForFirebaseAuth();
+    if (!ready || !auth || typeof signInWithEmailAndPassword !== "function") {
+      const code = firebaseError?.code || "";
+      status.textContent = code ? `Firebase Authentication เชื่อมต่อไม่ได้ (${code})` : "เชื่อมต่อ Firebase Authentication ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วลองใหม่";
+      return;
+    }
     try {
       if (action === "login") {
         await signInWithEmailAndPassword(auth, emailValue, passwordValue);
@@ -2255,7 +2278,7 @@ render();
 
 // Firebase must never block the initial UI. Load it only after the local app
 // has rendered, then hydrate/sync cloud data in the background.
-initializeFirebaseInBackground();
+firebaseAuthPromise = initializeFirebaseInBackground().catch(() => false);
 
 
 
