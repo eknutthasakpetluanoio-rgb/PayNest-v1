@@ -531,3 +531,5 @@ body::before{
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
   pointer-events: none;
 }
+
+.ui-icon{width:19px;height:19px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.nav-icon{width:21px;height:21px;stroke-width:1.75}.nav-item .ui-icon{color:currentColor}.icon-btn .ui-icon{color:currentColor}
