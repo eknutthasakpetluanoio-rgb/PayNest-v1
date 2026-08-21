@@ -316,3 +316,151 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
   backdrop-filter:blur(30px) saturate(190%)!important;
   -webkit-backdrop-filter:blur(30px) saturate(190%)!important;
 }
+
+
+/* =========================================================
+   PAYPREMINIQ — SMOKY BLACK / GRAPHITE / CLEAR LIQUID GLASS
+   FINAL UI PASS — visual only. No data or application logic.
+========================================================= */
+
+:root{
+  --bg:#0b0c0e;
+  --surface:#141619;
+  --surface-2:#191b1e;
+  --text:#eeeeef;
+  --muted:#85888e;
+  --soft:#bfc1c5;
+  --line:rgba(255,255,255,.085);
+  --glass:rgba(255,255,255,.035);
+  --glass-strong:rgba(255,255,255,.055);
+  --glass-edge:rgba(255,255,255,.115);
+}
+
+html{
+  background:#0b0c0e;
+  color-scheme:dark;
+}
+
+body{
+  background:
+    radial-gradient(560px 420px at 5% -8%,rgba(150,150,150,.055),transparent 70%),
+    radial-gradient(520px 400px at 96% 12%,rgba(120,120,120,.040),transparent 72%),
+    linear-gradient(180deg,#101114 0%,#0b0c0e 48%,#090a0c 100%);
+}
+
+body::before{
+  background:
+    radial-gradient(320px 220px at 18% 34%,rgba(255,255,255,.014),transparent 72%),
+    radial-gradient(420px 280px at 82% 66%,rgba(255,255,255,.012),transparent 72%);
+}
+
+/* Clear glass cards: darker material, but visibly translucent. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,
+.detail-status,.note-box,.subtle-box,.customer-detail div,
+.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.075);
+  background:
+    radial-gradient(120% 85% at 12% 0%,rgba(255,255,255,.042),transparent 48%),
+    linear-gradient(145deg,rgba(255,255,255,.036),rgba(255,255,255,.014) 62%,rgba(255,255,255,.010));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.065),
+    0 14px 34px rgba(0,0,0,.30);
+  backdrop-filter:blur(28px) saturate(135%);
+  -webkit-backdrop-filter:blur(28px) saturate(135%);
+}
+
+/* Topbar / FAB / bottom nav are clearer than cards. */
+.topbar{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.105);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 16px 34px rgba(0,0,0,.32);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.icon-btn{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.016));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 10px 24px rgba(0,0,0,.32);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+}
+
+.bottom-nav{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 20px 46px rgba(0,0,0,.44);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.nav-item.active{
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.18);
+}
+
+.fab{
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.095),rgba(255,255,255,.042) 45%,rgba(255,255,255,.018) 100%);
+  border-color:rgba(255,255,255,.135);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    0 16px 34px rgba(0,0,0,.46),
+    0 0 0 1px rgba(255,255,255,.025);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.fab::after{
+  background:rgba(255,255,255,.075);
+}
+
+/* Keep the graphite palette neutral — no blue cast. */
+.hero:after{
+  background:radial-gradient(circle,rgba(190,190,195,.12),transparent 68%);
+}
+
+.progress i,
+.installment-progress i{
+  background:linear-gradient(90deg,#cfd0d4,#8f9298);
+  box-shadow:0 0 12px rgba(210,210,215,.10);
+}
+
+.product-thumb,.avatar{
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.075);
+}
+
+/* Preserve semantic status colors while keeping their surfaces translucent. */
+.status-text.paid,.pill.paid{background:rgba(70,210,140,.075)}
+.status-text.partial,.pill.partial{background:rgba(255,190,70,.075)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{background:rgba(150,160,175,.075)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{background:rgba(255,80,90,.075)}
+.status-text.pending,.pill.pending{background:rgba(255,255,255,.040)}
+
+.installment-row{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.040),rgba(255,255,255,.014));
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.modal{
+  background:
+    radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.045),transparent 52%),
+    rgba(16,18,21,.84);
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(32px) saturate(140%);
+  -webkit-backdrop-filter:blur(32px) saturate(140%);
+}
