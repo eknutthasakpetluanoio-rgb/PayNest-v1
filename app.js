@@ -6,23 +6,24 @@
    so the project remains exactly six files.
 ========================================================= */
 
-/* ---------- Firebase (lazy-loaded so UI cannot die if Firebase CDN is unavailable) ---------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-let initializeApp = null;
-let getAuth = null;
-let onAuthStateChanged = null;
-let signInWithEmailAndPassword = null;
-let createUserWithEmailAndPassword = null;
-let signOut = null;
-let getFirestore = null;
-let doc = null;
-let getDoc = null;
-let setDoc = null;
-let onSnapshot = null;
-let serverTimestamp = null;
-let auth = null;
-let db = null;
-let firebaseReady = false;
+/* ---------- Firebase ---------- */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCGc0iB3dZe_CZe8vLfEuPwgnn5XCgI5gs",
@@ -33,28 +34,9 @@ const firebaseConfig = {
   appId: "1:469151372030:web:625320d22038fe42484baf"
 };
 
-async function initFirebase() {
-  if (firebaseReady) return true;
-  try {
-    const [appMod, authMod, firestoreMod] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-    ]);
-    initializeApp = appMod.initializeApp;
-    ({ getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = authMod);
-    ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
-    const firebaseApp = initializeApp(firebaseConfig);
-    auth = getAuth(firebaseApp);
-    db = getFirestore(firebaseApp);
-    firebaseReady = true;
-    return true;
-  } catch (error) {
-    firebaseReady = false;
-    console.warn("PAYPREMINIQ Firebase unavailable; running local-first:", error);
-    return false;
-  }
-}
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 /* ---------- Local Storage ---------- */
 
@@ -196,12 +178,12 @@ function resetData() {
 let unsubscribeRealtime = null;
 
 function currentUser() {
-  return auth?.currentUser || null;
+  return auth.currentUser;
 }
 
 function userDocumentRef() {
   const user = currentUser();
-  return (firebaseReady && db && user) ? doc(db, "users", user.uid) : null;
+  return user ? doc(db, "users", user.uid) : null;
 }
 
 async function getCloudData() {
@@ -637,7 +619,7 @@ function openAuthModal() {
 function renderAuthButton() {
   const button = $("#cloudAccount");
   if (!button) return;
-  const user = auth?.currentUser || null;
+  const user = auth.currentUser;
   button.textContent = user ? "☁" : "☁";
   button.title = user ? `Cloud: ${user.email} — กดเพื่อออกจากระบบ` : "เข้าสู่ระบบ PAYPREMINIQ Cloud";
   button.setAttribute("aria-label", button.title);
@@ -1853,14 +1835,13 @@ function openContractDetail(id) {
           ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
           ${p.note ? `<small>${esc(p.note)}</small>` : ""}
         </div>
-        <div class="payment-row-actions">
+        <div class="payment-row-actions">`
+        }).join("")}</div>`
           <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
           <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
         </div>
-      </div>`;
-        }).join("")}</div>`
-      : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}
-  </section>`;
+      </div>`).join("")}</div>`
+      : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
     <div class="modal small contract-detail-modal">
@@ -2117,9 +2098,11 @@ document.addEventListener("click", event => {
     if (confirm("ล้างข้อมูล PAYPREMINIQ ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
       data = resetData();
-      // IMPORTANT: local reset must NEVER delete/overwrite the Cloud backup.
-      // Firebase remains the recovery source for another login/device.
+      // IMPORTANT: a local reset must NEVER write the empty/default database
+      // to Firestore. Firebase is the recovery source for a cleared device.
+      // Keep the cloud copy untouched so a fresh reload can restore it.
       stopRealtimeSync();
+      cloudWriteInProgress = false;
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
@@ -2195,26 +2178,18 @@ $("#cloudAccount")?.addEventListener("click", async () => {
   }
 });
 
-render();
-renderAuthButton();
-
-// Firebase is initialized after the UI renders. A CDN/network failure must
-// never leave the whole application blank. If the local database is empty,
-// the user can sign in and recover the Cloud copy.
-(async () => {
-  const ready = await initFirebase();
+onAuthStateChanged(auth, async user => {
   renderAuthButton();
-  if (!ready) return;
 
-  onAuthStateChanged(auth, async user => {
-    renderAuthButton();
-    if (!user) {
-      stopRealtimeSync();
-      return;
-    }
-    await bootstrapCloud();
-  });
-})();
+  if (!user) {
+    stopRealtimeSync();
+    return;
+  }
+
+  await bootstrapCloud();
+});
+
+render();
 
 
 

@@ -1,11 +1,11 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v13-ios-graphite-recovery-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v13-recovery-safe-20260821";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
-  "./app.js?v=20260821-recovery3",
+  "./app.js",
   "./manifest.json",
   "./sw.js",
   "./icon-192.png",
