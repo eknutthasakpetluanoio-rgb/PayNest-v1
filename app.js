@@ -521,9 +521,7 @@ function defaultProductImage(product) {
 function productThumb(product, imageData = "", size = "small") {
   const safeImage = String(imageData || "");
   const fallback = defaultProductImage(product);
-  // For the three catalog products, always use the supplied sharp transparent
-  // product asset so legacy LocalStorage imageData cannot bring the old image back.
-  const src = fallback || (safeImage.startsWith("data:image/") ? safeImage : "");
+  const src = safeImage.startsWith("data:image/") ? safeImage : fallback;
   return `<div class="product-thumb product-thumb-${size}" aria-hidden="true">${
     src ? `<img src="${esc(src)}" alt="">` : `<span>${esc(productInitials(product))}</span>`
   }</div>`;
