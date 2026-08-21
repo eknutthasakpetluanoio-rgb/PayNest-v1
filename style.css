@@ -203,298 +203,121 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 .auth-reset-btn{display:block;width:100%;margin:10px 0 0;border:0;background:transparent;color:#d9dbe2;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}.auth-reset-btn:active{opacity:.7}.auth-status{min-height:20px}
 
 /* =========================================================
-   PAYPREMINIQ — iOS TYPOGRAPHY + LIQUID GLASS UI PASS
-   UI/STYLE ONLY — no application logic changes
-========================================================= */
+   PAYPREMINIQ — iOS Liquid Glass Transparency Pass
+   UI/STYLE ONLY — no logic/data/auth changes
+   ========================================================= */
 :root{
-  --ios-text:#f5f5f7;
-  --ios-secondary:rgba(235,235,245,.70);
-  --ios-tertiary:rgba(235,235,245,.48);
-  --ios-glass:rgba(255,255,255,.055);
-  --ios-glass-strong:rgba(255,255,255,.075);
-  --ios-edge:rgba(255,255,255,.115);
-  --ios-highlight:rgba(255,255,255,.14);
+  --glass:rgba(255,255,255,.035);
+  --glass-strong:rgba(255,255,255,.055);
+  --glass-edge:rgba(255,255,255,.12);
 }
 
-body{
-  font-size:15px;
-  line-height:1.45;
-  letter-spacing:-.01em;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-}
-
-/* iOS-like type hierarchy: readable first, compact metadata second. */
-.brand{font-size:9px;line-height:1;letter-spacing:2.6px;font-weight:700}
-.eyebrow{font-size:10px;line-height:1.2;letter-spacing:1.8px;font-weight:600;color:var(--ios-tertiary)}
-.topbar h1{font-size:19px;line-height:1.2;font-weight:600;letter-spacing:-.45px}
-.subtle{font-size:13px;line-height:1.45;color:var(--ios-secondary)}
-
-.page-heading h2,.section-head h2{font-size:20px;line-height:1.25;font-weight:600;letter-spacing:-.35px}
-.text-btn{font-size:13px;line-height:1.3;font-weight:600}
-
-.hero-number{font-size:36px;line-height:1.02;font-weight:700;letter-spacing:-1.35px}
-.hero-meta{font-size:12px;line-height:1.35;color:var(--ios-tertiary)}
-.stat span{font-size:12px;line-height:1.35;color:var(--ios-secondary)}
-.stat strong{font-size:20px;line-height:1.15;font-weight:600;letter-spacing:-.35px}
-.stat small{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
-.status-summary{font-size:13px;line-height:1.35}
-.status-summary>div span{font-size:11px;line-height:1.35}
-.summary-dot{font-size:11px;font-weight:600}
-
-.task-main b{font-size:14px;line-height:1.3;font-weight:600}
-.task-main span,.task-main small{font-size:12px;line-height:1.4}
-.task-right strong{font-size:14px;line-height:1.25;font-weight:600}
-.status-text{font-size:11px;line-height:1.3}
-
-/* Cards use a lighter, layered glass instead of opaque dark blocks. */
-.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row{
-  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.038) 55%,rgba(255,255,255,.022));
-  border-color:var(--ios-edge);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 12px 30px rgba(0,0,0,.24);
-  backdrop-filter:blur(30px) saturate(170%);
-  -webkit-backdrop-filter:blur(30px) saturate(170%);
-}
-
-.today-chip,.count,.pill{
-  font-size:11px;
-  line-height:1.25;
-  font-weight:500;
-  padding:7px 10px;
-  background:rgba(255,255,255,.055);
-  border-color:rgba(255,255,255,.105);
-  color:var(--ios-secondary);
-  backdrop-filter:blur(18px) saturate(150%);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
-}
-
-.tabs{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
-.tab{font-size:13px;line-height:1.2;font-weight:500;padding:9px 12px;color:var(--ios-tertiary)}
-.tab.active{background:rgba(255,255,255,.88);color:#111216;border-color:rgba(255,255,255,.72);box-shadow:0 6px 18px rgba(0,0,0,.22)}
-
-.search-wrap{background:rgba(255,255,255,.048);border-color:rgba(255,255,255,.10)}
-.search-wrap>span{font-size:17px;color:var(--ios-tertiary)}
-.search-wrap input{font-size:14px;line-height:1.4;padding:12px 0}
-.search-wrap input::placeholder{color:rgba(235,235,245,.38)}
-
-.contract-card{background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.032) 60%,rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 12px 28px rgba(0,0,0,.23);backdrop-filter:blur(28px) saturate(165%);-webkit-backdrop-filter:blur(28px) saturate(165%)}
-.contract-title-copy h3,.contract-top h3{font-size:15px;line-height:1.3;font-weight:600;letter-spacing:-.2px}
-.contract-title-copy span,.contract-top span:not(.pill){font-size:12px;line-height:1.35;color:var(--ios-tertiary)}
-.progress-meta{font-size:11px;line-height:1.3}
-.contract-info{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
-.contract-bottom{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
-
-.mini-btn,.wide-btn{font-size:13px;line-height:1.25;font-weight:600}
-.paid-label{font-size:12px}
-
-.customer-main b{font-size:15px;line-height:1.3;font-weight:600}
-.customer-main span{font-size:12px;line-height:1.35;color:var(--ios-secondary)}
-.customer-main small{font-size:11px;line-height:1.35;color:var(--ios-tertiary)}
-
-.empty b{font-size:15px;line-height:1.35;font-weight:600}
-.empty span{font-size:12px;line-height:1.45}
-
-.settings-card h2{font-size:20px;line-height:1.25;font-weight:600}
-.settings-card p{font-size:13px;line-height:1.55}
-.data-summary b{font-size:17px;font-weight:600}
-.data-summary span{font-size:11px;line-height:1.35}
-.version-line{font-size:11px;line-height:1.35}
-
-/* Modal typography follows iOS sheets: clear title, comfortable labels, compact helper text. */
-.overlay{background:rgba(0,0,0,.56);backdrop-filter:blur(18px) saturate(120%);-webkit-backdrop-filter:blur(18px) saturate(120%)}
-.modal{background:linear-gradient(145deg,rgba(30,32,38,.84),rgba(17,19,24,.76));border-color:rgba(255,255,255,.12);box-shadow:0 -24px 60px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(34px) saturate(170%);-webkit-backdrop-filter:blur(34px) saturate(170%)}
-.modal h2{font-size:21px;line-height:1.25;font-weight:600;letter-spacing:-.35px}
-.modal label,.form-group-label{font-size:13px;line-height:1.35;font-weight:500;color:var(--ios-secondary)}
-.modal input,.modal select,.modal textarea{font-size:15px;line-height:1.4;background:rgba(255,255,255,.052);border-color:rgba(255,255,255,.105);padding:12px 13px}
-.modal input::placeholder,.modal textarea::placeholder{color:rgba(235,235,245,.36)}
-.form-note b{font-size:13px;line-height:1.35;font-weight:600}
-.form-note span{font-size:12px;line-height:1.5;color:var(--ios-tertiary)}
-.form-total{font-size:13px;line-height:1.35}
-.primary-btn{font-size:15px;line-height:1.3;font-weight:600;padding:13px}
-
-.payment-summary span{font-size:11px;line-height:1.35}
-.payment-summary strong{font-size:20px;line-height:1.2;font-weight:600}
-.customer-detail span,.detail-grid span{font-size:11px;line-height:1.35}
-.customer-detail b,.detail-grid b{font-size:13px;line-height:1.35;font-weight:600}
-.note-box,.subtle-box{font-size:12px;line-height:1.55}
-.modal-section-title{font-size:13px;line-height:1.35;font-weight:600}
-.detail-status strong{font-size:20px;line-height:1.2;font-weight:600}
-
-.installment-summary span{font-size:11px;line-height:1.35}
-.installment-summary b{font-size:13px;line-height:1.3;font-weight:600}
-.installment-summary>strong{font-size:17px;line-height:1.2;font-weight:600}
-.installment-main b{font-size:14px;line-height:1.3;font-weight:600}
-.installment-main span{font-size:11px;line-height:1.35}
-.installment-main small{font-size:10px;line-height:1.35}
-.installment-side strong{font-size:14px;line-height:1.25;font-weight:600}
-.installment-side span{font-size:11px;line-height:1.3}
-.payment-installment-badge{font-size:11px;line-height:1.25;font-weight:600}
-.payment-row>div:first-child span{font-size:11px}
-.payment-row>div:first-child b{font-size:13px;font-weight:600}
-.payment-row>div:first-child small{font-size:10px}
-
-.product-image-copy b{font-size:12px;line-height:1.35}
-.product-image-copy span{font-size:10px;line-height:1.35}
-.file-btn{font-size:12px!important;line-height:1.25!important}
-.auth-reset-btn{font-size:13px;line-height:1.35;font-weight:500;color:var(--ios-secondary)}
-
-/* Shared glass material for fixed controls. */
-.topbar,.bottom-nav,.fab,.icon-btn{
-  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.035) 58%,rgba(255,255,255,.022));
-  border-color:rgba(255,255,255,.13);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 38px rgba(0,0,0,.30);
-  backdrop-filter:blur(28px) saturate(175%);
-  -webkit-backdrop-filter:blur(28px) saturate(175%);
-}
-.nav-item span{font-size:20px;line-height:1}
-.nav-item small{font-size:11px;line-height:1.15;font-weight:500}
-.fab span{font-size:28px;font-weight:300}
-.fab small{font-size:10px;line-height:1;font-weight:600}
-
-/* Keep touch targets comfortable while text itself stays visually restrained. */
-.text-btn,.mini-btn,.wide-btn,.tab{min-height:42px}
-.icon-btn{font-size:17px}
-
-@media(max-width:600px){
-  body{font-size:15px}
-  .page{padding-top:16px}
-  .hero-number{font-size:34px}
-  .page-heading h2,.section-head h2{font-size:19px}
-}
-
-@media(max-width:380px){
-  .brand{font-size:8px;letter-spacing:2.2px}
-  .topbar h1{font-size:18px}
-  .hero-number{font-size:32px}
-  .section-head h2,.page-heading h2{font-size:18px}
-  .contract-title-copy h3,.contract-top h3{font-size:14px}
-  .customer-main b{font-size:14px}
-  .nav-item small{font-size:10px}
-  .modal input,.modal select,.modal textarea{font-size:14px}
-}
-
-/* =========================================================
-   PAYPREMINIQ — iOS LIGHT / LIQUID GLASS PREVIEW
-   UI + Style only. No business/auth/data logic changed.
-========================================================= */
-:root{
-  --bg:#F2F2F7;
-  --text:#1C1C1E;
-  --muted:#6E6E73;
-  --line:rgba(60,60,67,.16);
-  --glass:rgba(255,255,255,.58);
-  --glass2:rgba(255,255,255,.42);
-  --ios-blue:#007AFF;
-  --ios-secondary:#6E6E73;
-  --ios-tertiary:#8E8E93;
-  --ios-edge:rgba(60,60,67,.14);
-  --fab-glass:rgba(255,255,255,.62);
-}
-html{background:#F2F2F7;color-scheme:light}
-body{
-  color:var(--text);
-  background:
-    radial-gradient(520px 360px at 8% -5%,rgba(0,122,255,.10),transparent 68%),
-    radial-gradient(520px 360px at 94% 8%,rgba(175,82,222,.08),transparent 68%),
-    linear-gradient(180deg,#F7F7FA 0%,#F2F2F7 52%,#ECECF1 100%);
-}
-body::before{
-  background:
-    radial-gradient(360px 260px at 20% 35%,rgba(255,255,255,.72),transparent 72%),
-    radial-gradient(420px 280px at 80% 68%,rgba(255,255,255,.48),transparent 72%);
-}
 .topbar{
-  background:rgba(242,242,247,.62)!important;
-  border-bottom-color:rgba(60,60,67,.10)!important;
-  box-shadow:0 8px 28px rgba(60,60,67,.08)!important;
-  backdrop-filter:blur(28px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+  background:rgba(12,14,18,.46)!important;
+  border-bottom-color:rgba(255,255,255,.055)!important;
+  box-shadow:0 8px 26px rgba(0,0,0,.12)!important;
+  backdrop-filter:blur(30px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(175%)!important;
 }
-.brand,.eyebrow{color:#8E8E93!important}
-.topbar h1{color:#1C1C1E!important}
-.icon-btn{
-  color:#1C1C1E!important;
-  background:rgba(255,255,255,.56)!important;
-  border-color:rgba(60,60,67,.13)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 8px 22px rgba(60,60,67,.12)!important;
-}
-.subtle,.hero-meta,.stat span,.stat small,.task-main span,.task-main small,
-.contract-title-copy span,.contract-top span:not(.pill),.progress-meta,
-.contract-info,.contract-bottom{color:#6E6E73!important}
+
 .card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,
 .note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,
 .payment-row{
-  border-color:rgba(60,60,67,.12)!important;
-  background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,255,255,.42))!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 14px 34px rgba(60,60,67,.10)!important;
-  backdrop-filter:blur(28px) saturate(175%)!important;
-  -webkit-backdrop-filter:blur(28px) saturate(175%)!important;
+  background:linear-gradient(145deg,
+    rgba(255,255,255,.050),
+    rgba(255,255,255,.022) 58%,
+    rgba(255,255,255,.012))!important;
+  border-color:rgba(255,255,255,.070)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 14px 34px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
 }
-.hero-number{color:#1C1C1E!important}
-.section-head h2,.page-heading h2{color:#1C1C1E!important}
-.text-btn{color:#007AFF!important}
+
+.card::before,.settings-card::before,.bottom-nav::before,.fab::before{
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent)!important;
+}
+
+.tabs{
+  background:rgba(255,255,255,.022)!important;
+  border:1px solid rgba(255,255,255,.055)!important;
+  backdrop-filter:blur(26px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
+}
+
+.search-wrap{background:rgba(255,255,255,.030)!important}
+
 .today-chip,.count,.pill{
-  color:#3A3A3C!important;
-  background:rgba(255,255,255,.55)!important;
-  border-color:rgba(60,60,67,.12)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important;
+  background:rgba(255,255,255,.035)!important;
+  border-color:rgba(255,255,255,.075)!important;
+  backdrop-filter:blur(20px) saturate(175%);
+  -webkit-backdrop-filter:blur(20px) saturate(175%);
 }
-.tabs{background:rgba(118,118,128,.12)!important}
-.tab{color:#6E6E73!important}
-.tab.active{background:rgba(255,255,255,.88)!important;color:#1C1C1E!important;border-color:rgba(60,60,67,.08)!important;box-shadow:0 4px 12px rgba(60,60,67,.12)!important}
-.search-wrap input{color:#1C1C1E!important}
-.search-wrap input::placeholder{color:#8E8E93!important}
-.contract-card{border-color:rgba(60,60,67,.12)!important}
-.contract-title-copy h3,.contract-top h3,.task-main b,.customer-main b{color:#1C1C1E!important}
-.progress{background:rgba(118,118,128,.14)!important}
-.progress i{background:linear-gradient(90deg,#007AFF,#5AC8FA)!important;box-shadow:0 0 12px rgba(0,122,255,.18)!important}
-.contract-bottom{border-top-color:rgba(60,60,67,.10)!important}
-.mini-btn,.wide-btn{
-  color:#1C1C1E!important;
-  border-color:rgba(60,60,67,.12)!important;
-  background:rgba(255,255,255,.58)!important;
+
+.product-thumb,.avatar{
+  background:rgba(255,255,255,.030)!important;
+  border-color:rgba(255,255,255,.075)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 7px 16px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(20px) saturate(175%);
+  -webkit-backdrop-filter:blur(20px) saturate(175%);
 }
-.primary-mini,.primary-btn{background:#007AFF!important;color:#fff!important;border-color:#007AFF!important}
-.product-thumb,.avatar{background:rgba(255,255,255,.48)!important;border-color:rgba(60,60,67,.10)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 7px 16px rgba(60,60,67,.10)!important}
-.empty{color:#6E6E73!important}
-.empty b{color:#1C1C1E!important}
-.empty span{color:#8E8E93!important}
-.settings-card h2{color:#1C1C1E!important}
-.settings-card p{color:#6E6E73!important}
-.data-summary div{background:rgba(255,255,255,.48)!important;border-color:rgba(60,60,67,.10)!important}
-.data-summary span{color:#8E8E93!important}
+
 .bottom-nav{
-  background:rgba(255,255,255,.64)!important;
-  border-color:rgba(60,60,67,.13)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.92),0 20px 46px rgba(60,60,67,.16)!important;
-  backdrop-filter:blur(30px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+  background:rgba(18,20,24,.52)!important;
+  border-color:rgba(255,255,255,.105)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 20px 46px rgba(0,0,0,.30)!important;
+  backdrop-filter:blur(32px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(180%)!important;
 }
-.nav-item{color:#8E8E93!important}
-.nav-item.active{color:#007AFF!important;background:rgba(0,122,255,.09)!important;border-color:rgba(0,122,255,.10)!important;box-shadow:none!important}
-.fab{
-  color:#1C1C1E!important;
-  background:rgba(255,255,255,.70)!important;
-  border-color:rgba(60,60,67,.14)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 16px 34px rgba(60,60,67,.18)!important;
-  backdrop-filter:blur(24px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+
+.nav-item.active{
+  background:rgba(255,255,255,.055)!important;
+  border-color:rgba(255,255,255,.085)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.12)!important;
 }
-.fab::after{background:rgba(255,255,255,.55)!important}
+
+.fab,.icon-btn{
+  background:rgba(255,255,255,.055)!important;
+  border-color:rgba(255,255,255,.13)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 16px 34px rgba(0,0,0,.30)!important;
+  backdrop-filter:blur(30px) saturate(185%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(185%)!important;
+}
+
+.fab::after{background:rgba(255,255,255,.10)!important}
+
+.mini-btn,.wide-btn{
+  background:rgba(255,255,255,.035)!important;
+  border-color:rgba(255,255,255,.085)!important;
+  backdrop-filter:blur(20px) saturate(175%);
+  -webkit-backdrop-filter:blur(20px) saturate(175%);
+}
+
+.installment-summary,.installment-row{
+  background:rgba(255,255,255,.035)!important;
+  border-color:rgba(255,255,255,.085)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 12px 26px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(28px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+}
+
 .modal{
-  color:#1C1C1E!important;
-  border-color:rgba(60,60,67,.14)!important;
-  background:rgba(250,250,252,.82)!important;
-  box-shadow:0 24px 60px rgba(60,60,67,.20)!important;
-  backdrop-filter:blur(30px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+  background:radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.045),transparent 50%),rgba(18,20,24,.70)!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 70px rgba(0,0,0,.40)!important;
+  backdrop-filter:blur(34px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(180%)!important;
 }
-.modal h2{color:#1C1C1E!important}
-.modal label,.form-group-label{color:#3A3A3C!important}
-.modal input,.modal select,.modal textarea{color:#1C1C1E!important;background:rgba(255,255,255,.62)!important;border-color:rgba(60,60,67,.14)!important}
-.modal input::placeholder,.modal textarea::placeholder{color:#8E8E93!important}
-.auth-reset-btn{color:#007AFF!important}
-.installment-summary,.installment-row,.payment-row{background:rgba(255,255,255,.52)!important;color:#1C1C1E!important;border-color:rgba(60,60,67,.12)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 10px 24px rgba(60,60,67,.09)!important}
-.installment-main b,.installment-side strong{color:#1C1C1E!important}
-.installment-main span,.installment-main small,.installment-side span{color:#6E6E73}
-.payment-installment-badge{background:rgba(118,118,128,.10)!important;border-color:rgba(60,60,67,.10)!important;color:#3A3A3C!important}
+
+.modal input,.modal select,.modal textarea{
+  background:rgba(255,255,255,.030)!important;
+  border-color:rgba(255,255,255,.085)!important;
+  backdrop-filter:blur(20px) saturate(175%);
+  -webkit-backdrop-filter:blur(20px) saturate(175%);
+}
+
+/* Keep text fully opaque while surfaces become more transparent. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,
+.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,
+.payment-row,.modal,.bottom-nav,.fab,.icon-btn,.installment-row,.installment-summary{
+  color:var(--text);
+}
