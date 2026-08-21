@@ -1,5 +1,5 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v15-auth-split-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v16-firebase-direct-20260821";
 
 const APP_SHELL = [
   "./",
@@ -32,18 +32,17 @@ self.addEventListener("activate", event => {
   );
 });
 
-function isFirebaseModule(url) {
-  return url.hostname === "www.gstatic.com" &&
-    url.pathname.includes("/firebasejs/");
-}
-
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
 
-  if (request.mode === "navigate" && url.origin === self.location.origin) {
+  // Never intercept third-party Firebase/CDN requests.
+  // Let the browser fetch Firebase SDK modules directly.
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then(response => {
@@ -60,36 +59,17 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request)
-        .then(cached => cached || fetch(request).then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(request, copy))
-              .catch(() => {});
-          }
-          return response;
-        }))
-        .catch(() => caches.match("./index.html"))
-    );
-    return;
-  }
-
-  if (isFirebaseModule(url)) {
-    event.respondWith(
-      caches.match(request)
-        .then(cached => cached || fetch(request).then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(request, copy))
-              .catch(() => {});
-          }
-          return response;
-        }))
-        .catch(() => Response.error())
-    );
-  }
+  event.respondWith(
+    caches.match(request)
+      .then(cached => cached || fetch(request).then(response => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(request, copy))
+            .catch(() => {});
+        }
+        return response;
+      }))
+      .catch(() => caches.match("./index.html"))
+  );
 });

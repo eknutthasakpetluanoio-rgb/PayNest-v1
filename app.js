@@ -37,8 +37,8 @@ async function initializeFirebaseInBackground() {
     // IMPORTANT: Auth must not depend on Firestore loading.
     // A Firestore/module failure must never make login/reset appear unavailable.
     const [appMod, authMod] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js")
+      import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js")
     ]);
 
     ({ initializeApp } = appMod);
@@ -62,7 +62,7 @@ async function initializeFirebaseInBackground() {
 
     // Firestore is loaded separately so it cannot block Authentication.
     try {
-      const firestoreMod = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js");
+      const firestoreMod = await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
       ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
       db = getFirestore(firebaseApp);
       // If the user was already authenticated before Firestore finished loading, hydrate now.
