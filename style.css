@@ -277,3 +277,42 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){
   .topbar,.bottom-nav,.fab{transition:none!important}
 }
+
+
+/* =========================================================
+   PAYPREMINIQ — CLEAR LIQUID GLASS FINAL PASS
+   UI-only: no Firebase / data / application logic changes.
+========================================================= */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,
+.customer-detail div,.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.075)!important;
+  background:
+    radial-gradient(115% 90% at 12% 0%,rgba(255,255,255,.050),transparent 48%),
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.014) 62%,rgba(255,255,255,.010))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.070),
+    0 12px 30px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(28px) saturate(165%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(165%)!important;
+}
+
+.hero,.stat,.contract-card{
+  border-radius:26px;
+}
+.contract-card{border-color:rgba(255,255,255,.075)!important}
+
+.topbar{
+  background:rgba(8,9,11,.30)!important;
+  backdrop-filter:blur(32px) saturate(185%)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(185%)!important;
+}
+.bottom-nav{
+  background:rgba(18,20,24,.30)!important;
+  backdrop-filter:blur(34px) saturate(190%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(190%)!important;
+}
+.fab{
+  background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.12),rgba(255,255,255,.050) 45%,rgba(255,255,255,.020) 100%)!important;
+  backdrop-filter:blur(30px) saturate(190%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(190%)!important;
+}
