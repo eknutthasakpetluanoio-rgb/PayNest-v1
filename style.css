@@ -199,3 +199,5 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
   .icon-btn{width:42px;height:42px;min-width:42px;min-height:42px}
   .installment-row{padding:11px 10px}
 }
+
+.auth-reset-btn{display:block;width:100%;margin:10px 0 0;border:0;background:transparent;color:#d9dbe2;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}.auth-reset-btn:active{opacity:.7}.auth-status{min-height:20px}

@@ -27,7 +27,7 @@ let firebaseReady = false;
 let firebaseError = null;
 let auth = { currentUser: null };
 let db = null;
-let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword;
+let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail;
 let createUserWithEmailAndPassword, signOut, getFirestore, doc, getDoc;
 let setDoc, onSnapshot, serverTimestamp;
 
@@ -40,7 +40,7 @@ async function initializeFirebaseInBackground() {
     ]);
 
     ({ initializeApp } = appMod);
-    ({ getAuth, onAuthStateChanged: firebaseOnAuthStateChanged, signInWithEmailAndPassword,
+    ({ getAuth, onAuthStateChanged: firebaseOnAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail,
        createUserWithEmailAndPassword, signOut } = authMod);
     ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
 
@@ -570,7 +570,7 @@ function persist() {
 
 function authErrorMessage(error) {
   const code = error?.code || "";
-  if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) return "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+  if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) return "อีเมลหรือรหัสผ่านไม่ถูกต้อง — หากจำรหัสไม่ได้ ให้ใช้ “ลืมรหัสผ่าน”";
   if (code.includes("email-already-in-use")) return "อีเมลนี้ถูกใช้แล้ว";
   if (code.includes("weak-password")) return "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
   if (code.includes("invalid-email")) return "รูปแบบอีเมลไม่ถูกต้อง";
@@ -610,6 +610,7 @@ function openAuthModal() {
           <button class="wide-btn" id="authRegister" type="button">สร้างบัญชีใหม่</button>
         </div>
 
+        <button class="auth-reset-btn" id="authReset" type="button">ลืมรหัสผ่าน?</button>
         <p id="authStatus" class="muted auth-status" role="status" aria-live="polite"></p>
       </div>
     </div>`;
@@ -617,6 +618,39 @@ function openAuthModal() {
   const status = $("#authStatus");
   const email = $("#authEmail");
   const password = $("#authPassword");
+
+  async function resetPassword() {
+    const emailValue = email.value.trim();
+    if (!emailValue) {
+      status.textContent = "กรุณากรอกอีเมลก่อน แล้วกด “ลืมรหัสผ่าน?”";
+      email.focus();
+      return;
+    }
+    if (!firebaseReady || !auth || typeof sendPasswordResetEmail !== "function") {
+      status.textContent = "Firebase Authentication ยังไม่พร้อม กรุณาลองใหม่อีกครั้ง";
+      return;
+    }
+
+    status.textContent = "กำลังส่งลิงก์รีเซ็ตรหัสผ่าน...";
+    try {
+      await sendPasswordResetEmail(auth, emailValue);
+      status.textContent = "ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว กรุณาตรวจ Inbox หรือ Spam";
+    } catch (error) {
+      console.error("PAYPREMINIQ password reset error:", error);
+      const code = error?.code || "";
+      if (code.includes("invalid-email")) {
+        status.textContent = "รูปแบบอีเมลไม่ถูกต้อง";
+      } else if (code.includes("user-not-found")) {
+        status.textContent = "ไม่พบบัญชีจากอีเมลนี้";
+      } else if (code.includes("too-many-requests")) {
+        status.textContent = "ส่งคำขอมากเกินไป กรุณารอสักครู่แล้วลองใหม่";
+      } else if (code.includes("network-request-failed")) {
+        status.textContent = "ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้";
+      } else {
+        status.textContent = "ส่งลิงก์รีเซ็ตรหัสผ่านไม่สำเร็จ กรุณาลองใหม่";
+      }
+    }
+  }
 
   async function runAuth(action) {
     const emailValue = email.value.trim();
@@ -641,6 +675,7 @@ function openAuthModal() {
 
   $("#authLogin").addEventListener("click", () => runAuth("login"));
   $("#authRegister").addEventListener("click", () => runAuth("register"));
+  $("#authReset").addEventListener("click", resetPassword);
 }
 
 function renderAuthButton() {
