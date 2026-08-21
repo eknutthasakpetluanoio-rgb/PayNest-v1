@@ -1,11 +1,11 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v17-ios27-glass-fix-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v16-firebase-direct-20260821";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style-v27.css?v=20260821-01",
-  "./app.js?v=20260821-01",
+  "./style.css",
+  "./app.js",
   "./manifest.json",
   "./sw.js",
   "./icon-192.png",

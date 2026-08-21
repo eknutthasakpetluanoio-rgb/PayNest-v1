@@ -92,7 +92,6 @@ function waitForFirebaseAuth(timeoutMs = 12000) {
 /* ---------- Local Storage ---------- */
 
 const STORAGE_KEY = "paynest_v1_data";
-const LEGACY_STORAGE_KEYS = ["paypreminiq_v1_data", "paypreminiq_data", "paynest_data", "paynest_v1"];
 
 const DEFAULT_DATA = {
   version: 1,
@@ -163,21 +162,9 @@ function validateImportData(imported) {
 
 function loadData() {
   try {
-    let raw = localStorage.getItem(STORAGE_KEY);
-    // Recover data from older PAYPREMINIQ/PayNest keys before falling back to empty defaults.
-    if (!raw) {
-      for (const key of LEGACY_STORAGE_KEYS) {
-        const candidate = localStorage.getItem(key);
-        if (candidate) { raw = candidate; break; }
-      }
-    }
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return clone(DEFAULT_DATA);
-    const normalized = normalize(JSON.parse(raw));
-    // Migrate only meaningful legacy data into the current canonical key.
-    if (!localStorage.getItem(STORAGE_KEY) && hasMeaningfulData(normalized)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-    }
-    return normalized;
+    return normalize(JSON.parse(raw));
   } catch (error) {
     console.error("PAYPREMINIQ storage load error:", error);
     return clone(DEFAULT_DATA);
