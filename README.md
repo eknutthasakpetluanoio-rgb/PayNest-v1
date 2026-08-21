@@ -54,9 +54,3 @@ Firebase, LocalStorage และ PWA ที่ใช้งานจริงถ�
 This revision introduces a single `PayNestCore` calculation layer in `app.js` for installment dates, installment status, payment-to-installment mapping, outstanding balances, due-soon/overdue classification, and payment validation.
 
 Existing UI code remains in place so the revision can be tested incrementally without replacing the existing Firebase/data workflow.
-
-## UI Build Note — Neutral Clear Glass Final
-- UI-only correction: all pages now use the same neutral graphite / clear-glass material as the Create Contract screen.
-- Removed the blue/purple cast from page backgrounds, hero cards, cards, navigation, FAB, search, tabs, and detail surfaces.
-- Preserved semantic status colors and existing application/data logic.
-- No data model, LocalStorage, Firebase/auth, contract, customer, installment, payment-history, backup/restore, or deletion logic was intentionally changed.
