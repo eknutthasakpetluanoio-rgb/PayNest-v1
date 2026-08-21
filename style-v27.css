@@ -1,0 +1,643 @@
+*{box-sizing:border-box}
+:root{--bg:#08090d;--text:#f5f5f7;--muted:#92959f;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.07);--glass2:rgba(255,255,255,.045);--danger:#ff7777;--success:#79e2a8;--warning:#ffd36a;--radius:22px}
+html{background:var(--bg);color-scheme:dark;scroll-behavior:smooth}body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--text);font-family:"Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(600px 360px at 0 -10%,rgba(95,110,165,.2),transparent 65%),radial-gradient(520px 360px at 100% 10%,rgba(80,120,155,.14),transparent 65%),linear-gradient(180deg,#0c0e13,#08090d 55%,#06070a)}body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(300px 200px at 20% 35%,rgba(255,255,255,.025),transparent 70%),radial-gradient(400px 260px at 80% 65%,rgba(110,130,180,.035),transparent 70%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:active{transform:scale(.97)}img{max-width:100%;display:block}a{color:#a9d7ff}
+.skip-link{position:fixed;left:10px;top:10px;z-index:9999;transform:translateY(-150%);padding:9px 12px;border-radius:11px;background:#fff;color:#111;font-weight:800}.skip-link:focus{transform:none}
+
+.brand-lockup{display:flex;align-items:center;gap:9px;min-width:0}.app-logo{width:38px;height:38px;flex:0 0 38px;object-fit:cover;border-radius:11px;border:1px solid rgba(255,255,255,.18);box-shadow:0 5px 16px #0005,inset 0 1px 0 #fff3}.brand,.eyebrow{font-size:8px;line-height:1;letter-spacing:3px;color:#858894;font-weight:800}.topbar h1{margin:5px 0 0;font-size:20px;line-height:1}.topbar>div:last-child{display:flex!important;gap:5px!important;align-items:center!important}
+#view{width:100%}.page{width:100%;max-width:720px;margin:auto;padding:18px 14px calc(112px + env(safe-area-inset-bottom))}.welcome-row,.section-head,.contract-top,.contract-bottom,.hero-meta,.progress-meta,.task,.customer,.modal-head,.detail-status,.receipt-meta,.receipt-row,.receipt-total{display:flex}.welcome-row{align-items:center;justify-content:space-between;gap:10px;margin:0 0 15px}.subtle{margin:5px 0 0;color:var(--muted);font-size:10px}.today-chip,.count,.pill{display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100px;padding:6px 9px;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:#bfc1c8;background:#ffffff0d;box-shadow:inset 0 1px 0 #fff1;font-size:9px;line-height:1.2;white-space:nowrap}
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.035) 58%,rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 14px 34px #0003;backdrop-filter:blur(26px) saturate(165%);-webkit-backdrop-filter:blur(26px) saturate(165%)}.card:before,.settings-card:before,.bottom-nav:before,.fab:before{content:"";position:absolute;left:8%;right:18%;top:0;height:1px;background:linear-gradient(90deg,transparent,#fff5,transparent);pointer-events:none}
+.hero{padding:21px;margin-bottom:11px;border-radius:26px;min-height:145px}.hero:after{content:"";position:absolute;width:210px;height:150px;right:-90px;top:-70px;border-radius:50%;background:radial-gradient(circle,#aabcf238,transparent 68%);filter:blur(18px)}.hero-number{position:relative;z-index:1;margin:14px 0;font-size:38px;line-height:1;font-weight:800;letter-spacing:-1.7px}.hero-meta{position:relative;z-index:1;justify-content:space-between;gap:10px;color:#8d9099;font-size:9px}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{padding:15px;border-radius:20px}.stat span{display:block;color:#92959e;font-size:9px;margin-bottom:7px}.stat strong{display:block;font-size:21px;line-height:1.1}.stat small{display:block;color:#696c75;font-size:8px;margin-top:6px}.status-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding:13px 15px;border-radius:20px;font-size:10px}.status-summary b{display:block}.status-summary>div span{display:block;color:#777a83;font-size:8px;margin-top:4px}.summary-dot{padding:6px 8px;border-radius:999px;background:#79e2a81a;color:var(--success);font-size:8px;font-weight:800;white-space:nowrap}.summary-dot.has-overdue{background:#ff77771a;color:var(--danger)}
+.section{margin-top:23px}.section-head{align-items:end;justify-content:space-between;gap:8px;margin-bottom:9px}.section-head h2,.page-heading h2{margin:4px 0 0;font-size:20px;line-height:1.15}.text-btn{border:0;background:none;color:#c2c4cb;padding:5px 0;font-size:9px;font-weight:800}.task{align-items:center;justify-content:space-between;gap:10px;padding:13px;margin:8px 0;border-radius:18px}.task-main{min-width:0;flex:1}.task-main b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-main span,.task-main small{display:block;color:#858891;margin-top:3px;font-size:8px}.task-right{text-align:right;flex:0 0 auto}.task-right strong{display:block;font-size:11px;margin-bottom:3px}.status-text{display:block;font-size:8px;margin-bottom:5px}.status-text.overdue,.status-text.overdue-partial{color:var(--danger)}
+.page-heading{margin-bottom:13px}.page-heading h2{font-size:24px}.tabs{display:flex;gap:5px;padding:5px;margin-bottom:9px;border-radius:17px;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{flex:0 0 auto;border:1px solid transparent;border-radius:12px;padding:8px 10px;background:transparent;color:#8b8e97;font-size:9px;font-weight:800}.tab.active{background:#f2f2f5;color:#101114;border-color:#fff;box-shadow:0 5px 14px #0003}.search-wrap{display:flex;align-items:center;gap:7px;padding:0 11px;margin-bottom:10px;border-radius:17px}.search-wrap>span{color:#777b85;font-size:16px}.search-wrap input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#eee;padding:12px 0;font-size:11px}.search-wrap input::placeholder{color:#686b74}.clear-search{width:24px;height:24px;border:0;border-radius:50%;background:#fff0f;color:#ccc}
+.contract-card{padding:13px;margin:9px 0;border-radius:21px}.contract-top{align-items:flex-start;justify-content:space-between;gap:8px}.contract-title-wrap{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.contract-title-copy{min-width:0}.contract-title-copy h3,.contract-top h3{margin:0;font-size:13px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.contract-title-copy span,.contract-top span:not(.pill){display:block;color:#858891;margin-top:3px;font-size:8px}.contract-top>.pill{flex:0 0 auto;max-width:84px;white-space:normal;text-align:center;padding:6px 7px}.progress{height:5px;background:#fff0d;border-radius:99px;margin:12px 0 7px;overflow:hidden}.progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#e9e9f0,#bdc5ff);box-shadow:0 0 12px #c5ccff22}.progress-meta{justify-content:space-between;gap:8px;color:#81848d;font-size:8px}.contract-info{display:flex;justify-content:space-between;gap:8px;color:#777a83;font-size:8px;margin-top:7px}.contract-bottom{align-items:center;justify-content:space-between;gap:7px;border-top:1px solid #fff1;margin-top:10px;padding-top:10px;color:#999ca5;font-size:8px}.button-row{display:flex;align-items:center;gap:5px}.mini-btn,.wide-btn{border:1px solid #ffffff1c;background:#ffffff0a;color:#eee;border-radius:12px;padding:7px 9px;font-size:8px;font-weight:800}.primary-mini{background:#f2f2f5;color:#101114;border-color:#f2f2f5}.ghost-mini{color:#bfc1c8}.paid-label{display:inline-flex;align-items:center;justify-content:center;color:#7f838d}
+.product-thumb{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;overflow:hidden;border-radius:13px;background:#ffffff08;border:1px solid #fff2;box-shadow:inset 0 1px 0 #fff2,0 7px 16px #0003}.product-thumb-small{width:46px;height:46px;flex-basis:46px}.product-thumb-large{width:62px;height:62px;flex-basis:62px}.product-thumb img{width:100%;height:100%;object-fit:contain;padding:5px;max-width:none}.product-thumb span{font-size:10px;color:#a8abb3;font-weight:800}.contract-detail-title{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.contract-detail-title>div:last-child{min-width:0}.contract-detail-title h2{font-size:20px;line-height:1.2;word-break:break-word}
+.customer{align-items:center;gap:11px;padding:13px;margin:8px 0;border-radius:19px}.avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;overflow:hidden;border-radius:14px;background:#ffffff09;border:1px solid #fff2;font-weight:800}.avatar img{width:100%;height:100%;object-fit:cover}.customer-main{flex:1;min-width:0}.customer-main b,.customer-main span,.customer-main small{display:block}.customer-main b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-main span{color:#888b94;margin-top:3px;font-size:9px}.customer-main small{color:#6e717a;margin-top:4px;font-size:8px}
+.empty{min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;border-radius:19px;color:#8c8f98}.empty-icon{font-size:28px;color:#858892}.empty b{font-size:12px;color:#ddd}.empty span{font-size:8px;color:#6e7179}
+.settings-card{padding:19px;border-radius:21px;margin-bottom:11px}.settings-card h2{font-size:21px;margin:5px 0}.settings-card p{color:#9497a0;line-height:1.6;font-size:10px}.data-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0}.data-summary div{background:#fff06;border:1px solid #fff1;border-radius:14px;padding:11px}.data-summary b,.data-summary span{display:block}.data-summary b{font-size:16px}.data-summary span{font-size:8px;color:#777a83;margin-top:3px}.wide-btn{width:100%;margin-top:7px;padding:12px}.danger{color:var(--danger)}.version-line{display:flex;justify-content:space-between;border-top:1px solid #fff1;padding-top:12px;color:#777a83;font-size:8px}.version-line b{color:#c7c8ce}
+
+
+.overlay{position:fixed;inset:0;z-index:100;background:#0009;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:flex-end;justify-content:center}.modal{width:min(720px,100%);max-height:92vh;overflow:auto;padding:21px 15px 27px;border:1px solid #fff2;border-radius:27px 27px 0 0;background:rgba(19,21,26,.80);box-shadow:0 -24px 60px #0008,inset 0 1px 0 #fff2;backdrop-filter:blur(30px) saturate(165%);-webkit-backdrop-filter:blur(30px) saturate(165%)}.modal.small{max-width:680px}.modal-head{align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px}.modal-head-actions{display:flex;align-items:center;gap:5px}.modal h2{margin:4px 0;font-size:22px}.modal label{display:block;color:#aeb0b8;font-size:9px;margin:10px 0}.modal input,.modal select,.modal textarea{width:100%;margin-top:5px;padding:12px;border-radius:14px;border:1px solid #fff2;background:#ffffff09;color:#f2f2f4;outline:0}.modal textarea{resize:vertical}.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:#fff4}.form-note{padding:11px 12px;margin-bottom:11px;border-radius:15px}.form-note b,.form-note span{display:block}.form-note b{font-size:10px}.form-note span{font-size:8px;color:#858891;margin-top:3px;line-height:1.5}.form-total{padding:10px;border-radius:13px;background:#fff08;color:#aaa;font-size:9px;margin-top:7px}.primary-btn{width:100%;border:1px solid #fff8;border-radius:16px;background:linear-gradient(180deg,#fff,#dfe1e8);color:#101114;padding:13px;font-weight:900;font-size:13px;margin-top:11px;box-shadow:inset 0 1px 0 #fff,0 10px 24px #0004}.payment-summary{padding:13px;border-radius:17px;margin-bottom:7px}.payment-summary b,.payment-summary span,.payment-summary strong{display:block}.payment-summary span{color:#858891;font-size:8px;margin-top:3px}.payment-summary strong{font-size:18px;margin-top:8px}.customer-detail,.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}.customer-detail div,.detail-grid div{padding:10px;border-radius:13px}.customer-detail span,.customer-detail b,.detail-grid span,.detail-grid b{display:block}.customer-detail span,.detail-grid span{font-size:8px;color:#747780}.customer-detail b,.detail-grid b{font-size:10px;margin-top:4px;overflow-wrap:anywhere}.note-box,.subtle-box{padding:11px;border-radius:14px;color:#9497a0;font-size:9px;line-height:1.55;margin:8px 0}.modal-section-title{font-size:10px;font-weight:900;margin:15px 0 7px}.detail-status{align-items:center;justify-content:space-between;padding:13px;border-radius:17px;margin-bottom:7px}.detail-status strong{font-size:18px}.schedule-summary{padding:11px;border-radius:15px;background:#fff08;border:1px solid #fff1}.payment-list{display:grid;gap:6px}.payment-row{align-items:center;justify-content:space-between;gap:7px;padding:10px;border-radius:14px}.payment-row>div:first-child span,.payment-row>div:first-child b,.payment-row>div:first-child small{display:block}.payment-row>div:first-child span{font-size:8px;color:#777a83}.payment-row>div:first-child b{font-size:10px;margin-top:3px}.payment-row>div:first-child small{font-size:7px;color:#6f727b;margin-top:3px}.payment-row-actions{display:flex;gap:4px}.payment-penalty{color:var(--warning)!important}
+.form-group-label{font-size:9px;color:#aeb0b8;margin:11px 0 6px}.form-group-label small{color:#6f727b}.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.photo-upload,.product-image-field{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #fff1;border-radius:15px;background:#fff06;margin:9px 0}.photo-preview,.product-image-preview{width:50px;height:50px;flex:0 0 50px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:#fff08;border:1px solid #fff1}.photo-preview img,.product-image-preview img{width:100%;height:100%;object-fit:cover}.product-image-copy{min-width:0;flex:1}.product-image-copy b,.product-image-copy span{display:block}.product-image-copy b{font-size:9px}.product-image-copy span{font-size:7px;color:#747780;margin-top:2px}.file-btn{display:inline-flex!important;align-items:center;justify-content:center;padding:7px 9px!important;margin:0!important;border-radius:11px!important;background:#fff0d!important;border:1px solid #fff1!important;color:#ddd!important;font-size:8px!important;font-weight:800}
+.receipt-paper{padding:17px;border-radius:17px;background:#f8f8fa;color:#17181b}.receipt-brand{text-align:center;font-weight:900;letter-spacing:2px;font-size:16px}.receipt-title{text-align:center;font-size:17px;font-weight:900;margin:6px 0 15px}.receipt-meta,.receipt-row,.receipt-total{justify-content:space-between;gap:15px;margin:7px 0;font-size:9px}.receipt-meta span,.receipt-row span{color:#666}.receipt-divider{border-top:1px dashed #aaa;margin:13px 0}.receipt-total{align-items:center;font-size:11px}.receipt-total strong{font-size:19px}.receipt-thanks{text-align:center;color:#777;font-size:8px;margin-top:17px}
+@media(min-width:600px){.topbar{padding-left:20px;padding-right:20px}.page{padding-left:20px;padding-right:20px}}
+@media(max-width:380px){.page{padding-left:10px;padding-right:10px}.hero{padding:18px}.hero-number{font-size:34px}.product-thumb,.product-thumb-small{width:44px;height:44px;flex-basis:44px}.contract-card{padding:12px}}
+
+/* =========================================================
+   PAYPREMINIQ — iOS Graphite Dark UI System
+   Single theme / single source of visual truth.
+   Data + application logic are untouched.
+========================================================= */
+:root{
+  --bg:#070809;
+  --surface:#111214;
+  --surface-2:#17191c;
+  --text:#f5f5f7;
+  --muted:#92959f;
+  --soft:#c6c8ce;
+  --line:rgba(255,255,255,.11);
+  --glass:rgba(255,255,255,.045);
+  --glass-strong:rgba(255,255,255,.075);
+  --glass-edge:rgba(255,255,255,.14);
+  --success:#79e2a8;
+  --warning:#ffd36a;
+  --danger:#ff7777;
+  --ios-radius:24px;
+}
+
+html{color-scheme:dark;background:var(--bg);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:radial-gradient(520px 420px at 8% 0%,rgba(105,112,128,.10),transparent 68%),radial-gradient(520px 420px at 94% 16%,rgba(140,145,155,.07),transparent 70%),linear-gradient(180deg,#0b0c0f 0%,#070809 58%,#060708 100%);overscroll-behavior-x:none;-webkit-tap-highlight-color:transparent}
+body::before{background:radial-gradient(320px 220px at 20% 35%,rgba(255,255,255,.018),transparent 70%),radial-gradient(420px 280px at 80% 65%,rgba(255,255,255,.015),transparent 70%)}
+
+button,a,input,select,textarea{touch-action:manipulation}
+button{min-width:44px;min-height:44px}
+button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
+
+/* Top bar: touch-safe, compact and genuinely graphite. */
+.topbar{min-height:68px;padding:9px 12px;padding-top:max(9px,env(safe-area-inset-top));background:rgba(8,9,11,.72);border-bottom:1px solid rgba(255,255,255,.07);box-shadow:0 8px 26px rgba(0,0,0,.20);backdrop-filter:blur(26px) saturate(145%);-webkit-backdrop-filter:blur(26px) saturate(145%)}
+.brand-lockup{gap:9px}
+.app-logo{width:40px;height:40px;flex-basis:40px;border-radius:12px;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 20px rgba(0,0,0,.34)}
+.brand,.eyebrow{color:#858890;font-size:8px;font-weight:800;letter-spacing:3px}
+.topbar h1{margin-top:5px;color:#f4f4f6;font-size:21px;font-weight:700;letter-spacing:-.55px}
+.topbar>div:last-child{gap:5px!important}
+.icon-btn{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--glass-edge);border-radius:14px;color:#e9eaee;font-size:17px;font-weight:600;background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 22px rgba(0,0,0,.28);backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%)}
+.icon-btn:active{transform:scale(.94)}
+
+/* Typography hierarchy. */
+.subtle,.hero-meta,.stat span,.stat small,.task-main span,.task-main small,.contract-title-copy span,.contract-top span:not(.pill),.progress-meta,.contract-info,.contract-bottom{color:#8e919a}
+.hero-number{color:#f8f8fa;font-size:40px;letter-spacing:-2px}
+.section-head h2,.page-heading h2{color:#f2f2f4;font-size:21px;letter-spacing:-.45px}
+.text-btn{color:#c7c9cf;font-size:10px}
+
+/* Shared glass material. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.085);
+  background:radial-gradient(110% 80% at 12% 0%,rgba(255,255,255,.055),transparent 46%),linear-gradient(145deg,rgba(255,255,255,.048),rgba(255,255,255,.020) 62%,rgba(255,255,255,.015));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 14px 34px rgba(0,0,0,.24);
+  backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);
+}
+.card::before,.settings-card::before,.bottom-nav::before,.fab::before{content:"";position:absolute;left:8%;right:18%;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);pointer-events:none}
+
+/* Mobile bottom navigation: fixed like iOS tab bar, but with generous touch targets. */
+.bottom-nav{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;width:min(calc(100% - 16px),520px);min-height:76px;padding:7px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;border:1px solid rgba(255,255,255,.12);border-radius:24px;background:rgba(18,20,24,.78);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 20px 46px rgba(0,0,0,.45);backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%)}
+.nav-item{position:relative;min-width:0;min-height:60px;border:1px solid transparent;border-radius:18px;background:transparent;color:#858892;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px 3px;line-height:1}
+.nav-item span{font-size:21px;line-height:1}
+.nav-item small{color:inherit;font-size:9px;line-height:1;font-weight:600;white-space:nowrap}
+.nav-item.active{color:#f5f5f7;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.035));border-color:rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 16px rgba(0,0,0,.18)}
+.nav-item:active{transform:scale(.96)}
+
+/* FAB: graphite glass, not a white alien button. Position remains on the same side. */
+.fab{position:fixed;right:15px;bottom:calc(94px + env(safe-area-inset-bottom));z-index:80;width:58px;height:58px;min-width:58px;min-height:58px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);color:#f5f5f7;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.16),rgba(255,255,255,.07) 45%,rgba(255,255,255,.035) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 16px 34px rgba(0,0,0,.46),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+.fab::after{content:"";position:absolute;width:58%;height:32%;left:10%;top:4%;border-radius:50%;background:rgba(255,255,255,.14);filter:blur(12px);pointer-events:none}
+.fab span{position:relative;z-index:1;font-size:30px;font-weight:400;line-height:1}
+.fab:active{transform:scale(.94)}
+
+/* Touch-safe secondary controls. */
+.text-btn,.mini-btn,.wide-btn,.tab{min-height:44px}
+.mini-btn,.wide-btn{color:#e5e6e9;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.045);font-size:9px}
+.primary-mini,.primary-btn{background:linear-gradient(180deg,#e8e9ed,#c9ccd3);color:#121317}
+.search-wrap input,.modal input,.modal select,.modal textarea{font-size:12px}
+.search-wrap input::placeholder,.modal input::placeholder,.modal textarea::placeholder{color:#666a74}
+
+/* Modals remain part of the same dark material system. */
+.modal{border-color:rgba(255,255,255,.11);background:radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.06),transparent 50%),rgba(18,20,24,.90);backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%)}
+.modal h2{color:#f5f5f7;font-size:23px;letter-spacing:-.5px}
+.modal label,.form-group-label{color:#b1b3ba;font-size:10px}
+.modal input,.modal select,.modal textarea{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.11);color:#f2f2f4}
+
+/* Keep the content clear of the fixed tab bar and FAB. */
+.page{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+
+@media(max-width:600px){
+  .topbar{padding-left:12px;padding-right:12px}
+  .page{padding-top:17px;padding-left:12px;padding-right:12px}
+  .bottom-nav{width:calc(100% - 12px);bottom:max(6px,env(safe-area-inset-bottom));min-height:76px}
+  .fab{right:14px;bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+
+@media(max-width:380px){
+  .topbar{padding-left:10px;padding-right:10px}
+  .app-logo{width:36px;height:36px;flex-basis:36px}
+  .topbar h1{font-size:19px}
+  .icon-btn{width:44px;height:44px;flex-basis:44px}
+  .page{padding-left:10px;padding-right:10px;padding-bottom:calc(130px + env(safe-area-inset-bottom))}
+  .bottom-nav{width:calc(100% - 10px);min-height:74px;padding:6px;bottom:max(5px,env(safe-area-inset-bottom))}
+  .nav-item{min-height:60px}
+  .nav-item span{font-size:20px}
+  .nav-item small{font-size:8px}
+  .fab{width:56px;height:56px;min-width:56px;min-height:56px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom))}
+}
+
+/* =========================================================
+   PAYPREMINIQ — FINAL LOCKED MATERIAL + STATUS SYSTEM
+========================================================= */
+
+:root{
+  --fab-glass:radial-gradient(circle at 30% 20%,rgba(255,255,255,.16),rgba(255,255,255,.07) 45%,rgba(255,255,255,.035) 100%);
+  --glass-edge:rgba(255,255,255,.18);
+  --status-green:rgba(70,210,140,.12);
+  --status-amber:rgba(255,190,70,.12);
+  --status-red:rgba(255,80,90,.12);
+  --status-blue:rgba(120,165,255,.10);
+}
+
+/* Top Bar scrolls naturally with the page; it is not fixed. */
+.topbar{
+  position:relative;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  min-height:68px;
+  padding-left:12px;
+  padding-right:12px;
+  background:var(--fab-glass);
+  border:1px solid rgba(255,255,255,.16);
+  border-top:0;
+  border-radius:0 0 22px 22px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 16px 34px rgba(0,0,0,.34);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+}
+.topbar-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;min-width:0}
+.icon-btn{width:44px;height:44px;min-width:44px;min-height:44px;background:var(--fab-glass);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.34);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+
+/* Bottom navigation uses the same material as FAB. */
+.bottom-nav{background:var(--fab-glass);border-color:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 20px 46px rgba(0,0,0,.46);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+.nav-item.active{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+
+/* Installment schedule = individual glass cards, visually distinct from payment history. */
+.installment-section{margin-top:15px}
+.installment-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;margin-bottom:8px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.installment-summary span,.installment-summary b{display:block}.installment-summary span{font-size:8px;color:#858891}.installment-summary b{font-size:10px;margin-top:3px}.installment-summary>strong{font-size:15px}
+.installment-progress{height:5px;margin:0 0 9px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}
+.installment-progress i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#dfe3ea,#aeb7c8);box-shadow:0 0 12px rgba(210,220,240,.16)}
+.installment-list{display:grid;gap:8px}
+.installment-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:72px;padding:12px 13px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:var(--fab-glass);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 12px 26px rgba(0,0,0,.28);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+.installment-main{min-width:0}.installment-main b,.installment-main span,.installment-main small{display:block}.installment-main b{font-size:11px;color:#f2f3f5}.installment-main span{font-size:8px;color:#a2a5ad;margin-top:3px}.installment-main small{font-size:8px;color:#878a93;margin-top:3px}.installment-side{text-align:right;flex:0 0 auto}.installment-side strong,.installment-side span{display:block}.installment-side strong{font-size:11px}.installment-side span{font-size:8px;font-weight:800;margin-top:4px}
+.installment-paid{background:linear-gradient(145deg,rgba(70,210,140,.12),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(120,235,180,.20)}.installment-paid .installment-side span{color:var(--success)}
+.installment-partial,.installment-overdue-partial{background:linear-gradient(145deg,rgba(255,190,70,.10),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,205,110,.20)}.installment-partial .installment-side span,.installment-overdue-partial .installment-side span{color:var(--warning)}
+.installment-due-soon{background:linear-gradient(145deg,rgba(255,190,70,.12),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,205,110,.22)}.installment-due-soon .installment-side span{color:var(--warning)}
+.installment-overdue{background:linear-gradient(145deg,rgba(255,80,90,.13),rgba(255,255,255,.045) 62%,rgba(255,255,255,.025));border-color:rgba(255,110,120,.24)}.installment-overdue .installment-side span{color:var(--danger)}
+.installment-pending{background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.035) 62%,rgba(255,255,255,.025));border-color:rgba(255,255,255,.14)}.installment-pending .installment-side span{color:#c3c6cd}
+
+/* Payment history is intentionally quieter than the schedule. */
+.payment-history-section{margin-top:18px}.payment-list{display:grid;gap:7px}.payment-row{min-height:64px;padding:10px 11px;border-radius:16px;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 18px rgba(0,0,0,.20)}
+.payment-installment-badge{display:inline-flex;align-items:center;padding:7px 10px;margin:4px 0 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:#d9dbe0;font-size:9px;font-weight:800}
+
+/* Data actions: same glass material, status tint communicates risk. */
+.action-backup{background:linear-gradient(145deg,rgba(70,210,140,.10),rgba(255,255,255,.045));border-color:rgba(120,235,180,.18);color:var(--success)}
+.action-restore{background:linear-gradient(145deg,rgba(120,165,255,.10),rgba(255,255,255,.045));border-color:rgba(150,185,255,.18);color:#bcd0ff}
+.action-delete{background:linear-gradient(145deg,rgba(255,80,90,.11),rgba(255,255,255,.045));border-color:rgba(255,110,120,.22);color:var(--danger)}
+.action-clear{background:linear-gradient(145deg,rgba(255,55,70,.16),rgba(255,255,255,.035));border-color:rgba(255,100,110,.28);color:#ff9a9f}
+
+@media(max-width:380px){
+  .topbar{padding-left:9px;padding-right:9px}
+  .topbar-actions{gap:3px!important}
+  .icon-btn{width:42px;height:42px;min-width:42px;min-height:42px}
+  .installment-row{padding:11px 10px}
+}
+
+.auth-reset-btn{display:block;width:100%;margin:10px 0 0;border:0;background:transparent;color:#d9dbe2;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}.auth-reset-btn:active{opacity:.7}.auth-status{min-height:20px}
+
+/* =========================================================
+   PAYPREMINIQ — UI STATUS + CONTACT TYPOGRAPHY FIX
+   UI/Style only — no logic/data changes
+========================================================= */
+
+/* Payment status colors: keep the glass material, tint only the status. */
+.status-text{font-weight:800;line-height:1.25}
+.status-text.paid,.pill.paid{color:var(--success);background:rgba(70,210,140,.10);border-color:rgba(120,235,180,.20)}
+.status-text.partial,.pill.partial{color:var(--warning);background:rgba(255,190,70,.10);border-color:rgba(255,205,110,.20)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{color:#bcd0ff;background:rgba(120,165,255,.09);border-color:rgba(150,185,255,.18)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{color:var(--danger);background:rgba(255,80,90,.10);border-color:rgba(255,110,120,.22)}
+.status-text.pending,.pill.pending{color:#c3c6cd;background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.12)}
+
+/* The status pill must remain compact and readable on small screens. */
+.pill{font-weight:800;overflow:hidden;text-overflow:ellipsis}
+
+/* Data actions: preserve the semantic colors that were lost in the UI pass. */
+.wide-btn.action-backup{color:#79e2a8!important;background:linear-gradient(145deg,rgba(70,210,140,.11),rgba(255,255,255,.035))!important;border-color:rgba(120,235,180,.20)!important}
+.wide-btn.action-restore{color:#bcd0ff!important;background:linear-gradient(145deg,rgba(120,165,255,.11),rgba(255,255,255,.035))!important;border-color:rgba(150,185,255,.20)!important}
+.wide-btn.action-delete{color:#ff7777!important;background:linear-gradient(145deg,rgba(255,80,90,.11),rgba(255,255,255,.035))!important;border-color:rgba(255,110,120,.22)!important}
+.wide-btn.action-clear{color:#ff9a9f!important;background:linear-gradient(145deg,rgba(255,55,70,.14),rgba(255,255,255,.03))!important;border-color:rgba(255,100,110,.26)!important}
+
+/* Contact information: compact iOS-like links, never oversized or stretched. */
+.customer-contacts{margin:8px 0;padding:11px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.035);overflow:hidden}
+.customer-contacts>b{display:block;color:#d9dbe0;font-size:10px;margin-bottom:6px}
+.customer-contacts>div{display:grid;grid-template-columns:minmax(72px,86px) minmax(0,1fr);align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.055);min-width:0}
+.customer-contacts>div:first-of-type{border-top:0}
+.customer-contacts span{color:#858891;font-size:8px;line-height:1.25}
+.customer-contacts a,.customer-contacts div>b{display:block;min-width:0;max-width:100%;color:#a9d7ff;font-size:10px;line-height:1.3;font-weight:600;overflow-wrap:anywhere;word-break:break-word;text-decoration:none}
+.customer-contacts a:hover{text-decoration:underline;text-underline-offset:2px}
+
+/* Phone links in customer/contract detail stay compact too. */
+.customer-detail a,.detail-grid a{display:block;min-width:0;max-width:100%;color:#a9d7ff;font-size:10px;line-height:1.3;font-weight:600;overflow-wrap:anywhere;word-break:break-word;text-decoration:none}
+
+@media(max-width:380px){
+  .customer-contacts>div{grid-template-columns:64px minmax(0,1fr);gap:7px}
+  .customer-contacts a,.customer-contacts div>b,.customer-detail a,.detail-grid a{font-size:9px}
+}
+
+/* =========================================================
+   PAYPREMINIQ — iOS LIQUID GLASS CHROME
+   Clearer glass + scroll-away chrome (UI only)
+========================================================= */
+.topbar{
+  transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .24s ease;
+  will-change:transform,opacity;
+  background:rgba(8,9,11,.34)!important;
+  border-bottom-color:rgba(255,255,255,.055)!important;
+  box-shadow:0 8px 26px rgba(0,0,0,.10)!important;
+  backdrop-filter:blur(30px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(175%)!important;
+}
+.bottom-nav{
+  transition:transform .38s cubic-bezier(.22,.61,.36,1), opacity .24s ease;
+  will-change:transform,opacity;
+  background:rgba(18,20,24,.34)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 20px 46px rgba(0,0,0,.24)!important;
+  backdrop-filter:blur(32px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(180%)!important;
+}
+.fab{
+  transition:transform .38s cubic-bezier(.22,.61,.36,1), opacity .24s ease!important;
+  will-change:transform,opacity;
+  background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.13),rgba(255,255,255,.055) 45%,rgba(255,255,255,.022) 100%)!important;
+  backdrop-filter:blur(28px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+}
+.topbar.chrome-hidden{transform:translateY(-115%);opacity:.02;pointer-events:none}
+.bottom-nav.chrome-hidden{transform:translate(-50%,calc(115% + env(safe-area-inset-bottom)));opacity:.02;pointer-events:none}
+.fab.chrome-hidden{transform:translateY(150px)!important;opacity:.02;pointer-events:none}
+.fab.chrome-hidden:active{transform:translateY(150px)!important}
+@media(prefers-reduced-motion:reduce){
+  .topbar,.bottom-nav,.fab{transition:none!important}
+}
+
+
+/* =========================================================
+   PAYPREMINIQ — CLEAR LIQUID GLASS FINAL PASS
+   UI-only: no Firebase / data / application logic changes.
+========================================================= */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,
+.customer-detail div,.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.075)!important;
+  background:
+    radial-gradient(115% 90% at 12% 0%,rgba(255,255,255,.050),transparent 48%),
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.014) 62%,rgba(255,255,255,.010))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.070),
+    0 12px 30px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(28px) saturate(165%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(165%)!important;
+}
+
+.hero,.stat,.contract-card{
+  border-radius:26px;
+}
+.contract-card{border-color:rgba(255,255,255,.075)!important}
+
+.topbar{
+  background:rgba(8,9,11,.30)!important;
+  backdrop-filter:blur(32px) saturate(185%)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(185%)!important;
+}
+.bottom-nav{
+  background:rgba(18,20,24,.30)!important;
+  backdrop-filter:blur(34px) saturate(190%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(190%)!important;
+}
+.fab{
+  background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.12),rgba(255,255,255,.050) 45%,rgba(255,255,255,.020) 100%)!important;
+  backdrop-filter:blur(30px) saturate(190%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(190%)!important;
+}
+
+
+/* =========================================================
+   PAYPREMINIQ — SMOKY BLACK / GRAPHITE / CLEAR LIQUID GLASS
+   FINAL UI PASS — visual only. No data or application logic.
+========================================================= */
+
+:root{
+  --bg:#0b0c0e;
+  --surface:#141619;
+  --surface-2:#191b1e;
+  --text:#eeeeef;
+  --muted:#85888e;
+  --soft:#bfc1c5;
+  --line:rgba(255,255,255,.085);
+  --glass:rgba(255,255,255,.035);
+  --glass-strong:rgba(255,255,255,.055);
+  --glass-edge:rgba(255,255,255,.115);
+}
+
+html{
+  background:#0b0c0e;
+  color-scheme:dark;
+}
+
+body{
+  background:
+    radial-gradient(560px 420px at 5% -8%,rgba(150,150,150,.055),transparent 70%),
+    radial-gradient(520px 400px at 96% 12%,rgba(120,120,120,.040),transparent 72%),
+    linear-gradient(180deg,#101114 0%,#0b0c0e 48%,#090a0c 100%);
+}
+
+body::before{
+  background:
+    radial-gradient(320px 220px at 18% 34%,rgba(255,255,255,.014),transparent 72%),
+    radial-gradient(420px 280px at 82% 66%,rgba(255,255,255,.012),transparent 72%);
+}
+
+/* Clear glass cards: darker material, but visibly translucent. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,
+.detail-status,.note-box,.subtle-box,.customer-detail div,
+.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.075);
+  background:
+    radial-gradient(120% 85% at 12% 0%,rgba(255,255,255,.042),transparent 48%),
+    linear-gradient(145deg,rgba(255,255,255,.036),rgba(255,255,255,.014) 62%,rgba(255,255,255,.010));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.065),
+    0 14px 34px rgba(0,0,0,.30);
+  backdrop-filter:blur(28px) saturate(135%);
+  -webkit-backdrop-filter:blur(28px) saturate(135%);
+}
+
+/* Topbar / FAB / bottom nav are clearer than cards. */
+.topbar{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.105);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 16px 34px rgba(0,0,0,.32);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.icon-btn{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.016));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 10px 24px rgba(0,0,0,.32);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+}
+
+.bottom-nav{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 20px 46px rgba(0,0,0,.44);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.nav-item.active{
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.18);
+}
+
+.fab{
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.095),rgba(255,255,255,.042) 45%,rgba(255,255,255,.018) 100%);
+  border-color:rgba(255,255,255,.135);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    0 16px 34px rgba(0,0,0,.46),
+    0 0 0 1px rgba(255,255,255,.025);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.fab::after{
+  background:rgba(255,255,255,.075);
+}
+
+/* Keep the graphite palette neutral — no blue cast. */
+.hero:after{
+  background:radial-gradient(circle,rgba(190,190,195,.12),transparent 68%);
+}
+
+.progress i,
+.installment-progress i{
+  background:linear-gradient(90deg,#cfd0d4,#8f9298);
+  box-shadow:0 0 12px rgba(210,210,215,.10);
+}
+
+.product-thumb,.avatar{
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.075);
+}
+
+/* Preserve semantic status colors while keeping their surfaces translucent. */
+.status-text.paid,.pill.paid{background:rgba(70,210,140,.075)}
+.status-text.partial,.pill.partial{background:rgba(255,190,70,.075)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{background:rgba(150,160,175,.075)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{background:rgba(255,80,90,.075)}
+.status-text.pending,.pill.pending{background:rgba(255,255,255,.040)}
+
+.installment-row{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.040),rgba(255,255,255,.014));
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.modal{
+  background:
+    radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.045),transparent 52%),
+    rgba(16,18,21,.84);
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(32px) saturate(140%);
+  -webkit-backdrop-filter:blur(32px) saturate(140%);
+}
+
+/* =========================================================
+   PAYPREMINIQ — CLEAR LIQUID GLASS / iOS-inspired MATERIAL
+   FINAL VISUAL OVERRIDE
+   IMPORTANT: visual-only. No layout, sizing, positioning,
+   data, storage, or application logic is changed here.
+========================================================= */
+:root{
+  --glass-clear:rgba(255,255,255,.055);
+  --glass-clear-2:rgba(255,255,255,.030);
+  --glass-edge-clear:rgba(255,255,255,.16);
+  --glass-highlight:rgba(255,255,255,.20);
+}
+
+html{background:#0b0d12}
+
+body{
+  background:
+    radial-gradient(520px 420px at 12% 6%,rgba(105,120,170,.20),transparent 68%),
+    radial-gradient(480px 380px at 88% 18%,rgba(145,120,175,.16),transparent 70%),
+    radial-gradient(620px 460px at 48% 82%,rgba(80,120,155,.12),transparent 72%),
+    linear-gradient(180deg,#10131a 0%,#0b0d12 52%,#080a0e 100%);
+}
+
+body::before{
+  background:
+    radial-gradient(340px 240px at 18% 28%,rgba(255,255,255,.045),transparent 72%),
+    radial-gradient(420px 300px at 82% 58%,rgba(135,150,210,.055),transparent 72%),
+    radial-gradient(300px 220px at 45% 92%,rgba(190,150,210,.035),transparent 72%);
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:-12%;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(300px 220px at 24% 18%,rgba(255,255,255,.028),transparent 72%),
+    radial-gradient(360px 260px at 76% 38%,rgba(170,180,220,.032),transparent 74%);
+  filter:blur(34px);
+}
+
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,
+.detail-status,.note-box,.subtle-box,.customer-detail div,
+.detail-grid div,.status-summary,.payment-row{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.032) 48%,rgba(255,255,255,.020)),
+    radial-gradient(100% 120% at 0% 0%,rgba(255,255,255,.045),transparent 62%);
+  border-color:var(--glass-edge-clear);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.16),
+    0 16px 38px rgba(0,0,0,.28);
+  backdrop-filter:blur(30px) saturate(155%);
+  -webkit-backdrop-filter:blur(30px) saturate(155%);
+}
+
+.card::after,.settings-card::after,.status-summary::after,.payment-row::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(115deg,rgba(255,255,255,.055),transparent 24%,transparent 72%,rgba(255,255,255,.018));
+}
+
+.topbar{
+  background:rgba(15,18,24,.48);
+  border-bottom-color:rgba(255,255,255,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 32px rgba(0,0,0,.22);
+  backdrop-filter:blur(32px) saturate(160%);
+  -webkit-backdrop-filter:blur(32px) saturate(160%);
+}
+
+.icon-btn{
+  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035));
+  border-color:rgba(255,255,255,.19);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.17),inset 0 -1px 0 rgba(0,0,0,.18),0 10px 24px rgba(0,0,0,.24);
+  backdrop-filter:blur(26px) saturate(165%);
+  -webkit-backdrop-filter:blur(26px) saturate(165%);
+}
+
+.hero{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.095),rgba(255,255,255,.040) 50%,rgba(255,255,255,.022)),
+    radial-gradient(90% 120% at 100% 0%,rgba(160,175,220,.10),transparent 66%);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(0,0,0,.16),0 18px 42px rgba(0,0,0,.30);
+}
+
+.hero:after{background:radial-gradient(circle,rgba(205,215,245,.16),transparent 68%)}
+
+.stat,.task,.customer,.note-box,.subtle-box{
+  background:linear-gradient(145deg,rgba(255,255,255,.060),rgba(255,255,255,.025));
+}
+
+.bottom-nav{
+  background:rgba(22,25,32,.54);
+  border-color:rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.18),0 20px 46px rgba(0,0,0,.34);
+  backdrop-filter:blur(32px) saturate(165%);
+  -webkit-backdrop-filter:blur(32px) saturate(165%);
+}
+
+.nav-item.active{
+  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035));
+  border-color:rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 8px 18px rgba(0,0,0,.20);
+}
+
+.fab{
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.20),rgba(255,255,255,.075) 42%,rgba(255,255,255,.025) 100%);
+  border-color:rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.18),0 16px 34px rgba(0,0,0,.36),0 0 0 1px rgba(255,255,255,.035);
+  backdrop-filter:blur(28px) saturate(165%);
+  -webkit-backdrop-filter:blur(28px) saturate(165%);
+}
+
+.fab::after{background:rgba(255,255,255,.12)}
+
+.today-chip,.count,.pill{
+  background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+}
+
+.contract-bottom{color:#b9bbc3}
+.contract-bottom > span:first-child{color:#b9bbc3}
+
+.status-text.paid,.pill.paid{color:var(--success);background:rgba(70,210,140,.10);border-color:rgba(120,235,180,.22)}
+.status-text.partial,.pill.partial{color:var(--warning);background:rgba(255,190,70,.10);border-color:rgba(255,205,110,.22)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{color:#c6d4ff;background:rgba(120,165,255,.10);border-color:rgba(150,185,255,.20)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{color:var(--danger);background:rgba(255,80,90,.10);border-color:rgba(255,110,120,.23)}
+.status-text.pending,.pill.pending{color:#d0d2d8;background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.13)}
+
+.progress{background:rgba(255,255,255,.075)}
+.progress i,.installment-progress i{background:linear-gradient(90deg,#f1f2f5,#bfc7ff);box-shadow:0 0 14px rgba(205,210,255,.18)}
+
+.product-thumb,.avatar{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+
+/* =========================================================
+   PAYPREMINIQ FIX 2026-08-21
+   Header/logo sizing is explicitly locked so the app logo can
+   never expand into the page content even if an older cached
+   stylesheet is partially mixed with this build.
+========================================================= */
+.topbar{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;width:100%!important;min-height:68px!important;box-sizing:border-box!important}
+.brand-lockup{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;min-width:0!important;flex:1 1 auto!important}
+.brand-lockup .app-logo{display:block!important;width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;min-height:40px!important;max-height:40px!important;flex:0 0 40px!important;object-fit:cover!important;border-radius:12px!important}
+.brand-lockup>div{min-width:0!important}
+.topbar-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;flex:0 0 auto!important}
+
+/* Clear Liquid Glass: brighter, more transparent, background remains visible. */
+body{background:
+  radial-gradient(520px 420px at 12% 6%,rgba(110,125,180,.24),transparent 68%),
+  radial-gradient(480px 380px at 88% 18%,rgba(160,130,190,.19),transparent 70%),
+  radial-gradient(620px 460px at 48% 82%,rgba(90,135,175,.15),transparent 72%),
+  linear-gradient(180deg,#10131a 0%,#0b0d12 52%,#080a0e 100%)!important}
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,.payment-row,.task,.customer,.stat{
+  background:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.028) 52%,rgba(255,255,255,.014))!important;
+  backdrop-filter:blur(32px) saturate(170%)!important;-webkit-backdrop-filter:blur(32px) saturate(170%)!important;
+  border-color:rgba(255,255,255,.15)!important;
+}
+.bottom-nav{background:rgba(30,34,43,.48)!important;backdrop-filter:blur(34px) saturate(175%)!important;-webkit-backdrop-filter:blur(34px) saturate(175%)!important}
+.fab{background:radial-gradient(circle at 30% 18%,rgba(255,255,255,.25),rgba(255,255,255,.10) 42%,rgba(255,255,255,.035) 100%)!important}
+
+/* Installment state colors must remain visible on every glass surface. */
+.status-text.paid,.pill.paid{color:#79e2a8!important;background:rgba(70,210,140,.14)!important;border-color:rgba(120,235,180,.30)!important}
+.status-text.partial,.pill.partial{color:#ffd36a!important;background:rgba(255,190,70,.14)!important;border-color:rgba(255,205,110,.28)!important}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{color:#cbd8ff!important;background:rgba(120,165,255,.14)!important;border-color:rgba(150,185,255,.28)!important}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{color:#ff7777!important;background:rgba(255,80,90,.14)!important;border-color:rgba(255,110,120,.30)!important}
+.status-text.pending,.pill.pending{color:#e0e2e8!important;background:rgba(255,255,255,.075)!important;border-color:rgba(255,255,255,.16)!important}
+.installment-row .status-text{font-weight:800!important}

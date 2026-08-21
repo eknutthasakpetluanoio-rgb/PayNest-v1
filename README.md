@@ -54,3 +54,6 @@ Firebase, LocalStorage และ PWA ที่ใช้งานจริงถ�
 This revision introduces a single `PayNestCore` calculation layer in `app.js` for installment dates, installment status, payment-to-installment mapping, outstanding balances, due-soon/overdue classification, and payment validation.
 
 Existing UI code remains in place so the revision can be tested incrementally without replacing the existing Firebase/data workflow.
+
+
+BUILD FIX: iOS27 Clear Liquid Glass header lock, visible installment status colors, duplicate SVG/icon cleanup, and legacy LocalStorage migration.
