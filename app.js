@@ -28,7 +28,7 @@ let firebaseError = null;
 let firebaseAuthPromise = null;
 let auth = { currentUser: null };
 let db = null;
-let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail;
+let initializeApp, getAuth, firebaseOnAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail;
 let createUserWithEmailAndPassword, signOut, getFirestore, doc, getDoc;
 let setDoc, onSnapshot, serverTimestamp;
 
