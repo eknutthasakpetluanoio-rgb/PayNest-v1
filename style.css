@@ -203,121 +203,40 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 .auth-reset-btn{display:block;width:100%;margin:10px 0 0;border:0;background:transparent;color:#d9dbe2;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px;cursor:pointer}.auth-reset-btn:active{opacity:.7}.auth-status{min-height:20px}
 
 /* =========================================================
-   PAYPREMINIQ — iOS Liquid Glass Transparency Pass
-   UI/STYLE ONLY — no logic/data/auth changes
-   ========================================================= */
-:root{
-  --glass:rgba(255,255,255,.035);
-  --glass-strong:rgba(255,255,255,.055);
-  --glass-edge:rgba(255,255,255,.12);
-}
+   PAYPREMINIQ — UI STATUS + CONTACT TYPOGRAPHY FIX
+   UI/Style only — no logic/data changes
+========================================================= */
 
-.topbar{
-  background:rgba(12,14,18,.46)!important;
-  border-bottom-color:rgba(255,255,255,.055)!important;
-  box-shadow:0 8px 26px rgba(0,0,0,.12)!important;
-  backdrop-filter:blur(30px) saturate(175%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(175%)!important;
-}
+/* Payment status colors: keep the glass material, tint only the status. */
+.status-text{font-weight:800;line-height:1.25}
+.status-text.paid,.pill.paid{color:var(--success);background:rgba(70,210,140,.10);border-color:rgba(120,235,180,.20)}
+.status-text.partial,.pill.partial{color:var(--warning);background:rgba(255,190,70,.10);border-color:rgba(255,205,110,.20)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{color:#bcd0ff;background:rgba(120,165,255,.09);border-color:rgba(150,185,255,.18)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{color:var(--danger);background:rgba(255,80,90,.10);border-color:rgba(255,110,120,.22)}
+.status-text.pending,.pill.pending{color:#c3c6cd;background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.12)}
 
-.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,
-.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,
-.payment-row{
-  background:linear-gradient(145deg,
-    rgba(255,255,255,.050),
-    rgba(255,255,255,.022) 58%,
-    rgba(255,255,255,.012))!important;
-  border-color:rgba(255,255,255,.070)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.075),0 14px 34px rgba(0,0,0,.18)!important;
-  backdrop-filter:blur(30px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
-}
+/* The status pill must remain compact and readable on small screens. */
+.pill{font-weight:800;overflow:hidden;text-overflow:ellipsis}
 
-.card::before,.settings-card::before,.bottom-nav::before,.fab::before{
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent)!important;
-}
+/* Data actions: preserve the semantic colors that were lost in the UI pass. */
+.wide-btn.action-backup{color:#79e2a8!important;background:linear-gradient(145deg,rgba(70,210,140,.11),rgba(255,255,255,.035))!important;border-color:rgba(120,235,180,.20)!important}
+.wide-btn.action-restore{color:#bcd0ff!important;background:linear-gradient(145deg,rgba(120,165,255,.11),rgba(255,255,255,.035))!important;border-color:rgba(150,185,255,.20)!important}
+.wide-btn.action-delete{color:#ff7777!important;background:linear-gradient(145deg,rgba(255,80,90,.11),rgba(255,255,255,.035))!important;border-color:rgba(255,110,120,.22)!important}
+.wide-btn.action-clear{color:#ff9a9f!important;background:linear-gradient(145deg,rgba(255,55,70,.14),rgba(255,255,255,.03))!important;border-color:rgba(255,100,110,.26)!important}
 
-.tabs{
-  background:rgba(255,255,255,.022)!important;
-  border:1px solid rgba(255,255,255,.055)!important;
-  backdrop-filter:blur(26px) saturate(175%)!important;
-  -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
-}
+/* Contact information: compact iOS-like links, never oversized or stretched. */
+.customer-contacts{margin:8px 0;padding:11px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.035);overflow:hidden}
+.customer-contacts>b{display:block;color:#d9dbe0;font-size:10px;margin-bottom:6px}
+.customer-contacts>div{display:grid;grid-template-columns:minmax(72px,86px) minmax(0,1fr);align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.055);min-width:0}
+.customer-contacts>div:first-of-type{border-top:0}
+.customer-contacts span{color:#858891;font-size:8px;line-height:1.25}
+.customer-contacts a,.customer-contacts div>b{display:block;min-width:0;max-width:100%;color:#a9d7ff;font-size:10px;line-height:1.3;font-weight:600;overflow-wrap:anywhere;word-break:break-word;text-decoration:none}
+.customer-contacts a:hover{text-decoration:underline;text-underline-offset:2px}
 
-.search-wrap{background:rgba(255,255,255,.030)!important}
+/* Phone links in customer/contract detail stay compact too. */
+.customer-detail a,.detail-grid a{display:block;min-width:0;max-width:100%;color:#a9d7ff;font-size:10px;line-height:1.3;font-weight:600;overflow-wrap:anywhere;word-break:break-word;text-decoration:none}
 
-.today-chip,.count,.pill{
-  background:rgba(255,255,255,.035)!important;
-  border-color:rgba(255,255,255,.075)!important;
-  backdrop-filter:blur(20px) saturate(175%);
-  -webkit-backdrop-filter:blur(20px) saturate(175%);
-}
-
-.product-thumb,.avatar{
-  background:rgba(255,255,255,.030)!important;
-  border-color:rgba(255,255,255,.075)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 7px 16px rgba(0,0,0,.18)!important;
-  backdrop-filter:blur(20px) saturate(175%);
-  -webkit-backdrop-filter:blur(20px) saturate(175%);
-}
-
-.bottom-nav{
-  background:rgba(18,20,24,.52)!important;
-  border-color:rgba(255,255,255,.105)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 20px 46px rgba(0,0,0,.30)!important;
-  backdrop-filter:blur(32px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(32px) saturate(180%)!important;
-}
-
-.nav-item.active{
-  background:rgba(255,255,255,.055)!important;
-  border-color:rgba(255,255,255,.085)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.12)!important;
-}
-
-.fab,.icon-btn{
-  background:rgba(255,255,255,.055)!important;
-  border-color:rgba(255,255,255,.13)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 16px 34px rgba(0,0,0,.30)!important;
-  backdrop-filter:blur(30px) saturate(185%)!important;
-  -webkit-backdrop-filter:blur(30px) saturate(185%)!important;
-}
-
-.fab::after{background:rgba(255,255,255,.10)!important}
-
-.mini-btn,.wide-btn{
-  background:rgba(255,255,255,.035)!important;
-  border-color:rgba(255,255,255,.085)!important;
-  backdrop-filter:blur(20px) saturate(175%);
-  -webkit-backdrop-filter:blur(20px) saturate(175%);
-}
-
-.installment-summary,.installment-row{
-  background:rgba(255,255,255,.035)!important;
-  border-color:rgba(255,255,255,.085)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 12px 26px rgba(0,0,0,.18)!important;
-  backdrop-filter:blur(28px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
-}
-
-.modal{
-  background:radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.045),transparent 50%),rgba(18,20,24,.70)!important;
-  border-color:rgba(255,255,255,.09)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 70px rgba(0,0,0,.40)!important;
-  backdrop-filter:blur(34px) saturate(180%)!important;
-  -webkit-backdrop-filter:blur(34px) saturate(180%)!important;
-}
-
-.modal input,.modal select,.modal textarea{
-  background:rgba(255,255,255,.030)!important;
-  border-color:rgba(255,255,255,.085)!important;
-  backdrop-filter:blur(20px) saturate(175%);
-  -webkit-backdrop-filter:blur(20px) saturate(175%);
-}
-
-/* Keep text fully opaque while surfaces become more transparent. */
-.card,.settings-card,.search-wrap,.form-note,.payment-summary,.detail-status,
-.note-box,.subtle-box,.customer-detail div,.detail-grid div,.status-summary,
-.payment-row,.modal,.bottom-nav,.fab,.icon-btn,.installment-row,.installment-summary{
-  color:var(--text);
+@media(max-width:380px){
+  .customer-contacts>div{grid-template-columns:64px minmax(0,1fr);gap:7px}
+  .customer-contacts a,.customer-contacts div>b,.customer-detail a,.detail-grid a{font-size:9px}
 }
