@@ -464,3 +464,76 @@ body::before{
   backdrop-filter:blur(32px) saturate(140%);
   -webkit-backdrop-filter:blur(32px) saturate(140%);
 }
+
+/* =========================================================
+   PAYPREMINIQ — PIANO BLACK / CLEAR LIQUID GLASS
+   LOCKED VISUAL DIRECTION — visual only
+   Deep black environment, clear glass, neutral refraction.
+========================================================= */
+:root{
+  --bg:#050608;
+  --glass-clear:rgba(255,255,255,.028);
+  --glass-clear-2:rgba(255,255,255,.042);
+  --glass-reflect:rgba(255,255,255,.085);
+}
+
+html{background:#050608}
+body{
+  background:
+    radial-gradient(520px 360px at 12% -8%,rgba(255,255,255,.035),transparent 68%),
+    radial-gradient(500px 340px at 92% 18%,rgba(255,255,255,.022),transparent 72%),
+    radial-gradient(620px 460px at 50% 112%,rgba(255,255,255,.018),transparent 72%),
+    linear-gradient(180deg,#08090b 0%,#050608 52%,#030406 100%);
+}
+body::before{
+  background:
+    radial-gradient(300px 210px at 20% 34%,rgba(255,255,255,.018),transparent 72%),
+    radial-gradient(360px 240px at 80% 65%,rgba(255,255,255,.014),transparent 74%);
+}
+
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,
+.detail-status,.note-box,.subtle-box,.customer-detail div,
+.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.095);
+  background:
+    radial-gradient(120% 90% at 14% 0%,rgba(255,255,255,.045),transparent 44%),
+    linear-gradient(145deg,rgba(255,255,255,.030),rgba(255,255,255,.012) 58%,rgba(255,255,255,.007));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.085),0 18px 42px rgba(0,0,0,.42);
+  backdrop-filter:blur(30px) saturate(155%);
+  -webkit-backdrop-filter:blur(30px) saturate(155%);
+}
+.card::after,.settings-card::after,.search-wrap::after,.contract-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(112deg,rgba(255,255,255,.035),transparent 24%,transparent 72%,rgba(255,255,255,.012));
+  mix-blend-mode:screen;
+}
+
+.topbar,.bottom-nav,.icon-btn{
+  background:linear-gradient(145deg,rgba(255,255,255,.038),rgba(255,255,255,.010));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 18px 42px rgba(0,0,0,.46);
+  backdrop-filter:blur(34px) saturate(165%);
+  -webkit-backdrop-filter:blur(34px) saturate(165%);
+}
+.bottom-nav{background:linear-gradient(145deg,rgba(255,255,255,.040),rgba(255,255,255,.009));}
+.nav-item.active{background:rgba(255,255,255,.042);border-color:rgba(255,255,255,.075)}
+
+.fab{
+  background:radial-gradient(circle at 30% 18%,rgba(255,255,255,.115),rgba(255,255,255,.040) 44%,rgba(255,255,255,.012) 100%);
+  border-color:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 18px 40px rgba(0,0,0,.52),0 0 0 1px rgba(255,255,255,.025);
+  backdrop-filter:blur(30px) saturate(165%);
+  -webkit-backdrop-filter:blur(30px) saturate(165%);
+}
+.fab::after{background:rgba(255,255,255,.095)}
+.hero:after{background:radial-gradient(circle,rgba(255,255,255,.10),transparent 68%)}
+
+/* Product cards: make the real product artwork more prominent without cropping. */
+.product-thumb,.product-thumb-small{width:58px;height:58px;flex-basis:58px;border-radius:16px;background:rgba(255,255,255,.018);border-color:rgba(255,255,255,.075);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 9px 22px rgba(0,0,0,.34)}
+.product-thumb img{width:100%;height:100%;object-fit:contain;padding:3px}
+.contract-title-wrap{gap:11px}
+
+/* Restore a distinct readable tone for the next-installment amount. */
+.contract-info span:last-child{color:#cfd2d8;font-weight:700}
+
+.installment-row{background:linear-gradient(145deg,rgba(255,255,255,.032),rgba(255,255,255,.010));border-color:rgba(255,255,255,.10);backdrop-filter:blur(28px) saturate(155%);-webkit-backdrop-filter:blur(28px) saturate(155%)}
