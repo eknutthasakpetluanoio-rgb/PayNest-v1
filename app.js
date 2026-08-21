@@ -190,6 +190,10 @@ function resetData() {
   if (hasMeaningfulData(current)) {
     localStorage.setItem(RECOVERY_KEY, JSON.stringify(current));
   }
+
+  // DATA-SAFE rule: never delete the Cloud copy as a side effect of a local
+  // reset. A local reset must never make Firebase forget the user's database.
+  // The next signed-in boot can restore the local database from Cloud.
   localStorage.removeItem(STORAGE_KEY);
   return clone(DEFAULT_DATA);
 }
@@ -2121,12 +2125,8 @@ document.addEventListener("click", event => {
     if (confirm("ล้างข้อมูล PAYPREMINIQ ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
       data = resetData();
-      // Keep Firestore consistent with the explicit local reset.
-      if (currentUser()) {
-        setCloudData(data).catch(error =>
-          console.warn("PAYPREMINIQ cloud reset sync skipped:", error)
-        );
-      }
+      // IMPORTANT: do NOT sync the empty local reset to Firebase.
+      // Firebase is the recovery source for a cleared browser/device.
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
