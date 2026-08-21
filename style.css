@@ -242,49 +242,38 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
 }
 
 /* =========================================================
-   PAYPREMINIQ — EXTRA CLEAR LIQUID GLASS PASS
-   UI/Style only — Firebase, data and logic untouched
+   PAYPREMINIQ — iOS LIQUID GLASS CHROME
+   Clearer glass + scroll-away chrome (UI only)
 ========================================================= */
-:root{
-  --fab-glass-clear:radial-gradient(circle at 30% 18%,rgba(255,255,255,.11),rgba(255,255,255,.045) 44%,rgba(255,255,255,.018) 100%);
-  --chrome-glass-clear:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.025) 58%,rgba(255,255,255,.012));
-}
-
-/* FAB: keep its shape/position, but let more of the background show through. */
-.fab{
-  background:var(--fab-glass-clear);
-  border-color:rgba(255,255,255,.14);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 16px 34px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.025);
-  backdrop-filter:blur(28px) saturate(170%);
-  -webkit-backdrop-filter:blur(28px) saturate(170%);
-}
-.fab::after{background:rgba(255,255,255,.10)}
-
-/* Topbar: substantially clearer than before; content remains fully opaque. */
 .topbar{
-  background:var(--chrome-glass-clear);
-  border-color:rgba(255,255,255,.10);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px rgba(0,0,0,.22);
-  backdrop-filter:blur(32px) saturate(180%);
-  -webkit-backdrop-filter:blur(32px) saturate(180%);
+  transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .24s ease;
+  will-change:transform,opacity;
+  background:rgba(8,9,11,.34)!important;
+  border-bottom-color:rgba(255,255,255,.055)!important;
+  box-shadow:0 8px 26px rgba(0,0,0,.10)!important;
+  backdrop-filter:blur(30px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(175%)!important;
 }
-.topbar .icon-btn{
-  background:rgba(255,255,255,.035);
-  border-color:rgba(255,255,255,.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 8px 20px rgba(0,0,0,.24);
-  backdrop-filter:blur(28px) saturate(175%);
-  -webkit-backdrop-filter:blur(28px) saturate(175%);
-}
-
-/* Bottom navigation: more transparent than the FAB, with stronger glass depth. */
 .bottom-nav{
-  background:var(--chrome-glass-clear);
-  border-color:rgba(255,255,255,.11);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 20px 42px rgba(0,0,0,.38);
-  backdrop-filter:blur(34px) saturate(185%);
-  -webkit-backdrop-filter:blur(34px) saturate(185%);
+  transition:transform .38s cubic-bezier(.22,.61,.36,1), opacity .24s ease;
+  will-change:transform,opacity;
+  background:rgba(18,20,24,.34)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 20px 46px rgba(0,0,0,.24)!important;
+  backdrop-filter:blur(32px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(180%)!important;
 }
-.bottom-nav .nav-item.active{
-  background:rgba(255,255,255,.055);
-  border-color:rgba(255,255,255,.09);
+.fab{
+  transition:transform .38s cubic-bezier(.22,.61,.36,1), opacity .24s ease!important;
+  will-change:transform,opacity;
+  background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.13),rgba(255,255,255,.055) 45%,rgba(255,255,255,.022) 100%)!important;
+  backdrop-filter:blur(28px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+}
+.topbar.chrome-hidden{transform:translateY(-115%);opacity:.02;pointer-events:none}
+.bottom-nav.chrome-hidden{transform:translate(-50%,calc(115% + env(safe-area-inset-bottom)));opacity:.02;pointer-events:none}
+.fab.chrome-hidden{transform:translateY(150px)!important;opacity:.02;pointer-events:none}
+.fab.chrome-hidden:active{transform:translateY(150px)!important}
+@media(prefers-reduced-motion:reduce){
+  .topbar,.bottom-nav,.fab{transition:none!important}
 }

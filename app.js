@@ -2460,3 +2460,54 @@ const PayNestCore = (() => {
 window.PayNestCore = PayNestCore;
 
 })();
+
+/* =========================================================
+   PAYPREMINIQ — iOS CHROME SCROLL BEHAVIOR
+   UI interaction only: topbar + FAB + bottom navigation
+========================================================= */
+(() => {
+  let lastScrollY = Math.max(0, window.scrollY || 0);
+  let ticking = false;
+  let hidden = false;
+
+  const chrome = () => ({
+    topbar: document.querySelector('.topbar'),
+    fab: document.querySelector('.fab'),
+    bottom: document.querySelector('.bottom-nav')
+  });
+
+  const setChrome = nextHidden => {
+    const {topbar, fab, bottom} = chrome();
+    [topbar, fab, bottom].forEach(el => el?.classList.toggle('chrome-hidden', nextHidden));
+    hidden = nextHidden;
+  };
+
+  const updateChrome = () => {
+    ticking = false;
+    const y = Math.max(0, window.scrollY || 0);
+    const delta = y - lastScrollY;
+
+    if (y <= 8) {
+      setChrome(false);
+    } else if (delta > 8 && y > 70) {
+      setChrome(true);
+    } else if (delta < -8) {
+      setChrome(false);
+    }
+
+    lastScrollY = y;
+  };
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(updateChrome);
+    }
+  }, {passive:true});
+
+  window.addEventListener('resize', () => setChrome(hidden), {passive:true});
+  window.addEventListener('pageshow', () => {
+    lastScrollY = Math.max(0, window.scrollY || 0);
+    setChrome(false);
+  });
+})();
