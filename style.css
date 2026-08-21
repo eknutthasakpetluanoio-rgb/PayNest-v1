@@ -740,3 +740,87 @@ body::before{
 .installment-partial,.installment-overdue-partial,.installment-due-soon{background:linear-gradient(145deg,rgba(255,190,70,.065),rgba(255,255,255,.028) 62%,rgba(255,255,255,.018)) !important}
 .installment-overdue{background:linear-gradient(145deg,rgba(255,80,90,.075),rgba(255,255,255,.028) 62%,rgba(255,255,255,.018)) !important}
 .installment-pending{background:linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.022) 62%,rgba(255,255,255,.015)) !important}
+
+/* =========================================================
+   PAYPREMINIQ — STATUS COLOR SYSTEM v2
+   Clear Liquid Glass + high-visibility semantic colors
+   Status colors are intentionally stronger than the neutral UI.
+========================================================= */
+:root{
+  --status-green:#45e39a;
+  --status-green-bg:rgba(69,227,154,.18);
+  --status-green-line:rgba(69,227,154,.48);
+  --status-amber:#ffd34f;
+  --status-amber-bg:rgba(255,211,79,.18);
+  --status-amber-line:rgba(255,211,79,.48);
+  --status-red:#ff5967;
+  --status-red-bg:rgba(255,89,103,.20);
+  --status-red-line:rgba(255,89,103,.52);
+}
+
+/* Small status labels/pills: color must be immediately readable. */
+.status-text.paid,
+.pill.paid{
+  color:var(--status-green) !important;
+  background:linear-gradient(135deg,var(--status-green-bg),rgba(255,255,255,.045)) !important;
+  border-color:var(--status-green-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 0 14px rgba(69,227,154,.10) !important;
+  opacity:1 !important;
+}
+
+.status-text.partial,
+.status-text.due,
+.status-text.due-soon,
+.status-text.pending,
+.pill.partial,
+.pill.due,
+.pill.due-soon,
+.pill.pending{
+  color:var(--status-amber) !important;
+  background:linear-gradient(135deg,var(--status-amber-bg),rgba(255,255,255,.045)) !important;
+  border-color:var(--status-amber-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 0 14px rgba(255,211,79,.09) !important;
+  opacity:1 !important;
+}
+
+.status-text.overdue,
+.status-text.overdue-partial,
+.pill.overdue,
+.pill.overdue-partial{
+  color:var(--status-red) !important;
+  background:linear-gradient(135deg,var(--status-red-bg),rgba(255,255,255,.045)) !important;
+  border-color:var(--status-red-line) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 0 16px rgba(255,89,103,.12) !important;
+  opacity:1 !important;
+}
+
+/* Installment rows: keep the glass surface, but make the semantic edge unmistakable. */
+.installment-paid{
+  background:linear-gradient(135deg,rgba(69,227,154,.16),rgba(255,255,255,.035) 62%,rgba(255,255,255,.018)) !important;
+  border-color:rgba(69,227,154,.42) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 18px rgba(69,227,154,.08) !important;
+}
+.installment-partial,
+.installment-overdue-partial,
+.installment-due-soon{
+  background:linear-gradient(135deg,rgba(255,211,79,.16),rgba(255,255,255,.035) 62%,rgba(255,255,255,.018)) !important;
+  border-color:rgba(255,211,79,.42) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 18px rgba(255,211,79,.07) !important;
+}
+.installment-overdue{
+  background:linear-gradient(135deg,rgba(255,89,103,.18),rgba(255,255,255,.035) 62%,rgba(255,255,255,.018)) !important;
+  border-color:rgba(255,89,103,.46) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 20px rgba(255,89,103,.09) !important;
+}
+.installment-paid .installment-side span{color:var(--status-green) !important}
+.installment-partial .installment-side span,
+.installment-overdue-partial .installment-side span,
+.installment-due-soon .installment-side span{color:var(--status-amber) !important}
+.installment-overdue .installment-side span{color:var(--status-red) !important}
+
+.summary-dot.has-overdue{
+  color:var(--status-red) !important;
+  background:var(--status-red-bg) !important;
+  border-color:var(--status-red-line) !important;
+  box-shadow:0 0 14px rgba(255,89,103,.10) !important;
+}
