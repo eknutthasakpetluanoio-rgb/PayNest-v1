@@ -31,30 +31,39 @@ let initializeApp, getAuth, onAuthStateChanged, signInWithEmailAndPassword;
 let createUserWithEmailAndPassword, signOut, getFirestore, doc, getDoc;
 let setDoc, onSnapshot, serverTimestamp;
 
-try {
-  const [appMod, authMod, firestoreMod] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-    import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-  ]);
+async function initializeFirebaseInBackground() {
+  try {
+    const [appMod, authMod, firestoreMod] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+    ]);
 
-  ({ initializeApp } = appMod);
-  ({ getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-     createUserWithEmailAndPassword, signOut } = authMod);
-  ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
+    ({ initializeApp } = appMod);
+    ({ getAuth, onAuthStateChanged: firebaseOnAuthStateChanged, signInWithEmailAndPassword,
+       createUserWithEmailAndPassword, signOut } = authMod);
+    ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
 
-  const firebaseApp = initializeApp(firebaseConfig);
-  auth = getAuth(firebaseApp);
-  db = getFirestore(firebaseApp);
-  firebaseReady = true;
-} catch (error) {
-  firebaseError = error;
-  console.warn("PAYPREMINIQ: Firebase unavailable; local mode enabled.", error);
-  onAuthStateChanged = callback => { callback(null); return () => {}; };
-  signInWithEmailAndPassword = async () => { throw new Error("Firebase ยังไม่พร้อมใช้งาน"); };
-  createUserWithEmailAndPassword = async () => { throw new Error("Firebase ยังไม่พร้อมใช้งาน"); };
-  signOut = async () => {};
+    const firebaseApp = initializeApp(firebaseConfig);
+    auth = getAuth(firebaseApp);
+    db = getFirestore(firebaseApp);
+    firebaseReady = true;
+
+    // Replace the temporary no-op auth listener with the real Firebase listener.
+    firebaseOnAuthStateChanged(auth, async user => {
+      renderAuthButton();
+      if (!user) {
+        stopRealtimeSync();
+        return;
+      }
+      await bootstrapCloud();
+    });
+  } catch (error) {
+    firebaseError = error;
+    console.warn("PAYPREMINIQ: Firebase unavailable; local mode enabled.", error);
+  }
 }
+
 
 /* ---------- Local Storage ---------- */
 
@@ -2197,18 +2206,11 @@ $("#cloudAccount")?.addEventListener("click", async () => {
   }
 });
 
-onAuthStateChanged(auth, async user => {
-  renderAuthButton();
-
-  if (!user) {
-    stopRealtimeSync();
-    return;
-  }
-
-  await bootstrapCloud();
-});
-
 render();
+
+// Firebase must never block the initial UI. Load it only after the local app
+// has rendered, then hydrate/sync cloud data in the background.
+initializeFirebaseInBackground();
 
 
 
