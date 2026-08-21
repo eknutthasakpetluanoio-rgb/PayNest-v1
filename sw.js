@@ -1,5 +1,5 @@
 // PAYPREMINIQ — Service Worker
-const CACHE_NAME = "paypreminiq-pwa-v14-auth-reset-20260821";
+const CACHE_NAME = "paypreminiq-pwa-v15-auth-split-20260821";
 
 const APP_SHELL = [
   "./",

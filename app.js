@@ -33,23 +33,22 @@ let setDoc, onSnapshot, serverTimestamp;
 
 async function initializeFirebaseInBackground() {
   try {
-    const [appMod, authMod, firestoreMod] = await Promise.all([
+    // IMPORTANT: Auth must not depend on Firestore loading.
+    // A Firestore/module failure must never make login/reset appear unavailable.
+    const [appMod, authMod] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js")
     ]);
 
     ({ initializeApp } = appMod);
     ({ getAuth, onAuthStateChanged: firebaseOnAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail,
        createUserWithEmailAndPassword, signOut } = authMod);
-    ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
 
     const firebaseApp = initializeApp(firebaseConfig);
     auth = getAuth(firebaseApp);
-    db = getFirestore(firebaseApp);
     firebaseReady = true;
 
-    // Replace the temporary no-op auth listener with the real Firebase listener.
+    // Auth is ready now, independently of Firestore.
     firebaseOnAuthStateChanged(auth, async user => {
       renderAuthButton();
       if (!user) {
@@ -58,6 +57,17 @@ async function initializeFirebaseInBackground() {
       }
       await bootstrapCloud();
     });
+
+    // Firestore is loaded separately so it cannot block Authentication.
+    try {
+      const firestoreMod = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js");
+      ({ getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } = firestoreMod);
+      db = getFirestore(firebaseApp);
+      // If the user was already authenticated before Firestore finished loading, hydrate now.
+      if (auth.currentUser) await bootstrapCloud();
+    } catch (firestoreError) {
+      console.warn("PAYPREMINIQ: Firestore unavailable; Authentication remains available.", firestoreError);
+    }
   } catch (error) {
     firebaseError = error;
     console.warn("PAYPREMINIQ: Firebase unavailable; local mode enabled.", error);
