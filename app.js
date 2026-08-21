@@ -512,9 +512,9 @@ function productInitials(product) {
 
 function defaultProductImage(product) {
   const text = String(product || "").toLowerCase();
-  if (text.includes("vivo") && text.includes("v70")) return "./products/vivo-v70.svg";
-  if (text.includes("soundcore") && text.includes("r60i")) return "./products/soundcore-r60i-nc.svg";
-  if (text.includes("redmi") && text.includes("watch") && text.includes("5")) return "./products/redmi-watch-5-lite.svg";
+  if (text.includes("vivo") && text.includes("v70")) return "./products/vivo-v70.png";
+  if (text.includes("soundcore") && text.includes("r60i")) return "./products/soundcore-r60i-nc.png";
+  if (text.includes("redmi") && text.includes("watch") && text.includes("5")) return "./products/redmi-watch-5-lite.png";
   return "";
 }
 

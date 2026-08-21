@@ -11,7 +11,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer;-webkit-tap-high
 .section{margin-top:23px}.section-head{align-items:end;justify-content:space-between;gap:8px;margin-bottom:9px}.section-head h2,.page-heading h2{margin:4px 0 0;font-size:20px;line-height:1.15}.text-btn{border:0;background:none;color:#c2c4cb;padding:5px 0;font-size:9px;font-weight:800}.task{align-items:center;justify-content:space-between;gap:10px;padding:13px;margin:8px 0;border-radius:18px}.task-main{min-width:0;flex:1}.task-main b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-main span,.task-main small{display:block;color:#858891;margin-top:3px;font-size:8px}.task-right{text-align:right;flex:0 0 auto}.task-right strong{display:block;font-size:11px;margin-bottom:3px}.status-text{display:block;font-size:8px;margin-bottom:5px}.status-text.overdue,.status-text.overdue-partial{color:var(--danger)}
 .page-heading{margin-bottom:13px}.page-heading h2{font-size:24px}.tabs{display:flex;gap:5px;padding:5px;margin-bottom:9px;border-radius:17px;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{flex:0 0 auto;border:1px solid transparent;border-radius:12px;padding:8px 10px;background:transparent;color:#8b8e97;font-size:9px;font-weight:800}.tab.active{background:#f2f2f5;color:#101114;border-color:#fff;box-shadow:0 5px 14px #0003}.search-wrap{display:flex;align-items:center;gap:7px;padding:0 11px;margin-bottom:10px;border-radius:17px}.search-wrap>span{color:#777b85;font-size:16px}.search-wrap input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#eee;padding:12px 0;font-size:11px}.search-wrap input::placeholder{color:#686b74}.clear-search{width:24px;height:24px;border:0;border-radius:50%;background:#fff0f;color:#ccc}
 .contract-card{padding:13px;margin:9px 0;border-radius:21px}.contract-top{align-items:flex-start;justify-content:space-between;gap:8px}.contract-title-wrap{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.contract-title-copy{min-width:0}.contract-title-copy h3,.contract-top h3{margin:0;font-size:13px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.contract-title-copy span,.contract-top span:not(.pill){display:block;color:#858891;margin-top:3px;font-size:8px}.contract-top>.pill{flex:0 0 auto;max-width:84px;white-space:normal;text-align:center;padding:6px 7px}.progress{height:5px;background:#fff0d;border-radius:99px;margin:12px 0 7px;overflow:hidden}.progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#e9e9f0,#bdc5ff);box-shadow:0 0 12px #c5ccff22}.progress-meta{justify-content:space-between;gap:8px;color:#81848d;font-size:8px}.contract-info{display:flex;justify-content:space-between;gap:8px;color:#777a83;font-size:8px;margin-top:7px}.contract-bottom{align-items:center;justify-content:space-between;gap:7px;border-top:1px solid #fff1;margin-top:10px;padding-top:10px;color:#999ca5;font-size:8px}.button-row{display:flex;align-items:center;gap:5px}.mini-btn,.wide-btn{border:1px solid #ffffff1c;background:#ffffff0a;color:#eee;border-radius:12px;padding:7px 9px;font-size:8px;font-weight:800}.primary-mini{background:#f2f2f5;color:#101114;border-color:#f2f2f5}.ghost-mini{color:#bfc1c8}.paid-label{display:inline-flex;align-items:center;justify-content:center;color:#7f838d}
-.product-thumb{width:72px;height:72px;flex:0 0 72px;display:grid;place-items:center;overflow:hidden;border-radius:13px;background:#ffffff08;border:1px solid #fff2;box-shadow:inset 0 1px 0 #fff2,0 7px 16px #0003}.product-thumb-small{width:72px;height:72px;flex-basis:72px}.product-thumb-large{width:82px;height:82px;flex-basis:82px}.product-thumb img{width:100%;height:100%;object-fit:cover;padding:0;max-width:none}.product-thumb span{font-size:10px;color:#a8abb3;font-weight:800}.contract-detail-title{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.contract-detail-title>div:last-child{min-width:0}.contract-detail-title h2{font-size:20px;line-height:1.2;word-break:break-word}
+.product-thumb{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;overflow:hidden;border-radius:13px;background:#ffffff08;border:1px solid #fff2;box-shadow:inset 0 1px 0 #fff2,0 7px 16px #0003}.product-thumb-small{width:46px;height:46px;flex-basis:46px}.product-thumb-large{width:62px;height:62px;flex-basis:62px}.product-thumb img{width:100%;height:100%;object-fit:contain;padding:5px;max-width:none}.product-thumb span{font-size:10px;color:#a8abb3;font-weight:800}.contract-detail-title{display:flex;align-items:center;gap:9px;min-width:0;flex:1}.contract-detail-title>div:last-child{min-width:0}.contract-detail-title h2{font-size:20px;line-height:1.2;word-break:break-word}
 .customer{align-items:center;gap:11px;padding:13px;margin:8px 0;border-radius:19px}.avatar{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;overflow:hidden;border-radius:14px;background:#ffffff09;border:1px solid #fff2;font-weight:800}.avatar img{width:100%;height:100%;object-fit:cover}.customer-main{flex:1;min-width:0}.customer-main b,.customer-main span,.customer-main small{display:block}.customer-main b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.customer-main span{color:#888b94;margin-top:3px;font-size:9px}.customer-main small{color:#6e717a;margin-top:4px;font-size:8px}
 .empty{min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;border-radius:19px;color:#8c8f98}.empty-icon{font-size:28px;color:#858892}.empty b{font-size:12px;color:#ddd}.empty span{font-size:8px;color:#6e7179}
 .settings-card{padding:19px;border-radius:21px;margin-bottom:11px}.settings-card h2{font-size:21px;margin:5px 0}.settings-card p{color:#9497a0;line-height:1.6;font-size:10px}.data-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0}.data-summary div{background:#fff06;border:1px solid #fff1;border-radius:14px;padding:11px}.data-summary b,.data-summary span{display:block}.data-summary b{font-size:16px}.data-summary span{font-size:8px;color:#777a83;margin-top:3px}.wide-btn{width:100%;margin-top:7px;padding:12px}.danger{color:var(--danger)}.version-line{display:flex;justify-content:space-between;border-top:1px solid #fff1;padding-top:12px;color:#777a83;font-size:8px}.version-line b{color:#c7c8ce}
@@ -21,7 +21,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer;-webkit-tap-high
 .form-group-label{font-size:9px;color:#aeb0b8;margin:11px 0 6px}.form-group-label small{color:#6f727b}.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.photo-upload,.product-image-field{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #fff1;border-radius:15px;background:#fff06;margin:9px 0}.photo-preview,.product-image-preview{width:50px;height:50px;flex:0 0 50px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:#fff08;border:1px solid #fff1}.photo-preview img,.product-image-preview img{width:100%;height:100%;object-fit:cover}.product-image-copy{min-width:0;flex:1}.product-image-copy b,.product-image-copy span{display:block}.product-image-copy b{font-size:9px}.product-image-copy span{font-size:7px;color:#747780;margin-top:2px}.file-btn{display:inline-flex!important;align-items:center;justify-content:center;padding:7px 9px!important;margin:0!important;border-radius:11px!important;background:#fff0d!important;border:1px solid #fff1!important;color:#ddd!important;font-size:8px!important;font-weight:800}
 .receipt-paper{padding:17px;border-radius:17px;background:#f8f8fa;color:#17181b}.receipt-brand{text-align:center;font-weight:900;letter-spacing:2px;font-size:16px}.receipt-title{text-align:center;font-size:17px;font-weight:900;margin:6px 0 15px}.receipt-meta,.receipt-row,.receipt-total{justify-content:space-between;gap:15px;margin:7px 0;font-size:9px}.receipt-meta span,.receipt-row span{color:#666}.receipt-divider{border-top:1px dashed #aaa;margin:13px 0}.receipt-total{align-items:center;font-size:11px}.receipt-total strong{font-size:19px}.receipt-thanks{text-align:center;color:#777;font-size:8px;margin-top:17px}
 @media(min-width:600px){.topbar{padding-left:20px;padding-right:20px}.page{padding-left:20px;padding-right:20px}}
-@media(max-width:380px){.page{padding-left:10px;padding-right:10px}.hero{padding:18px}.hero-number{font-size:34px}.product-thumb,.product-thumb-small{width:64px;height:64px;flex-basis:64px}.contract-card{padding:12px}}
+@media(max-width:380px){.page{padding-left:10px;padding-right:10px}.hero{padding:18px}.hero-number{font-size:34px}.product-thumb,.product-thumb-small{width:44px;height:44px;flex-basis:44px}.contract-card{padding:12px}}
 
 /* =========================================================
    PAYPREMINIQ — iOS Graphite Dark UI System
@@ -315,4 +315,152 @@ button:focus-visible{outline:2px solid rgba(255,255,255,.45);outline-offset:2px}
   background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.12),rgba(255,255,255,.050) 45%,rgba(255,255,255,.020) 100%)!important;
   backdrop-filter:blur(30px) saturate(190%)!important;
   -webkit-backdrop-filter:blur(30px) saturate(190%)!important;
+}
+
+
+/* =========================================================
+   PAYPREMINIQ — SMOKY BLACK / GRAPHITE / CLEAR LIQUID GLASS
+   FINAL UI PASS — visual only. No data or application logic.
+========================================================= */
+
+:root{
+  --bg:#0b0c0e;
+  --surface:#141619;
+  --surface-2:#191b1e;
+  --text:#eeeeef;
+  --muted:#85888e;
+  --soft:#bfc1c5;
+  --line:rgba(255,255,255,.085);
+  --glass:rgba(255,255,255,.035);
+  --glass-strong:rgba(255,255,255,.055);
+  --glass-edge:rgba(255,255,255,.115);
+}
+
+html{
+  background:#0b0c0e;
+  color-scheme:dark;
+}
+
+body{
+  background:
+    radial-gradient(560px 420px at 5% -8%,rgba(150,150,150,.055),transparent 70%),
+    radial-gradient(520px 400px at 96% 12%,rgba(120,120,120,.040),transparent 72%),
+    linear-gradient(180deg,#101114 0%,#0b0c0e 48%,#090a0c 100%);
+}
+
+body::before{
+  background:
+    radial-gradient(320px 220px at 18% 34%,rgba(255,255,255,.014),transparent 72%),
+    radial-gradient(420px 280px at 82% 66%,rgba(255,255,255,.012),transparent 72%);
+}
+
+/* Clear glass cards: darker material, but visibly translucent. */
+.card,.settings-card,.search-wrap,.form-note,.payment-summary,
+.detail-status,.note-box,.subtle-box,.customer-detail div,
+.detail-grid div,.status-summary,.payment-row{
+  border-color:rgba(255,255,255,.075);
+  background:
+    radial-gradient(120% 85% at 12% 0%,rgba(255,255,255,.042),transparent 48%),
+    linear-gradient(145deg,rgba(255,255,255,.036),rgba(255,255,255,.014) 62%,rgba(255,255,255,.010));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.065),
+    0 14px 34px rgba(0,0,0,.30);
+  backdrop-filter:blur(28px) saturate(135%);
+  -webkit-backdrop-filter:blur(28px) saturate(135%);
+}
+
+/* Topbar / FAB / bottom nav are clearer than cards. */
+.topbar{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.105);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 16px 34px rgba(0,0,0,.32);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.icon-btn{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.050),rgba(255,255,255,.016));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 10px 24px rgba(0,0,0,.32);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+}
+
+.bottom-nav{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018));
+  border-color:rgba(255,255,255,.115);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    0 20px 46px rgba(0,0,0,.44);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+}
+
+.nav-item.active{
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.085);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.18);
+}
+
+.fab{
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.095),rgba(255,255,255,.042) 45%,rgba(255,255,255,.018) 100%);
+  border-color:rgba(255,255,255,.135);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    0 16px 34px rgba(0,0,0,.46),
+    0 0 0 1px rgba(255,255,255,.025);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.fab::after{
+  background:rgba(255,255,255,.075);
+}
+
+/* Keep the graphite palette neutral — no blue cast. */
+.hero:after{
+  background:radial-gradient(circle,rgba(190,190,195,.12),transparent 68%);
+}
+
+.progress i,
+.installment-progress i{
+  background:linear-gradient(90deg,#cfd0d4,#8f9298);
+  box-shadow:0 0 12px rgba(210,210,215,.10);
+}
+
+.product-thumb,.avatar{
+  background:rgba(255,255,255,.028);
+  border-color:rgba(255,255,255,.075);
+}
+
+/* Preserve semantic status colors while keeping their surfaces translucent. */
+.status-text.paid,.pill.paid{background:rgba(70,210,140,.075)}
+.status-text.partial,.pill.partial{background:rgba(255,190,70,.075)}
+.status-text.due,.status-text.due-soon,.pill.due,.pill.due-soon{background:rgba(150,160,175,.075)}
+.status-text.overdue,.status-text.overdue-partial,.pill.overdue,.pill.overdue-partial{background:rgba(255,80,90,.075)}
+.status-text.pending,.pill.pending{background:rgba(255,255,255,.040)}
+
+.installment-row{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.040),rgba(255,255,255,.014));
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+
+.modal{
+  background:
+    radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.045),transparent 52%),
+    rgba(16,18,21,.84);
+  border-color:rgba(255,255,255,.095);
+  backdrop-filter:blur(32px) saturate(140%);
+  -webkit-backdrop-filter:blur(32px) saturate(140%);
 }
