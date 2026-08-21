@@ -6,21 +6,24 @@
    so the project remains exactly six files.
 ========================================================= */
 
-/* ---------- Optional Firebase ----------
-   Firebase must never block the local-first app from booting.
-   GitHub Pages / offline / ad-blocked Firebase requests are allowed to fail.
---------------------------------------------------------------- */
-let firebaseReady = false;
-let auth = null;
-let db = null;
-let doc = null;
-let setDoc = null;
-let getDoc = null;
-let onSnapshot = null;
-let serverTimestamp = null;
-let signInWithEmailAndPassword = null;
-let createUserWithEmailAndPassword = null;
-let signOut = null;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+/* ---------- Firebase ---------- */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCGc0iB3dZe_CZe8vLfEuPwgnn5XCgI5gs",
@@ -31,33 +34,9 @@ const firebaseConfig = {
   appId: "1:469151372030:web:625320d22038fe42484baf"
 };
 
-async function initFirebase() {
-  try {
-    const [appMod, authMod, firestoreMod] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
-    ]);
-
-    const firebaseApp = appMod.initializeApp(firebaseConfig);
-    auth = authMod.getAuth(firebaseApp);
-    db = firestoreMod.getFirestore(firebaseApp);
-    doc = firestoreMod.doc;
-    setDoc = firestoreMod.setDoc;
-    getDoc = firestoreMod.getDoc;
-    onSnapshot = firestoreMod.onSnapshot;
-    serverTimestamp = firestoreMod.serverTimestamp;
-    signInWithEmailAndPassword = authMod.signInWithEmailAndPassword;
-    createUserWithEmailAndPassword = authMod.createUserWithEmailAndPassword;
-    signOut = authMod.signOut;
-    firebaseReady = true;
-    return true;
-  } catch (error) {
-    console.warn("PAYPREMINIQ: Firebase unavailable; continuing in local-first mode.", error);
-    firebaseReady = false;
-    return false;
-  }
-}
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 /* ---------- Local Storage ---------- */
 
@@ -191,9 +170,9 @@ function resetData() {
     localStorage.setItem(RECOVERY_KEY, JSON.stringify(current));
   }
 
-  // DATA-SAFE rule: never delete the Cloud copy as a side effect of a local
-  // reset. A local reset must never make Firebase forget the user's database.
-  // The next signed-in boot can restore the local database from Cloud.
+  // IMPORTANT: this is a LOCAL reset only. Never push an empty/default
+  // database to Firestore here. Firebase is the recovery source for the
+  // account, so clearing the browser must never destroy the cloud copy.
   localStorage.removeItem(STORAGE_KEY);
   return clone(DEFAULT_DATA);
 }
@@ -203,12 +182,12 @@ function resetData() {
 let unsubscribeRealtime = null;
 
 function currentUser() {
-  return auth?.currentUser || null;
+  return auth.currentUser;
 }
 
 function userDocumentRef() {
   const user = currentUser();
-  return firebaseReady && user && doc && db ? doc(db, "users", user.uid) : null;
+  return user ? doc(db, "users", user.uid) : null;
 }
 
 async function getCloudData() {
@@ -295,7 +274,6 @@ async function syncInitialData(localData) {
 
 function startRealtimeSync(onData) {
   stopRealtimeSync();
-  if (!firebaseReady || !auth || !db || !onSnapshot || !doc) return null;
 
   const ref = userDocumentRef();
   if (!ref) return () => {};
@@ -645,14 +623,13 @@ function openAuthModal() {
 function renderAuthButton() {
   const button = $("#cloudAccount");
   if (!button) return;
-  const user = auth?.currentUser || null;
+  const user = auth.currentUser;
   button.textContent = user ? "☁" : "☁";
   button.title = user ? `Cloud: ${user.email} — กดเพื่อออกจากระบบ` : "เข้าสู่ระบบ PAYPREMINIQ Cloud";
   button.setAttribute("aria-label", button.title);
 }
 
 async function bootstrapCloud() {
-  if (!firebaseReady || !auth || !db || !getDoc || !setDoc || !serverTimestamp) return;
   try {
     // Safety-first sync: populated local data is preserved. Cloud is used to
     // restore an empty device, or initialized from the device when empty.
@@ -1856,18 +1833,18 @@ function openContractDetail(id) {
       ? `<div class="payment-list">${payments.map((p, index) => {
           const installmentNo = Number(p.installmentNo || p.installment || p.no || 0) || (payments.length - index);
           return `<div class="payment-row">
-            <div>
-              <span>งวด ${installmentNo} · ${fmtDate(p.date)}</span>
-              <b>+ ${money(p.amount)}</b>
-              ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
-              ${p.note ? `<small>${esc(p.note)}</small>` : ""}
-            </div>
-            <div class="payment-row-actions">
-              <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
-              <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
-            </div>
-          </div>`;
+        <div>
+          <span>งวด ${installmentNo} · ${fmtDate(p.date)}</span>
+          <b>+ ${money(p.amount)}</b>
+          ${Number(p.penalty || 0) > 0 ? `<small class="payment-penalty">ค่าปรับ +${money(p.penalty)}</small>` : ""}
+          ${p.note ? `<small>${esc(p.note)}</small>` : ""}
+        </div>
+        <div class="payment-row-actions">`
         }).join("")}</div>`
+          <button type="button" class="mini-btn ghost-mini" data-edit-payment="${contract.id}" data-payment="${p.id}">แก้ไข</button>
+          <button type="button" class="mini-btn ghost-mini" data-receipt="${contract.id}" data-payment="${p.id}">ใบเสร็จ</button>
+        </div>
+      </div>`).join("")}</div>`
       : `<div class="subtle-box">ยังไม่มีประวัติการรับชำระ</div>`}`;
 
   $("#modalRoot").innerHTML = `<div class="overlay">
@@ -2124,14 +2101,15 @@ document.addEventListener("click", event => {
   if (event.target.id === "reset") {
     if (confirm("ล้างข้อมูล PAYPREMINIQ ทั้งหมดใช่หรือไม่? ระบบจะดาวน์โหลดไฟล์สำรองก่อนล้างข้อมูล")) {
       exportJson("before-reset");
+      // Reset only the browser copy. Firebase remains untouched so the
+      // account can restore the full database after a refresh/re-login.
+      stopRealtimeSync();
       data = resetData();
-      // IMPORTANT: do NOT sync the empty local reset to Firebase.
-      // Firebase is the recovery source for a cleared browser/device.
       contractFilter = "active";
       contractQuery = "";
       customerQuery = "";
       render();
-      alert("สำรองข้อมูลเดิมแล้ว และล้างข้อมูลเรียบร้อย");
+      alert("สำรองข้อมูลเดิมแล้ว และล้างข้อมูลในเครื่องเรียบร้อย — ข้อมูลบน Firebase ยังปลอดภัยและสามารถกู้กลับได้");
     }
   }
 });
@@ -2202,31 +2180,18 @@ $("#cloudAccount")?.addEventListener("click", async () => {
   }
 });
 
-render();
-
-// Firebase is enhancement-only. Never let it prevent the dashboard from rendering.
-(async () => {
-  const ready = await initFirebase();
+onAuthStateChanged(auth, async user => {
   renderAuthButton();
-  if (!ready || !auth) return;
 
-  try {
-    onAuthStateChanged(auth, async user => {
-      renderAuthButton();
-      if (!user) {
-        stopRealtimeSync();
-        return;
-      }
-      try {
-        await bootstrapCloud();
-      } catch (error) {
-        console.warn("PAYPREMINIQ cloud bootstrap skipped:", error);
-      }
-    });
-  } catch (error) {
-    console.warn("PAYPREMINIQ auth listener unavailable:", error);
+  if (!user) {
+    stopRealtimeSync();
+    return;
   }
-})();
+
+  await bootstrapCloud();
+});
+
+render();
 
 
 
